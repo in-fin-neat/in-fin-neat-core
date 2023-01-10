@@ -1,18 +1,16 @@
 from nordigen import NordigenClient
 import time
 from dataclasses import dataclass
-from typing import List
+from typing import List, Callable, Any
 import webbrowser
 from functools import reduce
-import subprocess
+from itertools import tee
+import subprocess, sys, os, signal
 import requests
-import os
-import signal
 import logging
 
 
 LOGGER = logging.getLogger(__name__)
-
 LOGGER.info = print
 
 
@@ -28,6 +26,16 @@ class NordigenAuth:
     secret_key: str
 
 
+def log_wrapper(func: Callable, *args, **kwargs) -> Any:
+    LOGGER.info(f"calling {func.__name__} with {kwargs}")
+    response = func(*args, **kwargs)
+    LOGGER.info(f"response from {func.__name__} is {response}")
+    return response
+
+
+EMPTY_TRANSACTIONS = {"booked": [], "pending": []}
+
+
 class BankClient:
     def __init__(self, auth: NordigenAuth, bank_details: List[BankDetails]):
         self.bank_details = bank_details
@@ -35,7 +43,7 @@ class BankClient:
             secret_id=auth.secret_id,
             secret_key=auth.secret_key,
         )
-        self._token = self._nordigen_client.generate_token()
+        self._token = log_wrapper(self._nordigen_client.generate_token)
         LOGGER.info("client initialized")
 
     def __enter__(self):
@@ -55,7 +63,8 @@ class BankClient:
 
     def _create_bank_sessions(self):
         institution_ids = map(
-            lambda bank_details: self._nordigen_client.institution.get_institution_id_by_name(
+            lambda bank_details: log_wrapper(
+                self._nordigen_client.institution.get_institution_id_by_name,
                 country=bank_details.country,
                 institution=bank_details.name,
             ),
@@ -63,12 +72,10 @@ class BankClient:
         )
 
         return map(
-            lambda institution_id: self._nordigen_client.initialize_session(
-                # institution id
+            lambda institution_id: log_wrapper(
+                self._nordigen_client.initialize_session,
                 institution_id=institution_id,
-                # redirect url after successful authentication
                 redirect_uri=f"http://localhost:8000/validations/{institution_id}",
-                # additional layer of unique ID defined by you
                 reference_id=f"Diego Personal PC {time.time()}"
             ),
             institution_ids
@@ -79,27 +86,45 @@ class BankClient:
 
     def _verify_authorizations(self):
         validations = []
-        while len(validations) < 3:
+
+        # TODO: validate content, not only length
+        while len(validations) < len(self.bank_details):
             validations = requests.get("http://localhost:8000/validations/", verify=False).json()
             LOGGER.info(validations)
             time.sleep(1)
 
     def _get_transactions_for_requisition(self, requisition_id):
-        accounts = self._nordigen_client.requisition.get_requisition_by_id(
-            requisition_id=init.requisition_id
+        LOGGER.info(f"getting transactions for requisition {requisition_id}")
+        accounts = log_wrapper(
+            self._nordigen_client.requisition.get_requisition_by_id,
+            requisition_id=requisition_id
         )
+
+        if len(accounts["accounts"]) == 0:
+            return EMPTY_TRANSACTIONS
+
         account_id = accounts["accounts"][0]
-        account = self._nordigen_client.account_api(id=account_id)
-        transactions = account.get_transactions()
+        account = log_wrapper(self._nordigen_client.account_api, id=account_id)
+        transactions = log_wrapper(account.get_transactions)
+        return transactions["transactions"]
 
     def get_transactions(self):
-        sessions = self._create_bank_sessions()
+        sessions = list(self._create_bank_sessions())
         for session in sessions:
             self._authorize_session(session)
+
         self._verify_authorizations()
 
+        LOGGER.info(sessions)
+
         return reduce(
-            lambda session: self._get_transactions_for_requisition(session.requisition_id),
-            sessions,
-            {"booked": [], "pending": []}
+            lambda all_transactons, transactions: {
+                "booked": all_transactons["booked"] + transactions["booked"],
+                "pending": all_transactons["pending"] + transactions["pending"]
+            },
+            map(
+                lambda session: self._get_transactions_for_requisition(session.requisition_id),
+                sessions,
+            ),
+            EMPTY_TRANSACTIONS
         )
