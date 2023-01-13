@@ -4,8 +4,9 @@ from dataclasses import dataclass
 from typing import List, Callable, Any
 import webbrowser
 from functools import reduce
-from itertools import tee
-import subprocess, sys, os, signal
+import subprocess
+import os
+import signal
 import requests
 import logging
 
@@ -48,8 +49,7 @@ class BankClient:
 
     def __enter__(self):
         self._web_authorizer_process = subprocess.Popen(
-            ["uvicorn", "authorizer:app", "--reload"],
-            preexec_fn=os.setpgrp
+            ["uvicorn", "authorizer:app", "--reload"], preexec_fn=os.setpgrp
         )
         LOGGER.info("uvicorn server started")
         return self
@@ -68,7 +68,7 @@ class BankClient:
                 country=bank_details.country,
                 institution=bank_details.name,
             ),
-            self.bank_details
+            self.bank_details,
         )
 
         return map(
@@ -76,9 +76,9 @@ class BankClient:
                 self._nordigen_client.initialize_session,
                 institution_id=institution_id,
                 redirect_uri=f"http://localhost:8000/validations/{institution_id}",
-                reference_id=f"Diego Personal PC {time.time()}"
+                reference_id=f"Diego Personal PC {time.time()}",
             ),
-            institution_ids
+            institution_ids,
         )
 
     def _authorize_session(self, session):
@@ -89,7 +89,9 @@ class BankClient:
 
         # TODO: validate content, not only length
         while len(validations) < len(self.bank_details):
-            validations = requests.get("http://localhost:8000/validations/", verify=False).json()
+            validations = requests.get(
+                "http://localhost:8000/validations/", verify=False
+            ).json()
             LOGGER.info(validations)
             time.sleep(1)
 
@@ -97,7 +99,7 @@ class BankClient:
         LOGGER.info(f"getting transactions for requisition {requisition_id}")
         accounts = log_wrapper(
             self._nordigen_client.requisition.get_requisition_by_id,
-            requisition_id=requisition_id
+            requisition_id=requisition_id,
         )
 
         if len(accounts["accounts"]) == 0:
@@ -120,11 +122,13 @@ class BankClient:
         return reduce(
             lambda all_transactons, transactions: {
                 "booked": all_transactons["booked"] + transactions["booked"],
-                "pending": all_transactons["pending"] + transactions["pending"]
+                "pending": all_transactons["pending"] + transactions["pending"],
             },
             map(
-                lambda session: self._get_transactions_for_requisition(session.requisition_id),
+                lambda session: self._get_transactions_for_requisition(
+                    session.requisition_id
+                ),
                 sessions,
             ),
-            EMPTY_TRANSACTIONS
+            EMPTY_TRANSACTIONS,
         )
