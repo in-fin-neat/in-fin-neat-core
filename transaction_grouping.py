@@ -22,6 +22,11 @@ WORDS_NOT_PART_OF_REFERENCE = [
     "*inet",
     "amanda trojan fenerich",
     "diego tsutsumi",
+    "ltd",
+    "limited",
+    "ireland",
+    ".com",
+    "refund from",
 ]
 
 
@@ -35,7 +40,9 @@ def _clean_reference(reference: str) -> str:
 
 
 def _get_group_name(group: List[str]) -> str:
-    all_references = chain(*[_clean_reference(reference).split(" ") for reference in group])
+    all_references = chain(
+        *[_clean_reference(reference).split(" ") for reference in group]
+    )
 
     sorted_references = sorted(
         reduce(
@@ -62,47 +69,55 @@ def _get_reference_similarity(ref1: str, ref2: str) -> float:
     ).ratio()
 
 
-def get_reference_groups(
+def _get_similarity_ratio(reference: str, group: List[str]) -> Dict:
+    return reduce(
+        lambda stat, ref_in_group: {
+            "min_ratio": min(
+                stat["min_ratio"],
+                _get_reference_similarity(reference, ref_in_group),
+            ),
+            "max_ratio": max(
+                stat["max_ratio"],
+                _get_reference_similarity(reference, ref_in_group),
+            ),
+        },
+        group,
+        {"min_ratio": 999, "max_ratio": -999},
+    )
+
+
+def group_transactions(
     transactions: List[Dict], grouping_type: TransactionGroupingType
-) -> Tuple[List, Dict]:
+) -> Tuple[List[Dict], List[List]]:
     if grouping_type != TransactionGroupingType.ReferenceSimilarity:
         raise NotImplementedError("grouping type not implemented")
 
-    groups = list()
-    references = list(map(lambda transaction: get_reference(transaction), transactions))
-    for reference in references:
+    groups = []
+    grouped_transactions = []
+    for transaction in transactions:
         added = False
+        reference = get_reference(transaction)
         for group_number, group in enumerate(groups):
-            similarity_stats = reduce(
-                lambda stat, ref_in_group: {
-                    "min_ratio": min(
-                        stat["min_ratio"],
-                        _get_reference_similarity(reference, ref_in_group),
-                    ),
-                    "max_ratio": max(
-                        stat["max_ratio"],
-                        _get_reference_similarity(reference, ref_in_group),
-                    ),
-                },
-                group,
-                {"min_ratio": 999, "max_ratio": -999},
-            )
-
+            similarity_ratio = _get_similarity_ratio(reference, group)
             if (
-                similarity_stats["min_ratio"] > 0.55
-                or similarity_stats["max_ratio"] > 0.8
+                similarity_ratio["min_ratio"] > 0.55
+                or similarity_ratio["max_ratio"] > 0.8
             ):
                 group.append(reference)
+                grouped_transactions.append(
+                    {**transaction, "groupNumber": group_number}
+                )
                 added = True
                 break
 
         if not added:
             groups.append([reference])
+            grouped_transactions.append({**transaction, "groupNumber": len(groups) - 1})
 
-    group_reference = {
-        reference: {"groupName": _get_group_name(group), "groupNumber": group_number}
-        for group_number, group in enumerate(groups)
-        for reference in group
-    }
-
-    return groups, group_reference
+    return [
+        {
+            **transaction,
+            "groupName": _get_group_name(groups[transaction["groupNumber"]]),
+        }
+        for transaction in grouped_transactions
+    ], groups

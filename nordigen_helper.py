@@ -63,3 +63,10 @@ def get_category_code(transaction: Dict) -> str:
         return transaction["merchantCategoryCode"]
 
     return "INVALID CATEGORY"
+
+
+def get_proprietary_bank_transaction_code(transaction: Dict) -> str:
+    if "proprietaryBankTransactionCode" in transaction:
+        return transaction["proprietaryBankTransactionCode"]
+
+    return "UNKNOWN_PROPRIETARY_TRANSACTION_CODE"
