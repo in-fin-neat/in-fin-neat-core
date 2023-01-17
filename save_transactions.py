@@ -19,7 +19,7 @@ with BankClient(
     ],
 ) as bank_client, open(f"data/transactions-{datetime.now().isoformat()}.json", "w") as output_file:
     transactions = bank_client.get_transactions()
-    output_file.write(json.dumps(transactions))
+    output_file.write(json.dumps(transactions, indent=4))
     print(
         f"""
         {len(transactions['booked']) + len(transactions['pending'])}

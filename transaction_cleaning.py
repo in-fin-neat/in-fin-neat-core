@@ -25,7 +25,8 @@ def _has_internal_transfer_features(transaction: Dict) -> bool:
     reference = get_reference(transaction)
     amount = get_amount(transaction)
     return amount != 0 and any(
-        transfer_ref in reference for transfer_ref in INTERNAL_TRANSFER_CUSTOM_REFERENCES
+        transfer_ref in reference
+        for transfer_ref in INTERNAL_TRANSFER_CUSTOM_REFERENCES
     )
 
 
@@ -43,15 +44,14 @@ def _get_internal_transfers(transactions: List[Dict]) -> List[Dict]:
         ):
             continue
 
-        matching_transactions = list(
-            filter(
-                lambda transaction: _has_internal_transfer_features(transaction)
-                and current_amount == -get_amount(transaction)
-                and abs(current_datetime - get_datetime(transaction))
-                < timedelta(days=BANK_PROCESSING_TIME_IN_DAYS),
-                transactions,
-            )
-        )
+        matching_transactions = [
+            transaction
+            for transaction in transactions
+            if _has_internal_transfer_features(transaction)
+            and current_amount == -get_amount(transaction)
+            and abs(current_datetime - get_datetime(transaction))
+            < timedelta(days=BANK_PROCESSING_TIME_IN_DAYS)
+        ]
 
         if len(matching_transactions) > 1:
             print(
@@ -78,9 +78,8 @@ def _get_internal_transfers(transactions: List[Dict]) -> List[Dict]:
 
 def remove_internal_transfers(transactions: List[Dict]) -> List[Dict]:
     internal_transfer_ids = set(chain(*_get_internal_transfers(transactions)))
-    return list(
-        filter(
-            lambda transaction: get_id(transaction) not in internal_transfer_ids,
-            transactions,
-        )
-    )
+    return [
+        transaction
+        for transaction in transactions
+        if get_id(transaction) not in internal_transfer_ids
+    ]

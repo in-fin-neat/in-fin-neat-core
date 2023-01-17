@@ -53,12 +53,11 @@ def is_expense(transaction: Dict) -> bool:
 def _filter_by_type(
     transactions: List[Dict], transaction_type: TransactionType
 ) -> List[Dict]:
-    return list(
-        filter(
-            lambda transaction: get_transaction_type(transaction) == transaction_type,
-            transactions,
-        )
-    )
+    return [
+        transaction
+        for transaction in transactions
+        if get_transaction_type(transaction) == transaction_type
+    ]
 
 
 def get_income_transactions(transactions: List[Dict]) -> List[Dict]:
