@@ -1,5 +1,6 @@
 from datetime import datetime
 import dateutil.parser
+from dateutil.tz import tzutc
 import uuid
 from typing import Dict
 
@@ -12,7 +13,8 @@ def get_datetime(transaction: Dict) -> datetime:
         return dateutil.parser.isoparse(transaction["bookingDatetime"])
 
     if "bookingDate" in transaction:
-        return dateutil.parser.parse(transaction["bookingDate"])
+        booking_date = dateutil.parser.parse(transaction["bookingDate"])
+        return booking_date.replace(tzinfo=booking_date.tzinfo or tzutc())
 
     raise Exception(f"no sort datetime found! {transaction}")
 
@@ -21,14 +23,17 @@ def get_amount(transaction: Dict) -> float:
     return float(transaction["transactionAmount"]["amount"])
 
 
+def _get_internal_transaction_id(transaction: Dict) -> str:
+    return transaction["internalTransactionId"]
+
+
 def get_id(transaction: Dict) -> str:
     if "transactionId" not in transaction:
         return str(
             uuid.uuid5(
                 uuid.UUID("29fff09d-93fa-49d2-a902-eb39f25ba953"),
-                get_datetime(transaction).isoformat()
+                _get_internal_transaction_id(transaction)
                 + str(get_amount(transaction))
-                + get_reference(transaction),
             )
         )
 

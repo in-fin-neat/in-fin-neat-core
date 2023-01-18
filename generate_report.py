@@ -13,6 +13,13 @@ from transaction_type import (
 from typing import Dict, List, Tuple, Callable, Any, Union
 from functools import partial
 from file_helper import write_json
+import dateutil
+import click
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.info = print
 
 
 def _add_group_category_field(transactions: List[Dict]) -> List[Dict]:
@@ -53,8 +60,12 @@ def _write_category_amounts(transactions: List[Dict], file_prefix: str):
         key=lambda transaction: transaction["customCategory"],
         add_dict=lambda transaction: {"category": transaction["customCategory"]},
     )
-    write_json(f"{file_prefix}_per_group.json", amount_per_group)
-    write_json(f"{file_prefix}_per_category.json", amount_per_category)
+    group_file_path = f"{file_prefix}_per_group.json"
+    category_file_path = f"{file_prefix}_per_category.json"
+    write_json(group_file_path, amount_per_group)
+    write_json(category_file_path, amount_per_category)
+    LOGGER.info(f"group amounts report written to: {group_file_path}")
+    LOGGER.info(f"category amounts report written to: {category_file_path}")
 
 
 def _write_balance(
@@ -63,8 +74,10 @@ def _write_balance(
     context: Dict,
     file_prefix: str,
 ):
+
+    file_path = f"{file_prefix}balance.json"
     write_json(
-        f"{file_prefix}balance.json",
+        file_path,
         {
             **context,
             "total_income": total_income,
@@ -72,6 +85,7 @@ def _write_balance(
             "total_balance": total_income + total_expense,
         },
     )
+    LOGGER.info(f"balance report written to: {file_path}")
 
 
 def _apply_processor(processor: Callable, processor_input: Union[Tuple, Any]) -> Any:
@@ -101,9 +115,8 @@ def _process_transactions(
 
 
 def write_reports(
-    raw_transactions: List[Dict], start_time: datetime, end_time: datetime
+    transactions: List[Dict], start_time: datetime, end_time: datetime
 ):
-    transactions = raw_transactions["booked"] + raw_transactions["pending"]
     (
         income_transactions,
         expense_transactions,
@@ -122,13 +135,37 @@ def write_reports(
     _write_category_amounts(expense_transactions, f"reports/{time_range}/expense")
 
 
-with open("data/transactions.json", "r") as transactions_file:
-    raw_transactions = json.loads(transactions_file.read())
-
-write_reports(
-    raw_transactions,
-    datetime(year=2022, month=11, day=1),
-    datetime(year=2022, month=11, day=30, hour=23, minute=59, second=59),
+@click.command()
+@click.option(
+    "-st",
+    "--start-time",
+    default="1970-01-01T00:00:00Z",
+    help="Start time of transactions filter in ISO 8061 format.",
 )
+@click.option(
+    "-et",
+    "--end-time",
+    default="2100-01-01T00:00:00Z",
+    help="End time of transactions filter in ISO 8061 format.",
+)
+@click.option(
+    "-tfp",
+    "--transactions-file-path",
+    default="data/merged_transactions.json",
+    help="File path of transactions fetched previously.",
+)
+def generate_reports(start_time: str, end_time: str, transactions_file_path: str):
+    """Generates reports from transactions according to the time filter specified."""
+    with open(transactions_file_path, "r") as transactions_file:
+        transactions = json.loads(transactions_file.read())
 
-print("reports written")
+    write_reports(
+        transactions,
+        dateutil.parser.isoparse(start_time),
+        dateutil.parser.isoparse(end_time),
+    )
+    LOGGER.info("finished reports")
+
+
+if __name__ == "__main__":
+    generate_reports()

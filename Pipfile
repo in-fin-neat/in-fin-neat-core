@@ -8,6 +8,7 @@ requests = "*"
 nordigen = "*"
 fastapi = "*"
 python-dateutil = "*"
+click = "*"
 
 [dev-packages]
 
