@@ -18,6 +18,7 @@ INCOME_TRANSACTION_CODES = ["Credit Transfer"]
 INCOME_REFERENCES = [
     "irish manufacturing research",
     "amazon development centre ireland",
+    "rent",
 ]
 
 

@@ -57,6 +57,8 @@ EXPENSE_CATEGORY_REFERENCES = {
         "delhi rasoi",
         "annie mays",
         "asahi",
+        "reyna",
+        "village inn",
     ],
     "entertainment": [
         "hilfiger",
