@@ -1,8 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 import uuid
 
 
-EXPENSE_CATEGORIES = {
+EXPENSE_CATEGORY_REFERENCES = {
     "house": [
         "woodies",
         "ikea",
@@ -56,7 +56,7 @@ EXPENSE_CATEGORIES = {
         "deliveroo",
         "delhi rasoi",
         "annie mays",
-        "asahi"
+        "asahi",
     ],
     "entertainment": [
         "hilfiger",
@@ -68,7 +68,7 @@ EXPENSE_CATEGORIES = {
         "ticketmaster",
         "kildare",
         "regatta",
-        "amazon prime"
+        "amazon prime",
     ],
     "health": ["boots", "drugstore", "pharmacy"],
     "transport": [
@@ -79,11 +79,12 @@ EXPENSE_CATEGORIES = {
         "partkingtag",
         "eflow.ie",
         "dublin airport car",
-        "payzone park"
+        "payzone park",
     ],
 }
 
-INCOME_CATEGORIES = {
+
+INCOME_CATEGORY_REFERENCES = {
     "salary amanda": ["irish manufacturing research", "imr"],
     "salary diego": ["amazon development centre ireland"],
     "income rent": [],
@@ -91,30 +92,42 @@ INCOME_CATEGORIES = {
 }
 
 
-def _get_categories_by_reference(references_by_category: List[Dict]) -> List[Dict]:
-    categories_by_reference = {}
-    for category, references in {**EXPENSE_CATEGORIES, **INCOME_CATEGORIES}.items():
-        for reference in references:
-            categories_by_reference = {**categories_by_reference, reference: category}
-    return categories_by_reference
+# Tags are manually included in each bank app
+# and have priority over plain transaction references
+EXPENSE_CATEGORY_TAGS = {
+    "house": ["#house"],
+    "travel": ["#travel"],
+    "groceries": ["#grocery"],
+    "restaurants/pubs": ["#restaurant", "#pub", "#coffee"],
+    "entertainment": ["#entertainment"],
+    "health": ["#health"],
+    "transport": ["#transport"],
+}
 
 
-def get_category(transaction_reference: str, fallback_reference: str) -> str:
-    cat_by_ref = _get_categories_by_reference(
-        {**EXPENSE_CATEGORIES, **INCOME_CATEGORIES}
-    )
+def _invert_index(category_index: Dict[str, List]) -> Dict[str, str]:
+    inverted_index = {}
+    for index, entries in category_index.items():
+        for entry in entries:
+            inverted_index = {**inverted_index, entry: index}
+    return inverted_index
 
+
+def _get_matching_categories(
+    reference: str, category_index: Dict[str, List]
+) -> List[str]:
     matching_categories = set()
-    for reference_keyword, category in cat_by_ref.items():
-        if reference_keyword in transaction_reference:
+    for reference_keyword, category in category_index.items():
+        if reference_keyword in reference:
             matching_categories.add(category)
 
-    sorted_matching_categories = sorted(matching_categories)
+    return matching_categories
 
-    if len(sorted_matching_categories) == 0:
-        print(f"""unknown category for reference {transaction_reference}""")
-        unknown_category_namespace = uuid.UUID("d705d48e-6833-4b96-bb38-5d95a197bb7f")
-        return f"unknown.{uuid.uuid5(unknown_category_namespace, fallback_reference)}"
+
+def _resolve_ambiguous_matching_categories(
+    matching_categories: List[str], transaction_reference: str
+) -> Optional[str]:
+    sorted_matching_categories = sorted(matching_categories)
 
     if len(sorted_matching_categories) > 1:
         print(
@@ -124,6 +137,46 @@ def get_category(transaction_reference: str, fallback_reference: str) -> str:
             matching categories {sorted_matching_categories}
             """
         )
-        pass
 
-    return sorted_matching_categories[0]
+    return next(iter(sorted_matching_categories), None)
+
+
+def _get_tag_matching_category(transaction_reference: str) -> Optional[str]:
+    tag_index = _invert_index(EXPENSE_CATEGORY_TAGS)
+    tag_matching_categories = _get_matching_categories(transaction_reference, tag_index)
+    return _resolve_ambiguous_matching_categories(
+        tag_matching_categories, transaction_reference
+    )
+
+
+def _get_group_ref_matching_category(group_references: List[str]) -> Optional[str]:
+    reference_index = _invert_index(
+        {**EXPENSE_CATEGORY_REFERENCES, **INCOME_CATEGORY_REFERENCES}
+    )
+    group_ref_matching_categories = _get_matching_categories(
+        "".join(group_references), reference_index
+    )
+    return _resolve_ambiguous_matching_categories(
+        group_ref_matching_categories, "".join(group_references)
+    )
+
+
+def _get_fallback_category(fallback_reference: str) -> str:
+    unknown_category_namespace = uuid.UUID("d705d48e-6833-4b96-bb38-5d95a197bb7f")
+    return f"unknown.{uuid.uuid5(unknown_category_namespace, fallback_reference)}"
+
+
+def get_category(
+    transaction_reference: str, group_references: List[str], fallback_reference: str
+) -> str:
+    """
+    Returns matching category given references in this order:
+    1. Categories matching tags
+    2. Categories matching group references
+    3. Fallback category using given fallback_reference
+    """
+    return (
+        _get_tag_matching_category(transaction_reference)
+        or _get_group_ref_matching_category(group_references)
+        or fallback_reference
+    )

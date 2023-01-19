@@ -4,6 +4,7 @@ from transaction_grouping import group_transactions, TransactionGroupingType
 from transaction_cleaning import remove_internal_transfers
 from transaction_filtering import transaction_datetime_filter
 from transaction_processing import sum_amount_by, sum_amount
+from nordigen_helper import get_reference
 from custom_categories import get_category
 from transaction_type import (
     get_expense_transactions,
@@ -31,7 +32,8 @@ def _add_group_category_field(transactions: List[Dict]) -> List[Dict]:
             lambda transaction: {
                 **transaction,
                 "customCategory": get_category(
-                    "".join(group_references[transaction["groupNumber"]]),
+                    get_reference(transaction),
+                    group_references[transaction["groupNumber"]],
                     fallback_reference=str(transaction["groupNumber"]),
                 ),
             },

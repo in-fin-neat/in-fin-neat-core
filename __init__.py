@@ -1,4 +1,5 @@
-import logging, sys
+import logging
+import sys
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
