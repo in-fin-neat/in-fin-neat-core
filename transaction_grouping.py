@@ -103,7 +103,7 @@ def group_transactions(
                 similarity_ratio["min_ratio"] > 0.55
                 or similarity_ratio["max_ratio"] > 0.8
             ):
-                group.append(reference)
+                group.add(reference)
                 grouped_transactions.append(
                     {**transaction, "groupNumber": group_number}
                 )
@@ -111,7 +111,7 @@ def group_transactions(
                 break
 
         if not added:
-            groups.append([reference])
+            groups.append({reference})
             grouped_transactions.append({**transaction, "groupNumber": len(groups) - 1})
 
     return [

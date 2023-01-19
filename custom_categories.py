@@ -121,12 +121,15 @@ def _get_matching_categories(
         if reference_keyword in reference:
             matching_categories.add(category)
 
-    return matching_categories
+    return list(matching_categories)
 
 
 def _resolve_ambiguous_matching_categories(
     matching_categories: List[str], transaction_reference: str
 ) -> Optional[str]:
+    if len(matching_categories) == 0:
+        return None
+
     sorted_matching_categories = sorted(matching_categories)
 
     if len(sorted_matching_categories) > 1:
@@ -138,7 +141,7 @@ def _resolve_ambiguous_matching_categories(
             """
         )
 
-    return next(iter(sorted_matching_categories), None)
+    return sorted_matching_categories[0]
 
 
 def _get_tag_matching_category(transaction_reference: str) -> Optional[str]:
@@ -178,5 +181,5 @@ def get_category(
     return (
         _get_tag_matching_category(transaction_reference)
         or _get_group_ref_matching_category(group_references)
-        or fallback_reference
+        or _get_fallback_category(fallback_reference)
     )
