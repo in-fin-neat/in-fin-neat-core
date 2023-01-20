@@ -1,7 +1,7 @@
 from nordigen import NordigenClient
 import time
 from dataclasses import dataclass
-from typing import List, Callable, Any
+from typing import List, Callable, Any, Dict
 import webbrowser
 from functools import reduce
 import subprocess
@@ -34,7 +34,7 @@ def log_wrapper(func: Callable, *args, **kwargs) -> Any:
     return response
 
 
-EMPTY_TRANSACTIONS = {"booked": [], "pending": []}
+EMPTY_TRANSACTIONS: Dict[str, List] = {"booked": [], "pending": []}
 
 
 class BankClient:

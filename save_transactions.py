@@ -1,4 +1,4 @@
-from bank_client import BankClient, BankDetails, NordigenAuth
+from .bank_client import BankClient, BankDetails, NordigenAuth
 from datetime import datetime
 import json
 import click

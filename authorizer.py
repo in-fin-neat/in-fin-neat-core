@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from typing import Set
 
 app = FastAPI()
-VALIDATIONS = set()
+VALIDATIONS: Set[str] = set()
+
 
 @app.get("/validations/")
 def get_validations():

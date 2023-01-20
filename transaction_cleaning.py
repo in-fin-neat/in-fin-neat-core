@@ -1,7 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from datetime import timedelta
 from itertools import chain
-from nordigen_helper import (
+from .nordigen_helper import (
     get_datetime,
     get_amount,
     get_id,
@@ -30,7 +30,7 @@ def _has_internal_transfer_features(transaction: Dict) -> bool:
     )
 
 
-def _get_internal_transfers(transactions: List[Dict]) -> List[Dict]:
+def _get_internal_transfers(transactions: List[Dict]) -> List[Tuple[str, str]]:
     skip_processing = set()
     internal_transfers = list()
     internal_transfer_ids = list()
@@ -70,7 +70,10 @@ def _get_internal_transfers(transactions: List[Dict]) -> List[Dict]:
         skip_processing.add(current_id)
         skip_processing.add(get_id(matching_transactions[0]))
         print(
-            f"internal transfer pair detected {current_transaction} {matching_transactions[0]}"
+            f"""
+            internal transfer pair detected
+            {current_transaction} {matching_transactions[0]}
+            """
         )
 
     return internal_transfer_ids

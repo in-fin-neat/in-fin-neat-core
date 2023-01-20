@@ -1,8 +1,8 @@
 from difflib import SequenceMatcher
-from nordigen_helper import get_reference
+from .nordigen_helper import get_reference
 from functools import reduce
 from enum import Enum
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Set, Iterable
 from itertools import chain
 import re
 
@@ -39,7 +39,7 @@ def _clean_reference(reference: str) -> str:
     return clean_reference
 
 
-def _get_group_name(group: List[str]) -> str:
+def _get_group_name(group: Iterable[str]) -> str:
     all_references = chain(
         *[_clean_reference(reference).split(" ") for reference in group]
     )
@@ -69,7 +69,7 @@ def _get_reference_similarity(ref1: str, ref2: str) -> float:
     ).ratio()
 
 
-def _get_similarity_ratio(reference: str, group: List[str]) -> Dict:
+def _get_similarity_ratio(reference: str, group: Iterable[str]) -> Dict:
     return reduce(
         lambda stat, ref_in_group: {
             "min_ratio": min(
@@ -88,11 +88,11 @@ def _get_similarity_ratio(reference: str, group: List[str]) -> Dict:
 
 def group_transactions(
     transactions: List[Dict], grouping_type: TransactionGroupingType
-) -> Tuple[List[Dict], List[List]]:
+) -> Tuple[List[Dict], List[Set[str]]]:
     if grouping_type != TransactionGroupingType.ReferenceSimilarity:
         raise NotImplementedError("grouping type not implemented")
 
-    groups = []
+    groups: List[Set[str]] = []
     grouped_transactions = []
     for transaction in transactions:
         added = False

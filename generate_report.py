@@ -1,19 +1,22 @@
 import json
 from datetime import datetime
-from transaction_grouping import group_transactions, TransactionGroupingType
-from transaction_cleaning import remove_internal_transfers
-from transaction_filtering import transaction_datetime_filter
-from transaction_processing import sum_amount_by, sum_amount
-from nordigen_helper import get_reference
-from custom_categories import get_category
-from transaction_type import (
+from .transaction_grouping import (
+    group_transactions,
+    TransactionGroupingType,
+)
+from .transaction_cleaning import remove_internal_transfers
+from .transaction_filtering import transaction_datetime_filter
+from .transaction_processing import sum_amount_by, sum_amount
+from .nordigen_helper import get_reference
+from .custom_categories import get_category
+from .transaction_type import (
     get_expense_transactions,
     get_income_transactions,
     get_unknown_type_transactions,
 )
+from .file_helper import write_json
 from typing import Dict, List, Tuple, Callable, Any, Union
 from functools import partial
-from file_helper import write_json
 import dateutil
 import click
 import logging
@@ -21,6 +24,8 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.info = print
+
+ProcessorDataType = Union[Any, Tuple[Any, Any]]
 
 
 def _add_group_category_field(transactions: List[Dict]) -> List[Dict]:
@@ -55,12 +60,17 @@ def _write_category_amounts(transactions: List[Dict], file_prefix: str):
     amount_per_group = sum_amount_by(
         transactions,
         key=lambda transaction: transaction["groupNumber"],
-        add_dict=lambda transaction: {"groupName": transaction["groupName"]},
+        extra_key_context=lambda group_number: {
+            "groupName": next(
+                transaction["groupName"]
+                for transaction in transactions
+                if transaction["groupNumber"] == group_number
+            )
+        },
     )
     amount_per_category = sum_amount_by(
         transactions,
         key=lambda transaction: transaction["customCategory"],
-        add_dict=lambda transaction: {"category": transaction["customCategory"]},
     )
     group_file_path = f"{file_prefix}_per_group.json"
     category_file_path = f"{file_prefix}_per_category.json"
@@ -71,8 +81,8 @@ def _write_category_amounts(transactions: List[Dict], file_prefix: str):
 
 
 def _write_balance(
-    total_income: List[Dict],
-    total_expense: List[Dict],
+    total_income: float,
+    total_expense: float,
     context: Dict,
     file_prefix: str,
 ):
@@ -90,7 +100,9 @@ def _write_balance(
     LOGGER.info(f"balance report written to: {file_path}")
 
 
-def _apply_processor(processor: Callable, processor_input: Union[Tuple, Any]) -> Any:
+def _apply_processor(
+    processor: Callable, processor_input: ProcessorDataType
+) -> ProcessorDataType:
     if isinstance(processor_input, tuple):
         return tuple(map(processor, processor_input))
     return processor(processor_input)
@@ -98,15 +110,15 @@ def _apply_processor(processor: Callable, processor_input: Union[Tuple, Any]) ->
 
 def _process_transactions(
     transactions: List[Dict], start_time: datetime, end_time: datetime
-) -> List[Dict]:
-    processors = [
+) -> Tuple[List[Dict], List[Dict]]:
+    processors: List[Callable] = [
         remove_internal_transfers,
         partial(transaction_datetime_filter, start_time, end_time),
         _split_by_type,
         _add_group_category_field,
     ]
 
-    processed_transactions = transactions
+    processed_transactions: ProcessorDataType = transactions
     for processor in processors:
         processed_transactions = _apply_processor(processor, processed_transactions)
 
@@ -116,9 +128,7 @@ def _process_transactions(
     return income_transactions, expense_transactions
 
 
-def write_reports(
-    transactions: List[Dict], start_time: datetime, end_time: datetime
-):
+def write_reports(transactions: List[Dict], start_time: datetime, end_time: datetime):
     (
         income_transactions,
         expense_transactions,

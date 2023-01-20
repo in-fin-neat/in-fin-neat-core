@@ -2,10 +2,10 @@ from datetime import datetime
 import dateutil.parser
 from dateutil.tz import tzutc
 import uuid
-from typing import Dict
+from typing import Dict, List, Any
 
 
-INVALID_REFERENCES = ["", "-", None, []]
+INVALID_REFERENCES: List[Any] = ["", "-", None, []]
 
 
 def get_datetime(transaction: Dict) -> datetime:

@@ -1,13 +1,13 @@
 from unittest.mock import patch, call
 from pytest import fixture
-from bank_client import BankClient, BankDetails, NordigenAuth
+from personal_finances.bank_client import BankClient, BankDetails, NordigenAuth
 import signal
 from nordigen.types import RequisitionDto
 
 
 @fixture(autouse=True)
 def nordigen_client_mock():
-    with patch("bank_client.NordigenClient") as mock:
+    with patch("personal_finances.bank_client.NordigenClient") as mock:
         mock.return_value.generate_token.__name__ = "generate_token"
 
         mock.return_value.institution.get_institution_id_by_name.__name__ = (
@@ -74,19 +74,19 @@ def nordigen_client_mock():
 
 @fixture(autouse=True)
 def subprocess_mock():
-    with patch("bank_client.subprocess") as mock:
+    with patch("personal_finances.bank_client.subprocess") as mock:
         yield mock
 
 
 @fixture(autouse=True)
 def os_mock():
-    with patch("bank_client.os") as mock:
+    with patch("personal_finances.bank_client.os") as mock:
         yield mock
 
 
 @fixture(autouse=True)
 def requests_mock():
-    with patch("bank_client.requests") as mock:
+    with patch("personal_finances.bank_client.requests") as mock:
         mock.get.return_value.json.side_effect = [
             [],
             [],
@@ -100,19 +100,19 @@ def requests_mock():
 
 @fixture(autouse=True)
 def webbrowser_mock():
-    with patch("bank_client.webbrowser") as mock:
+    with patch("personal_finances.bank_client.webbrowser") as mock:
         yield mock
 
 
 @fixture(autouse=True)
 def time_mock():
-    with patch("bank_client.time") as mock:
+    with patch("personal_finances.bank_client.time") as mock:
         mock.time.side_effect = [1, 2, 3, 4]
         yield mock
 
 
 def test_bank_client_initializes(nordigen_client_mock):
-    bank_client = BankClient(
+    BankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),

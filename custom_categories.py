@@ -1,8 +1,8 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 import uuid
 
 
-EXPENSE_CATEGORY_REFERENCES = {
+EXPENSE_CATEGORY_REFERENCES: Dict[str, List[str]] = {
     "house": [
         "woodies",
         "ikea",
@@ -86,7 +86,7 @@ EXPENSE_CATEGORY_REFERENCES = {
 }
 
 
-INCOME_CATEGORY_REFERENCES = {
+INCOME_CATEGORY_REFERENCES: Dict[str, List[str]] = {
     "salary amanda": ["irish manufacturing research", "imr"],
     "salary diego": ["amazon development centre ireland"],
     "income rent": [],
@@ -108,7 +108,7 @@ EXPENSE_CATEGORY_TAGS = {
 
 
 def _invert_index(category_index: Dict[str, List]) -> Dict[str, str]:
-    inverted_index = {}
+    inverted_index: Dict = {}
     for index, entries in category_index.items():
         for entry in entries:
             inverted_index = {**inverted_index, entry: index}
@@ -116,9 +116,9 @@ def _invert_index(category_index: Dict[str, List]) -> Dict[str, str]:
 
 
 def _get_matching_categories(
-    reference: str, category_index: Dict[str, List]
+    reference: str, category_index: Dict[str, str]
 ) -> List[str]:
-    matching_categories = set()
+    matching_categories: Set[str] = set()
     for reference_keyword, category in category_index.items():
         if reference_keyword in reference:
             matching_categories.add(category)
