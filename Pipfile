@@ -17,3 +17,9 @@ pytest-cov = "*"
 
 [requires]
 python_version = "3.11"
+
+[scripts]
+tests = "python -m pytest ./personal_finances/tests/"
+generate_reports = "python -m personal_finances.generate_reports"
+fetch_transactions = "python -m personal_finances.fetch_transactions"
+merge_transactions = "python -m personal_finances.merge_transactions"

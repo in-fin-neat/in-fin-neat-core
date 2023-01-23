@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Dict, Any, Callable
-from .nordigen_helper import get_datetime
+from ..bank_interface.nordigen_fields import get_datetime
 
 
 def _filter_by_property_range(

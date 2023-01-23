@@ -49,7 +49,8 @@ class BankClient:
 
     def __enter__(self):
         self._web_authorizer_process = subprocess.Popen(
-            ["uvicorn", "authorizer:app", "--reload"], preexec_fn=os.setpgrp
+            ["uvicorn", "personal_finances.bank_interface.authorizer:app", "--reload"],
+            preexec_fn=os.setpgrp,
         )
         LOGGER.info("uvicorn server started")
         return self

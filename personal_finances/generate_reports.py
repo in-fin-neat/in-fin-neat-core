@@ -1,20 +1,20 @@
 import json
 from datetime import datetime
-from .transaction_grouping import (
+from personal_finances.transaction.grouping import (
     group_transactions,
     TransactionGroupingType,
 )
-from .transaction_cleaning import remove_internal_transfers
-from .transaction_filtering import transaction_datetime_filter
-from .transaction_processing import sum_amount_by, sum_amount
-from .nordigen_helper import get_reference
-from .custom_categories import get_category
-from .transaction_type import (
+from personal_finances.transaction.cleaning import remove_internal_transfers
+from personal_finances.transaction.filtering import transaction_datetime_filter
+from personal_finances.transaction.processing import sum_amount_by, sum_amount
+from personal_finances.transaction.type import (
     get_expense_transactions,
     get_income_transactions,
     get_unknown_type_transactions,
 )
-from .file_helper import write_json
+from personal_finances.bank_interface.nordigen_fields import get_reference
+from personal_finances.transaction.categorizing import get_category
+from personal_finances.file_helper import write_json
 from typing import Dict, List, Tuple, Callable, Any, Union
 from functools import partial
 import dateutil

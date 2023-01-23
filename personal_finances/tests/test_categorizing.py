@@ -2,7 +2,7 @@ import pytest
 import re
 from typing import List
 
-from ..custom_categories import get_category
+from personal_finances.transaction.categorizing import get_category
 
 
 UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"

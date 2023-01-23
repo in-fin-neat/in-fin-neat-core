@@ -1,4 +1,8 @@
-from .bank_client import BankClient, BankDetails, NordigenAuth
+from personal_finances.bank_interface.client import (
+    BankClient,
+    BankDetails,
+    NordigenAuth,
+)
 from datetime import datetime
 import json
 import click
@@ -11,7 +15,7 @@ def _read_secrets():
 
 
 @click.command()
-def save_transactions():
+def fetch_transactions():
     """
     Authenticates Nordigen API to pre-configured banks,
     gets transactions and saves into 'data' folder.
@@ -38,4 +42,4 @@ def save_transactions():
 
 
 if __name__ == "__main__":
-    save_transactions()
+    fetch_transactions()

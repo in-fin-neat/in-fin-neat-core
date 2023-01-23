@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple
 from datetime import timedelta
 from itertools import chain
-from .nordigen_helper import (
+from ..bank_interface.nordigen_fields import (
     get_datetime,
     get_amount,
     get_id,

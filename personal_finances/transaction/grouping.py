@@ -1,5 +1,5 @@
 from difflib import SequenceMatcher
-from .nordigen_helper import get_reference
+from ..bank_interface.nordigen_fields import get_reference
 from functools import reduce
 from enum import Enum
 from typing import Tuple, List, Dict, Set, Iterable

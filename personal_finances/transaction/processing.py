@@ -1,6 +1,6 @@
 from typing import Dict, List, Callable, Hashable, TypedDict, Any, NotRequired
 from functools import reduce
-from .nordigen_helper import (
+from ..bank_interface.nordigen_fields import (
     get_amount,
     get_reference,
 )

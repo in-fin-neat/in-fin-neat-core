@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Dict, List
-from .nordigen_helper import (
+from ..bank_interface.nordigen_fields import (
     get_amount,
     get_proprietary_bank_transaction_code,
     get_reference,

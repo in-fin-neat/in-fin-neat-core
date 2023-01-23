@@ -5,8 +5,8 @@ import re
 from typing import List, Dict
 import json
 from collections import defaultdict
-from .file_helper import write_json
-from .nordigen_helper import get_id
+from personal_finances.file_helper import write_json
+from personal_finances.bank_interface.nordigen_fields import get_id
 
 
 LOGGER = logging.getLogger(__name__)
@@ -53,10 +53,11 @@ def merge_transactions():
     transaction_files = (
         transaction_file
         for transaction_file in os.listdir("data/")
-        if re.match(r"transaction.*\.json", transaction_file) is not None
+        if re.match(r"transactions.*\.json", transaction_file) is not None
     )
     transactions = []
     for transaction_file in transaction_files:
+        print(f"opening {transaction_file}")
         with open(f"data/{transaction_file}", "r") as t_file:
             file_transactions = json.loads(t_file.read())
             transactions += file_transactions["booked"]
