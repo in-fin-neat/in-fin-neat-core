@@ -2,13 +2,43 @@ from datetime import datetime
 import dateutil.parser
 from dateutil.tz import tzutc
 import uuid
-from typing import Dict, List, Any
+from typing import List, Any, TypedDict, NotRequired
+from ..transaction.definition import SimpleTransaction
 
 
 INVALID_REFERENCES: List[Any] = ["", "-", None, []]
 
 
-def get_datetime(transaction: Dict) -> datetime:
+class TransactionAmount(TypedDict):
+    amount: float
+    currency: str
+
+
+class NordigenTransaction(TypedDict):
+    bookingDatetime: str
+    bookingDate: str
+    internalTransactionId: str
+    transactionAmount: TransactionAmount
+    transactionId: NotRequired[str]
+    creditorName: NotRequired[str]
+    debtorName: NotRequired[str]
+    remittanceInformationUnstructured: NotRequired[str]
+    remittanceInformationUnstructuredArray: NotRequired[List[str]]
+    merchantCategoryCode: NotRequired[str]
+    proprietaryBankTransactionCode: NotRequired[str]
+
+
+def as_simple_transaction(transaction: NordigenTransaction) -> SimpleTransaction:
+    return {
+        "transactionId": get_id(transaction),
+        "datetime": get_datetime(transaction),
+        "amount": get_amount(transaction),
+        "referenceText": get_reference(transaction),
+        "bankTransactionCode": get_proprietary_bank_transaction_code(transaction),
+    }
+
+
+def get_datetime(transaction: NordigenTransaction) -> datetime:
     if "bookingDatetime" in transaction:
         return dateutil.parser.isoparse(transaction["bookingDatetime"])
 
@@ -19,15 +49,15 @@ def get_datetime(transaction: Dict) -> datetime:
     raise Exception(f"no sort datetime found! {transaction}")
 
 
-def get_amount(transaction: Dict) -> float:
+def get_amount(transaction: NordigenTransaction) -> float:
     return float(transaction["transactionAmount"]["amount"])
 
 
-def _get_internal_transaction_id(transaction: Dict) -> str:
+def _get_internal_transaction_id(transaction: NordigenTransaction) -> str:
     return transaction["internalTransactionId"]
 
 
-def get_id(transaction: Dict) -> str:
+def get_id(transaction: NordigenTransaction) -> str:
     if "transactionId" not in transaction:
         return str(
             uuid.uuid5(
@@ -40,7 +70,7 @@ def get_id(transaction: Dict) -> str:
     return transaction["transactionId"]
 
 
-def get_reference(transaction: Dict) -> str:
+def get_reference(transaction: NordigenTransaction) -> str:
     reference_keys = {
         "creditorName": lambda _: _,
         "remittanceInformationUnstructured": lambda _: _,
@@ -53,7 +83,7 @@ def get_reference(transaction: Dict) -> str:
     transaction_references = set()
     for reference_key, transformation in reference_keys.items():
         if reference_key in transaction:
-            reference_value = transformation(transaction[reference_key])
+            reference_value = transformation(transaction[reference_key])  # type: ignore
             if reference_value not in INVALID_REFERENCES:
                 transaction_references.add(reference_value.lower())
 
@@ -63,14 +93,14 @@ def get_reference(transaction: Dict) -> str:
     return ", ".join(sorted(transaction_references))
 
 
-def get_category_code(transaction: Dict) -> str:
+def get_category_code(transaction: NordigenTransaction) -> str:
     if "merchantCategoryCode" in transaction:
         return transaction["merchantCategoryCode"]
 
     return "INVALID CATEGORY"
 
 
-def get_proprietary_bank_transaction_code(transaction: Dict) -> str:
+def get_proprietary_bank_transaction_code(transaction: NordigenTransaction) -> str:
     if "proprietaryBankTransactionCode" in transaction:
         return transaction["proprietaryBankTransactionCode"]
 

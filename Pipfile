@@ -24,7 +24,7 @@ python_version = "3.11"
 
 [scripts]
 tests = "bash -c 'python -m pytest --cov=personal_finances --cov-report=xml --cov-report=term tests/ && diff-cover coverage.xml --compare-branch=origin/master && diff-quality --violations=flake8 --compare-branch=origin/master'"
-build = "bash -c 'mypy .; flake8 .'"
+build = "bash -c 'mypy . --warn-unused-configs --disallow-subclassing-any --disallow-untyped-calls --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs --disallow-untyped-decorators --warn-redundant-casts --warn-unused-ignores --warn-return-any --no-implicit-reexport --strict-equality --strict-concatenate && flake8 .'"
 format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"

@@ -1,9 +1,6 @@
-from typing import Dict, List, Callable, Hashable, TypedDict, Any, NotRequired
+from typing import Dict, List, Callable, Hashable, TypedDict, Any, NotRequired, Iterable
 from functools import reduce
-from ..bank_interface.nordigen_fields import (
-    get_amount,
-    get_reference,
-)
+from .definition import SimpleTransaction
 
 
 class ReferencesAmountByKey(TypedDict, total=False):
@@ -16,7 +13,8 @@ EMPTY_AMOUNT_OBJECT: ReferencesAmountByKey = {"amount": 0.0, "references": []}
 
 
 def _reduce_amount_and_references_by_key(
-    transactions: List[Dict], key: Callable[[Dict], Hashable]
+    transactions: Iterable[SimpleTransaction],
+    key: Callable[[SimpleTransaction], Hashable],
 ) -> Dict[Hashable, ReferencesAmountByKey]:
     return reduce(
         lambda amount_per_key, transaction: {
@@ -24,9 +22,9 @@ def _reduce_amount_and_references_by_key(
             key(transaction): {
                 "key": key(transaction),
                 "amount": amount_per_key[key(transaction)]["amount"]
-                + get_amount(transaction),
+                + transaction["amount"],
                 "references": amount_per_key[key(transaction)]["references"]
-                + [get_reference(transaction)],
+                + [transaction["referenceText"]],
             },
         },
         transactions,
@@ -35,9 +33,9 @@ def _reduce_amount_and_references_by_key(
 
 
 def sum_amount_by(
-    transactions: List[Dict],
+    transactions: Iterable[SimpleTransaction],
     *,
-    key: Callable[[Dict], Hashable],
+    key: Callable[[SimpleTransaction], Hashable],
     extra_key_context: Callable[[Hashable], Dict[str, Any]] = lambda _: {},
 ) -> List[Dict]:
     return list(
@@ -51,9 +49,9 @@ def sum_amount_by(
     )
 
 
-def sum_amount(transactions: List[Dict]) -> float:
+def sum_amount(transactions: Iterable[SimpleTransaction]) -> float:
     return reduce(
-        lambda total, transaction: get_amount(transaction) + total,
+        lambda total, transaction: transaction["amount"] + total,
         transactions,
         0.0,
     )

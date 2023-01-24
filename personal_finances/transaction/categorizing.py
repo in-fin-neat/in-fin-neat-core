@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set
 import uuid
 
 
@@ -154,7 +154,7 @@ def _get_tag_matching_category(transaction_reference: str) -> Optional[str]:
     )
 
 
-def _get_group_ref_matching_category(group_references: List[str]) -> Optional[str]:
+def _get_group_ref_matching_category(group_references: Iterable[str]) -> Optional[str]:
     reference_index = _invert_index(
         {**EXPENSE_CATEGORY_REFERENCES, **INCOME_CATEGORY_REFERENCES}
     )
@@ -172,7 +172,7 @@ def _get_fallback_category(fallback_reference: str) -> str:
 
 
 def get_category(
-    transaction_reference: str, group_references: List[str], fallback_reference: str
+    transaction_reference: str, group_references: Iterable[str], fallback_reference: str
 ) -> str:
     """
     Returns matching category given references in this order:

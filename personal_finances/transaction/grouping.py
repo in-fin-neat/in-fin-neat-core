@@ -1,8 +1,8 @@
 from difflib import SequenceMatcher
-from ..bank_interface.nordigen_fields import get_reference
+from .definition import SimpleTransaction
 from functools import reduce
 from enum import Enum
-from typing import Tuple, List, Dict, Set, Iterable
+from typing import Tuple, List, Dict, Set, Iterable, NotRequired, cast
 from itertools import chain
 import re
 
@@ -86,17 +86,22 @@ def _get_similarity_ratio(reference: str, group: Iterable[str]) -> Dict:
     )
 
 
+class GroupedTransaction(SimpleTransaction):
+    groupNumber: int
+    groupName: NotRequired[str]
+
+
 def group_transactions(
-    transactions: List[Dict], grouping_type: TransactionGroupingType
-) -> Tuple[List[Dict], List[Set[str]]]:
+    transactions: List[SimpleTransaction], grouping_type: TransactionGroupingType
+) -> Tuple[List[GroupedTransaction], List[Set[str]]]:
     if grouping_type != TransactionGroupingType.ReferenceSimilarity:
         raise NotImplementedError("grouping type not implemented")
 
     groups: List[Set[str]] = []
-    grouped_transactions = []
+    grouped_transactions: List[GroupedTransaction] = []
     for transaction in transactions:
         added = False
-        reference = get_reference(transaction)
+        reference = transaction["referenceText"]
         for group_number, group in enumerate(groups):
             similarity_ratio = _get_similarity_ratio(reference, group)
             if (
@@ -105,19 +110,25 @@ def group_transactions(
             ):
                 group.add(reference)
                 grouped_transactions.append(
-                    {**transaction, "groupNumber": group_number}
+                    cast(
+                        GroupedTransaction, {**transaction, "groupNumber": group_number}
+                    )
                 )
                 added = True
                 break
 
         if not added:
             groups.append({reference})
-            grouped_transactions.append({**transaction, "groupNumber": len(groups) - 1})
+            grouped_transactions.append(
+                cast(
+                    GroupedTransaction, {**transaction, "groupNumber": len(groups) - 1}
+                )
+            )
 
     return [
-        {
+        cast(GroupedTransaction, {
             **transaction,
             "groupName": _get_group_name(groups[transaction["groupNumber"]]),
-        }
+        })
         for transaction in grouped_transactions
     ], groups

@@ -1,8 +1,9 @@
 import os
 import json
+from typing import Any
 
 
-def create_dirs(path):
+def create_dirs(path: str) -> None:
     if "/" in path:
         try:
             directories = "/".join(path.split("/")[:-1])
@@ -11,7 +12,7 @@ def create_dirs(path):
             pass
 
 
-def write_json(path, content):
+def write_json(path: str, content: Any) -> None:
     create_dirs(path)
     with open(path, "w") as o_file:
         o_file.write(json.dumps(content, indent=4))

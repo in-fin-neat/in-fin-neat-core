@@ -1,10 +1,6 @@
 from enum import Enum
-from typing import Dict, List
-from ..bank_interface.nordigen_fields import (
-    get_amount,
-    get_proprietary_bank_transaction_code,
-    get_reference,
-)
+from typing import List
+from .definition import SimpleTransaction
 
 
 EXPENSE_TRANSACTION_CODES = [
@@ -28,7 +24,7 @@ class TransactionType(Enum):
     UNKOWN = "UNKNOWN"
 
 
-def get_transaction_type(transaction: Dict) -> TransactionType:
+def get_transaction_type(transaction: SimpleTransaction) -> TransactionType:
     if is_income(transaction):
         return TransactionType.INCOME
     if is_expense(transaction):
@@ -36,24 +32,23 @@ def get_transaction_type(transaction: Dict) -> TransactionType:
     return TransactionType.UNKOWN
 
 
-def is_income(transaction: Dict) -> bool:
-    amount = get_amount(transaction)
-    reference = get_reference(transaction)
-
-    return amount > 0 and any(
-        income_reference in reference for income_reference in INCOME_REFERENCES
+def is_income(transaction: SimpleTransaction) -> bool:
+    return transaction["amount"] > 0 and any(
+        income_reference in transaction["referenceText"]
+        for income_reference in INCOME_REFERENCES
     )
 
 
-def is_expense(transaction: Dict) -> bool:
-    amount = get_amount(transaction)
-    transaction_code = get_proprietary_bank_transaction_code(transaction)
-    return amount < 0 and transaction_code in EXPENSE_TRANSACTION_CODES
+def is_expense(transaction: SimpleTransaction) -> bool:
+    return (
+        transaction["amount"] < 0
+        and transaction["bankTransactionCode"] in EXPENSE_TRANSACTION_CODES
+    )
 
 
 def _filter_by_type(
-    transactions: List[Dict], transaction_type: TransactionType
-) -> List[Dict]:
+    transactions: List[SimpleTransaction], transaction_type: TransactionType
+) -> List[SimpleTransaction]:
     return [
         transaction
         for transaction in transactions
@@ -61,13 +56,19 @@ def _filter_by_type(
     ]
 
 
-def get_income_transactions(transactions: List[Dict]) -> List[Dict]:
+def get_income_transactions(
+    transactions: List[SimpleTransaction],
+) -> List[SimpleTransaction]:
     return _filter_by_type(transactions, TransactionType.INCOME)
 
 
-def get_expense_transactions(transactions: List[Dict]) -> List[Dict]:
+def get_expense_transactions(
+    transactions: List[SimpleTransaction],
+) -> List[SimpleTransaction]:
     return _filter_by_type(transactions, TransactionType.EXPENSE)
 
 
-def get_unknown_type_transactions(transactions: List[Dict]) -> List[Dict]:
+def get_unknown_type_transactions(
+    transactions: List[SimpleTransaction],
+) -> List[SimpleTransaction]:
     return _filter_by_type(transactions, TransactionType.UNKOWN)

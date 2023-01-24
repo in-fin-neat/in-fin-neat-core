@@ -3,19 +3,20 @@ from personal_finances.bank_interface.client import (
     BankDetails,
     NordigenAuth,
 )
+from typing import Tuple
 from datetime import datetime
 import json
 import click
 
 
-def _read_secrets():
+def _read_secrets() -> Tuple[str, str]:
     with open("/home/tsutsumi/Downloads/nord-diego.json", "r") as f:
         secrets = json.loads(f.read())
     return secrets["secret_id"], secrets["secret_key"]
 
 
 @click.command()
-def fetch_transactions():
+def fetch_transactions() -> None:
     """
     Authenticates Nordigen API to pre-configured banks,
     gets transactions and saves into 'data' folder.

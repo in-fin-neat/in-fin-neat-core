@@ -1,4 +1,4 @@
-from unittest.mock import patch, call
+from unittest.mock import patch, call, Mock
 from pytest import fixture
 from personal_finances.bank_interface.client import (
     BankClient,
@@ -7,10 +7,11 @@ from personal_finances.bank_interface.client import (
 )
 import signal
 from nordigen.types import RequisitionDto
+from typing import Generator
 
 
 @fixture(autouse=True)
-def nordigen_client_mock():
+def nordigen_client_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.bank_interface.client.NordigenClient") as mock:
         mock.return_value.generate_token.__name__ = "generate_token"
 
@@ -77,19 +78,19 @@ def nordigen_client_mock():
 
 
 @fixture(autouse=True)
-def subprocess_mock():
+def subprocess_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.bank_interface.client.subprocess") as mock:
         yield mock
 
 
 @fixture(autouse=True)
-def os_mock():
+def os_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.bank_interface.client.os") as mock:
         yield mock
 
 
 @fixture(autouse=True)
-def requests_mock():
+def requests_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.bank_interface.client.requests") as mock:
         mock.get.return_value.json.side_effect = [
             [],
@@ -103,19 +104,19 @@ def requests_mock():
 
 
 @fixture(autouse=True)
-def webbrowser_mock():
+def webbrowser_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.bank_interface.client.webbrowser") as mock:
         yield mock
 
 
 @fixture(autouse=True)
-def time_mock():
+def time_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.bank_interface.client.time") as mock:
         mock.time.side_effect = [1, 2, 3, 4]
         yield mock
 
 
-def test_bank_client_initializes(nordigen_client_mock):
+def test_bank_client_initializes(nordigen_client_mock: Mock) -> None:
     BankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
@@ -128,7 +129,7 @@ def test_bank_client_initializes(nordigen_client_mock):
     )
 
 
-def test_bank_client_scope(subprocess_mock, os_mock):
+def test_bank_client_scope(subprocess_mock: Mock, os_mock: Mock) -> None:
     with BankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
@@ -147,8 +148,8 @@ def test_bank_client_scope(subprocess_mock, os_mock):
 
 
 def test_bank_client_calls_nordigen_client(
-    nordigen_client_mock, requests_mock, webbrowser_mock
-):
+    nordigen_client_mock: Mock, requests_mock: Mock, webbrowser_mock: Mock
+) -> None:
     nordigen_client = nordigen_client_mock.return_value
     with BankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),

@@ -22,7 +22,7 @@ def test_get_category(
     group_references: List[str],
     fallback_reference: str,
     expected_pattern: str,
-):
+) -> None:
     assert (
         re.match(
             expected_pattern,

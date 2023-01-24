@@ -1,8 +1,10 @@
 import json
 from datetime import datetime
+from personal_finances.bank_interface.nordigen_adapter import as_simple_transaction
 from personal_finances.transaction.grouping import (
     group_transactions,
     TransactionGroupingType,
+    GroupedTransaction,
 )
 from personal_finances.transaction.cleaning import remove_internal_transfers
 from personal_finances.transaction.filtering import transaction_datetime_filter
@@ -12,42 +14,50 @@ from personal_finances.transaction.type import (
     get_income_transactions,
     get_unknown_type_transactions,
 )
-from personal_finances.bank_interface.nordigen_fields import get_reference
+from personal_finances.transaction.definition import SimpleTransaction
 from personal_finances.transaction.categorizing import get_category
 from personal_finances.file_helper import write_json
-from typing import Dict, List, Tuple, Callable, Any, Union
+from typing import Dict, List, Tuple, Callable, Any, Union, cast
 from functools import partial
-import dateutil
+import dateutil.parser
 import click
 import logging
 
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.info = print
 
 ProcessorDataType = Union[Any, Tuple[Any, Any]]
 
 
-def _add_group_category_field(transactions: List[Dict]) -> List[Dict]:
+class CategorizedTransaction(GroupedTransaction):
+    customCategory: str
+
+
+def _add_group_category_field(
+    transactions: List[SimpleTransaction],
+) -> List[CategorizedTransaction]:
     grouped_transactions, group_references = group_transactions(
         transactions, TransactionGroupingType.ReferenceSimilarity
     )
     return list(
         map(
-            lambda transaction: {
-                **transaction,
-                "customCategory": get_category(
-                    get_reference(transaction),
-                    group_references[transaction["groupNumber"]],
-                    fallback_reference=str(transaction["groupNumber"]),
-                ),
-            },
+            lambda transaction: cast(
+                CategorizedTransaction,
+                {
+                    **transaction,
+                    "customCategory": get_category(
+                        transaction["referenceText"],
+                        group_references[transaction["groupNumber"]],
+                        fallback_reference=str(transaction["groupNumber"]),
+                    ),
+                },
+            ),
             grouped_transactions,
         )
     )
 
 
-def _split_by_type(transactions: List[Dict]) -> Tuple[List, List]:
+def _split_by_type(transactions: List[SimpleTransaction]) -> Tuple[List, List]:
     income_transactions = get_income_transactions(transactions)
     expense_transactions = get_expense_transactions(
         transactions
@@ -56,10 +66,14 @@ def _split_by_type(transactions: List[Dict]) -> Tuple[List, List]:
     return income_transactions, expense_transactions
 
 
-def _write_category_amounts(transactions: List[Dict], file_prefix: str):
+def _write_category_amounts(
+    transactions: List[CategorizedTransaction], file_prefix: str
+) -> None:
     amount_per_group = sum_amount_by(
         transactions,
-        key=lambda transaction: transaction["groupNumber"],
+        key=lambda transaction: cast(CategorizedTransaction, transaction)[
+            "groupNumber"
+        ],
         extra_key_context=lambda group_number: {
             "groupName": next(
                 transaction["groupName"]
@@ -70,7 +84,9 @@ def _write_category_amounts(transactions: List[Dict], file_prefix: str):
     )
     amount_per_category = sum_amount_by(
         transactions,
-        key=lambda transaction: transaction["customCategory"],
+        key=lambda transaction: cast(CategorizedTransaction, transaction)[
+            "customCategory"
+        ],
     )
     group_file_path = f"{file_prefix}_per_group.json"
     category_file_path = f"{file_prefix}_per_category.json"
@@ -85,7 +101,7 @@ def _write_balance(
     total_expense: float,
     context: Dict,
     file_prefix: str,
-):
+) -> None:
 
     file_path = f"{file_prefix}balance.json"
     write_json(
@@ -109,8 +125,8 @@ def _apply_processor(
 
 
 def _process_transactions(
-    transactions: List[Dict], start_time: datetime, end_time: datetime
-) -> Tuple[List[Dict], List[Dict]]:
+    transactions: List[SimpleTransaction], start_time: datetime, end_time: datetime
+) -> Tuple[List[CategorizedTransaction], List[CategorizedTransaction]]:
     processors: List[Callable] = [
         remove_internal_transfers,
         partial(transaction_datetime_filter, start_time, end_time),
@@ -128,13 +144,15 @@ def _process_transactions(
     return income_transactions, expense_transactions
 
 
-def write_reports(transactions: List[Dict], start_time: datetime, end_time: datetime):
+def write_reports(
+    transactions: List[SimpleTransaction], start_time: datetime, end_time: datetime
+) -> None:
     (
         income_transactions,
         expense_transactions,
     ) = _process_transactions(transactions, start_time, end_time)
-    total_income = sum_amount(income_transactions)
-    total_expense = sum_amount(expense_transactions)
+    total_income = sum_amount(cast(List[SimpleTransaction], income_transactions))
+    total_expense = sum_amount(cast(List[SimpleTransaction], expense_transactions))
     time_range = f"{start_time.isoformat()}_{end_time.isoformat()}"
 
     _write_balance(
@@ -166,10 +184,17 @@ def write_reports(transactions: List[Dict], start_time: datetime, end_time: date
     default="data/merged_transactions.json",
     help="File path of transactions fetched previously.",
 )
-def generate_reports(start_time: str, end_time: str, transactions_file_path: str):
+def generate_reports(
+    start_time: str, end_time: str, transactions_file_path: str
+) -> None:
     """Generates reports from transactions according to the time filter specified."""
     with open(transactions_file_path, "r") as transactions_file:
-        transactions = json.loads(transactions_file.read())
+        transactions: List[SimpleTransaction] = list(
+            map(
+                as_simple_transaction,
+                json.loads(transactions_file.read()),
+            )
+        )
 
     write_reports(
         transactions,

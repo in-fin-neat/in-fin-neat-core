@@ -2,18 +2,19 @@ import click
 import logging
 import os
 import re
-from typing import List, Dict
+from typing import List
 import json
 from collections import defaultdict
 from personal_finances.file_helper import write_json
-from personal_finances.bank_interface.nordigen_fields import get_id
+from .bank_interface.nordigen_adapter import NordigenTransaction, get_id
 
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.info = print
 
 
-def _get_deduped_transaction(dupe_transactions: List[Dict]) -> Dict:
+def _get_deduped_transaction(
+    dupe_transactions: List[NordigenTransaction],
+) -> NordigenTransaction:
     if len(dupe_transactions) == 1:
         return dupe_transactions[0]
 
@@ -25,7 +26,9 @@ def _get_deduped_transaction(dupe_transactions: List[Dict]) -> Dict:
     )[0]
 
 
-def dedupe_transactions(transactions: List[Dict]) -> List[Dict]:
+def dedupe_transactions(
+    transactions: List[NordigenTransaction],
+) -> List[NordigenTransaction]:
     transactions_by_id = defaultdict(list)
     for transaction in transactions:
         transactions_by_id[get_id(transaction)].append(transaction)
@@ -38,7 +41,7 @@ def dedupe_transactions(transactions: List[Dict]) -> List[Dict]:
 
 
 @click.command()
-def merge_transactions():
+def merge_transactions() -> None:
     """
     Merges files with pattern 'data/transactions*.json' into
     'data/merged_transactions.json'.

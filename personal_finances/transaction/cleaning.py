@@ -1,12 +1,7 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 from datetime import timedelta
 from itertools import chain
-from ..bank_interface.nordigen_fields import (
-    get_datetime,
-    get_amount,
-    get_id,
-    get_reference,
-)
+from .definition import SimpleTransaction
 
 
 INTERNAL_TRANSFER_CUSTOM_REFERENCES = [
@@ -21,23 +16,23 @@ INTERNAL_TRANSFER_CUSTOM_REFERENCES = [
 BANK_PROCESSING_TIME_IN_DAYS = 4
 
 
-def _has_internal_transfer_features(transaction: Dict) -> bool:
-    reference = get_reference(transaction)
-    amount = get_amount(transaction)
-    return amount != 0 and any(
-        transfer_ref in reference
+def _has_internal_transfer_features(transaction: SimpleTransaction) -> bool:
+    return transaction["amount"] != 0 and any(
+        transfer_ref in transaction["referenceText"]
         for transfer_ref in INTERNAL_TRANSFER_CUSTOM_REFERENCES
     )
 
 
-def _get_internal_transfers(transactions: List[Dict]) -> List[Tuple[str, str]]:
+def _get_internal_transfers(
+    transactions: List[SimpleTransaction],
+) -> List[Tuple[str, str]]:
     skip_processing = set()
     internal_transfers = list()
     internal_transfer_ids = list()
     for current_transaction in transactions:
-        current_id = get_id(current_transaction)
-        current_amount = get_amount(current_transaction)
-        current_datetime = get_datetime(current_transaction)
+        current_id = current_transaction["transactionId"]
+        current_amount = current_transaction["amount"]
+        current_datetime = current_transaction["datetime"]
 
         if current_id in skip_processing or not _has_internal_transfer_features(
             current_transaction
@@ -48,8 +43,8 @@ def _get_internal_transfers(transactions: List[Dict]) -> List[Tuple[str, str]]:
             transaction
             for transaction in transactions
             if _has_internal_transfer_features(transaction)
-            and current_amount == -get_amount(transaction)
-            and abs(current_datetime - get_datetime(transaction))
+            and current_amount == -transaction["amount"]
+            and abs(current_datetime - transaction["datetime"])
             < timedelta(days=BANK_PROCESSING_TIME_IN_DAYS)
         ]
 
@@ -66,9 +61,11 @@ def _get_internal_transfers(transactions: List[Dict]) -> List[Tuple[str, str]]:
             continue
 
         internal_transfers.append((current_transaction, matching_transactions[0]))
-        internal_transfer_ids.append((current_id, get_id(matching_transactions[0])))
+        internal_transfer_ids.append(
+            (current_id, matching_transactions[0]["transactionId"])
+        )
         skip_processing.add(current_id)
-        skip_processing.add(get_id(matching_transactions[0]))
+        skip_processing.add(matching_transactions[0]["transactionId"])
         print(
             f"""
             internal transfer pair detected
@@ -79,10 +76,12 @@ def _get_internal_transfers(transactions: List[Dict]) -> List[Tuple[str, str]]:
     return internal_transfer_ids
 
 
-def remove_internal_transfers(transactions: List[Dict]) -> List[Dict]:
+def remove_internal_transfers(
+    transactions: List[SimpleTransaction],
+) -> List[SimpleTransaction]:
     internal_transfer_ids = set(chain(*_get_internal_transfers(transactions)))
     return [
         transaction
         for transaction in transactions
-        if get_id(transaction) not in internal_transfer_ids
+        if transaction["transactionId"] not in internal_transfer_ids
     ]
