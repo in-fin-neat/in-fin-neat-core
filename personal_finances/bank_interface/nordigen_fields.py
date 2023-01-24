@@ -33,7 +33,7 @@ def get_id(transaction: Dict) -> str:
             uuid.uuid5(
                 uuid.UUID("29fff09d-93fa-49d2-a902-eb39f25ba953"),
                 _get_internal_transaction_id(transaction)
-                + str(get_amount(transaction))
+                + str(get_amount(transaction)),
             )
         )
 

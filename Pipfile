@@ -14,12 +14,18 @@ click = "*"
 pytest = "*"
 mypy = "*"
 pytest-cov = "*"
+types-requests = "*"
+types-python-dateutil = "*"
+flake8 = "*"
+diff-cover = "*"
 
 [requires]
 python_version = "3.11"
 
 [scripts]
-tests = "python -m pytest tests/"
+tests = "bash -c 'python -m pytest --cov=personal_finances --cov-report=xml --cov-report=term tests/ && diff-cover coverage.xml --compare-branch=github/master && diff-quality --violations=flake8 --compare-branch=github/master'"
+build = "bash -c 'mypy .; flake8 .'"
+format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"
 merge_transactions = "python -m personal_finances.merge_transactions"

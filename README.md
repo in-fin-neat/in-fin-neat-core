@@ -1,3 +1,4 @@
+# Using
 ## Fetching transactions from banks
 This command collects transactions in the past 90 days from configured bank accounts, and creates a new transactions file in the `data/` folder.
 Browser tabs will be open for bank authentication and authorization.
@@ -17,5 +18,7 @@ Three reports will be saved into `/reports` folder:
 ### Command
 `pipenv run generate_reports`
 
-# Test
-`pipenv run tests`
+# Developing
+1. `pipenv run tests`
+1. `pipenv run build`
+1. `pipenv run format`
