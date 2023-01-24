@@ -23,7 +23,7 @@ diff-cover = "*"
 python_version = "3.11"
 
 [scripts]
-tests = "bash -c 'python -m pytest --cov=personal_finances --cov-report=xml --cov-report=term tests/ && diff-cover coverage.xml --compare-branch=github/master && diff-quality --violations=flake8 --compare-branch=github/master'"
+tests = "bash -c 'python -m pytest --cov=personal_finances --cov-report=xml --cov-report=term tests/ && diff-cover coverage.xml --compare-branch=origin/master && diff-quality --violations=flake8 --compare-branch=origin/master'"
 build = "bash -c 'mypy .; flake8 .'"
 format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
