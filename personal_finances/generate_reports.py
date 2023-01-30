@@ -151,8 +151,8 @@ def write_reports(
         income_transactions,
         expense_transactions,
     ) = _process_transactions(transactions, start_time, end_time)
-    total_income = sum_amount(cast(List[SimpleTransaction], income_transactions))
-    total_expense = sum_amount(cast(List[SimpleTransaction], expense_transactions))
+    total_income = sum_amount(income_transactions)
+    total_expense = sum_amount(expense_transactions)
     time_range = f"{start_time.isoformat()}_{end_time.isoformat()}"
 
     _write_balance(

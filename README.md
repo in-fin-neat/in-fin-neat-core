@@ -15,12 +15,15 @@ Reports are generated for a given time period selected using two parameters `--s
 
 Three reports will be saved into `/reports` folder:
 1. Balance report, showing total income, total expenses and the final balance.
-2. A income report by category
-3. An expense report by category
+1. A income report by category
+1. An expense report by category
+
 #### Command
-`pipenv run generate_reports`
+`pipenv run generate_reports --start-time <ISO8061 DATETIME> --end-time <ISO8061 DATETIME>`
 
 ## Developing
-1. `pipenv run tests`
+1. `gh repo clone diegotsutsumi/personal_finances`
 1. `pipenv run build`
+1. `pipenv run tests`
 1. `pipenv run format`
+1. `gh pr create --title "brand new feature"`
