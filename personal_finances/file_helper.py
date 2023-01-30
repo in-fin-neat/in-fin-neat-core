@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Any
+from typing import Any, Callable, Optional
 
 
 def create_dirs(path: str) -> None:
@@ -12,7 +12,13 @@ def create_dirs(path: str) -> None:
             pass
 
 
-def write_json(path: str, content: Any) -> None:
+def write_json(
+    path: str, content: Any, json_converter: Optional[Callable] = str
+) -> None:
     create_dirs(path)
     with open(path, "w") as o_file:
-        o_file.write(json.dumps(content, indent=4))
+        o_file.write(json.dumps(
+            content,
+            indent=4,
+            default=json_converter
+        ))

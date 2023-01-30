@@ -90,8 +90,14 @@ def _write_category_amounts(
     )
     group_file_path = f"{file_prefix}_per_group.json"
     category_file_path = f"{file_prefix}_per_category.json"
+    categorized_transactions_file_path = f"{file_prefix}_categorized_transactions.json"
     write_json(group_file_path, amount_per_group)
     write_json(category_file_path, amount_per_category)
+    write_json(
+        categorized_transactions_file_path,
+        transactions,
+        json_converter=lambda dt_obj: dt_obj.isoformat(),
+    )
     LOGGER.info(f"group amounts report written to: {group_file_path}")
     LOGGER.info(f"category amounts report written to: {category_file_path}")
 
