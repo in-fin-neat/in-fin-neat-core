@@ -1,0 +1,51 @@
+* DONE Get to know how much the house is costing                  :milestone:
+CLOSED: [2023-01-18 Wed 10:46]
+
+* DONE Have a central finance management among multiple banks     :milestone:
+CLOSED: [2023-01-18 Wed 10:51]
+
+* BLOCKED Reports to guide where to spend this and next month     :milestone:
+- Note taken on [2023-01-30 Mon 16:04] \\
+  blocked on user story [[budget]]
+
+* BLOCKED Retrospective Reports to clarify what went good and wrong :milestone:
+- Note taken on [2023-01-30 Mon 16:05] \\
+  blocked on user story [[budget]]
+
+* TODO Publish to friends                                         :milestone:
+DEADLINE: <2023-02-13 Mon>
+
+* TODO Add a "purchase" layer on top of transactions to manage refunds :milestone:
+DEADLINE: <2023-02-27 Mon>
+
+* TODO Monetize the solution                                      :milestone:
+DEADLINE: <2023-05-27 Mon>
+
+* DONE [#C] Add tags to override categories                      :user:story:
+CLOSED: [2023-02-03 Fri 13:16]
+
+* TODO [#A] Implement report on how far each category is from their <<budget>> :critical:user:story:
+
+* TODO [#B] Generate daily reports automatically (long term credentials) :user:story:
+
+* DONE [#C] Write a README.md                                     :user:story:
+CLOSED: [2023-01-24 Tue 10:25]
+
+* DONE [#C] Publish to Github                                     :user:story:
+CLOSED: [2023-01-24 Tue 10:25]
+
+* TODO [#C] Implement trend analysis                              :user:story:
+
+* DONE [#C] Add mypy checks and pytest coverage                 :tech:story:
+CLOSED: [2023-01-20 Fri 12:21]
+
+* TODO [#C] Solve LOGGER configurations                         :tech:story:
+
+* TODO [#A] Implement the custom configurations for categories and grouping :critical:user:story:
+
+* TODO [#B] Increase unit test coverage to 90%                  :tech:story:
+
+* TODO [#C] Validate content when validating authorizations     :tech:story:
+
+* TODO [#A] User configuration and Reports accessible through web API :user:story:
+** TODO Design Reports and data acquisition APIs
