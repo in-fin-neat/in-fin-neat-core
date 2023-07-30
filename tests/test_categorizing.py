@@ -11,8 +11,13 @@ UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 @pytest.mark.parametrize(
     "transaction_reference,group_references,fallback_reference,expected_pattern",
     [
-        ("abc", ["abc", "cde"], "some-fallback-ref", rf"unknown\.{UUID_REGEX}"),
-        ("abc", ["mortgage", "cde"], "some-fallback-ref", "house"),
+        (
+            "abc",
+            ["abc", "cde"],
+            "some-fallback-ref",
+            rf"some-fallback-ref\.{UUID_REGEX}",
+        ),
+        ("abc", ["ikea", "cde"], "some-fallback-ref", "house"),
         ("#coffee", ["mortgage", "cde"], "some-fallback-ref", "restaurants/pubs"),
         ("abc", ["dealz", "odeon"], "some-fallback-ref", "entertainment"),
     ],

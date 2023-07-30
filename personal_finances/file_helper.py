@@ -17,8 +17,4 @@ def write_json(
 ) -> None:
     create_dirs(path)
     with open(path, "w") as o_file:
-        o_file.write(json.dumps(
-            content,
-            indent=4,
-            default=json_converter
-        ))
+        o_file.write(json.dumps(content, indent=4, default=json_converter))

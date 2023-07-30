@@ -126,9 +126,12 @@ def group_transactions(
             )
 
     return [
-        cast(GroupedTransaction, {
-            **transaction,
-            "groupName": _get_group_name(groups[transaction["groupNumber"]]),
-        })
+        cast(
+            GroupedTransaction,
+            {
+                **transaction,
+                "groupName": _get_group_name(groups[transaction["groupNumber"]]),
+            },
+        )
         for transaction in grouped_transactions
     ], groups

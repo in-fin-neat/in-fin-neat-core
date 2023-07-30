@@ -1,0 +1,40 @@
+  @startuml
+  hide circle
+  skinparam monochrome true
+
+  class BankTransaction {
+          id
+          amount
+          datetime
+          refText
+  }
+
+  class BankTransactionReference {
+          bankTransactionId
+          netTransaction
+  }
+
+  note bottom of BankTransactionReference
+          netTransaction field cannot be null
+  end note
+
+  class NetTransaction {
+          id
+          amount
+          datetime
+          refText
+          --
+          dateTimeRule: First | Last
+  }
+
+  BankTransaction -- BankTransactionReference: 1 to 1
+  NetTransaction *-- BankTransactionReference: 1 to many
+
+  note bottom on link
+          Every BankTransactionReference is part of one
+          and only one NetTransaction.
+          There are no BankTransactionsReferences not associated
+          with one NetTransaction.
+  end note
+
+  @enduml

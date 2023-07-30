@@ -168,8 +168,10 @@ def _get_group_ref_matching_category(group_references: Iterable[str]) -> Optiona
 
 def _get_fallback_category(fallback_reference: str) -> str:
     unknown_category_namespace = uuid.UUID("d705d48e-6833-4b96-bb38-5d95a197bb7f")
-    return f"{fallback_reference}." + \
-        f"{uuid.uuid5(unknown_category_namespace, fallback_reference)}"
+    return (
+        f"{fallback_reference}."
+        + f"{uuid.uuid5(unknown_category_namespace, fallback_reference)}"
+    )
 
 
 def get_category(
