@@ -60,7 +60,7 @@ def merge_transactions() -> None:
     )
     transactions = []
     for transaction_file in transaction_files:
-        print(f"opening {transaction_file}")
+        LOGGER.info(f"opening {transaction_file}")
         with open(f"data/{transaction_file}", "r") as t_file:
             file_transactions = json.loads(t_file.read())
             transactions += file_transactions["booked"]

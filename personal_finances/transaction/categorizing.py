@@ -1,5 +1,9 @@
 from typing import Dict, Iterable, List, Optional, Set
 import uuid
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 EXPENSE_CATEGORY_REFERENCES: Dict[str, List[str]] = {
@@ -135,7 +139,7 @@ def _resolve_ambiguous_matching_categories(
     sorted_matching_categories = sorted(matching_categories)
 
     if len(sorted_matching_categories) > 1:
-        print(
+        LOGGER.info(
             f"""
             ambiguous matching categories, selecting the first
             transaction_reference {transaction_reference}

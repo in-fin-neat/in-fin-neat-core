@@ -3,10 +3,14 @@ from personal_finances.bank_interface.client import (
     BankDetails,
     NordigenAuth,
 )
+import logging
 from typing import Tuple
 from datetime import datetime
 import json
 import click
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _read_secrets() -> Tuple[str, str]:
@@ -34,7 +38,7 @@ def fetch_transactions() -> None:
     ) as output_file:
         transactions = bank_client.get_transactions()
         output_file.write(json.dumps(transactions, indent=4))
-        print(
+        LOGGER.info(
             f"""
             {len(transactions['booked']) + len(transactions['pending'])}
             transactions were written

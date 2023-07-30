@@ -2,6 +2,10 @@ from typing import List, Tuple
 from datetime import timedelta
 from itertools import chain
 from .definition import SimpleTransaction
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 INTERNAL_TRANSFER_CUSTOM_REFERENCES = [
@@ -49,7 +53,7 @@ def _get_internal_transfers(
         ]
 
         if len(matching_transactions) > 1:
-            print(
+            LOGGER.info(
                 f"""
                 ambiguous possible transfers:
                 {current_transaction} {matching_transactions}
@@ -66,7 +70,7 @@ def _get_internal_transfers(
         )
         skip_processing.add(current_id)
         skip_processing.add(matching_transactions[0]["transactionId"])
-        print(
+        LOGGER.info(
             f"""
             internal transfer pair detected
             {current_transaction} {matching_transactions[0]}
