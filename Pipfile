@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 requests = "*"
 nordigen = "*"
-fastapi = "*"
+fastapi = "0.100.1"
 python-dateutil = "*"
 click = "*"
 
