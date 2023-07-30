@@ -54,7 +54,9 @@ def get_amount(transaction: NordigenTransaction) -> float:
 
 
 def _get_internal_transaction_id(transaction: NordigenTransaction) -> str:
-    return transaction["internalTransactionId"]
+    if "internalTransactionId" in transaction:
+        return transaction["internalTransactionId"]
+    return str(uuid.uuid4())
 
 
 def get_id(transaction: NordigenTransaction) -> str:

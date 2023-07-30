@@ -48,7 +48,7 @@ def _add_group_category_field(
                     "customCategory": get_category(
                         transaction["referenceText"],
                         group_references[transaction["groupNumber"]],
-                        fallback_reference=str(transaction["groupNumber"]),
+                        fallback_reference=transaction["groupName"],
                     ),
                 },
             ),
