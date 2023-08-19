@@ -9,6 +9,7 @@ nordigen = "*"
 fastapi = "0.100.1"
 python-dateutil = "*"
 click = "*"
+uvicorn = "*"
 
 [dev-packages]
 pytest = "*"
@@ -18,6 +19,7 @@ types-requests = "*"
 types-python-dateutil = "*"
 flake8 = "*"
 diff-cover = "*"
+black = "*"
 
 [requires]
 python_version = "3.11"
