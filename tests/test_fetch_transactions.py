@@ -1,9 +1,4 @@
-import pytest
-import re
-import io
 import os
-from typing import List
-
 from personal_finances.fetch_transactions import _ensure_data_path_exist
 
 
