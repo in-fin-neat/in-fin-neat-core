@@ -24,6 +24,7 @@ def _ensure_data_path_exist() -> None:
     if not os.path.exists("data"):
         os.makedirs("data")
 
+
 @click.command()
 def fetch_transactions() -> None:
     """
