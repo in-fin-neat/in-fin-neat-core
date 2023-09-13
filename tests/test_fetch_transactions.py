@@ -25,7 +25,7 @@ def open_mock() -> Generator[Mock, None, None]:
 
 
 def test_data_path_not_created_if_already_exists(os_mock: Mock) -> None:
-    """ 
+    """
     Mock to return like the data path already exists.
     At this way, the function should not try to create a path for it.
     """
@@ -39,8 +39,8 @@ def test_data_path_not_created_if_already_exists(os_mock: Mock) -> None:
 
 
 def test_data_path_is_created_if_not_exists(os_mock: Mock) -> None:
-    """ 
-    Mock to return like the data path has yet to be created. 
+    """
+    Mock to return like the data path has yet to be created.
     In this way, the function should create it.
     """
     os_mock.path.exists.return_value = False
