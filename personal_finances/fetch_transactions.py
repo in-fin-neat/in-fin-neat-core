@@ -8,6 +8,7 @@ from typing import Tuple
 from datetime import datetime
 import json
 import click
+import os
 
 
 LOGGER = logging.getLogger(__name__)
@@ -19,12 +20,18 @@ def _read_secrets() -> Tuple[str, str]:
     return secrets["secret_id"], secrets["secret_key"]
 
 
+def _ensure_data_path_exist() -> None:
+    if not os.path.exists("data"):
+        os.makedirs("data")
+
+
 @click.command()
 def fetch_transactions() -> None:
     """
     Authenticates Nordigen API to pre-configured banks,
     gets transactions and saves into 'data' folder.
     """
+    _ensure_data_path_exist()
     secret_id, secret_key = _read_secrets()
     with BankClient(
         NordigenAuth(secret_id, secret_key),
