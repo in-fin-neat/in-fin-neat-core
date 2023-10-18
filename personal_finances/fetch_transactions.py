@@ -14,10 +14,22 @@ import os
 LOGGER = logging.getLogger(__name__)
 
 
-def _read_secrets() -> Tuple[str, str]:
-    with open("/home/tsutsumi/Downloads/nord-diego.json", "r") as f:
-        secrets = json.loads(f.read())
-    return secrets["secret_id"], secrets["secret_key"]
+def _read_secrets(secret_json_file: str) -> Tuple[str, str]:
+    try:
+        with open(secret_json_file, "r") as f:
+            try:
+                secrets = json.loads(f.read())
+            except ValueError:
+                raise ValueError("{} is a not valid JSON".format(secret_json_file))
+
+        if secrets.get("secret_id") is None:
+            raise KeyError("secret_id key not found in {}".format(secret_json_file))
+        if secrets.get("secret_key") is None:
+            raise KeyError("secret_key key not found in {}".format(secret_json_file))
+        return secrets["secret_id"], secrets["secret_key"]
+
+    except IOError:
+        raise IOError("{} secret file does not exist".format(secret_json_file))
 
 
 def _ensure_data_path_exist() -> None:
@@ -26,13 +38,20 @@ def _ensure_data_path_exist() -> None:
 
 
 @click.command()
-def fetch_transactions() -> None:
+@click.option(
+    "-s",
+    "--secret_json_file",
+    required=True,
+    help="Nordigen secrets JSON file for authentication",
+    type=str,
+)
+def fetch_transactions(secret_json_file: str) -> None:
     """
     Authenticates Nordigen API to pre-configured banks,
     gets transactions and saves into 'data' folder.
     """
     _ensure_data_path_exist()
-    secret_id, secret_key = _read_secrets()
+    secret_id, secret_key = _read_secrets(secret_json_file)
     with BankClient(
         NordigenAuth(secret_id, secret_key),
         [
