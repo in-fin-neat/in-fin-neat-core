@@ -1,4 +1,4 @@
-from unittest.mock import mock_open, patch, Mock
+from unittest.mock import mock_open, patch, Mock, call
 from pytest import fixture
 from click.testing import CliRunner
 from typing import Generator
@@ -38,7 +38,7 @@ def test_data_path_not_created_if_already_exists(os_mock: Mock) -> None:
     os_mock.path.exists.return_value = True
 
     runner = CliRunner()
-    runner.invoke(fetch_transactions, ["-s dummy_secrets.json"])
+    runner.invoke(fetch_transactions, [])
 
     os_mock.path.exists.assert_called_once_with("data")
     os_mock.makedirs.assert_not_called()
@@ -52,46 +52,26 @@ def test_data_path_is_created_if_not_exists(os_mock: Mock) -> None:
     os_mock.path.exists.return_value = False
 
     runner = CliRunner()
-    runner.invoke(fetch_transactions, ["-s dummy_secrets.json"])
+    runner.invoke(fetch_transactions, [])
 
     os_mock.path.exists.assert_called_once_with("data")
     os_mock.makedirs.assert_called_once_with("data")
 
 
-def test_json_file_not_found(open_mock: Mock) -> None:
-    open_mock = mock_open(read_data=None)
-    open_mock.side_effect = FileNotFoundError
-    with patch("personal_finances.fetch_transactions.open", open_mock):
-        runner = CliRunner()
-        result = runner.invoke(fetch_transactions, ["-s dummy_secrets.json"])
-        assert result.exit_code != 0
-        assert isinstance(
-            result.exception, IOError
-        ), f"Expected an IOError, but got {type(result.exception).__name__}"
-
-
-def test_json_file_not_valid(json_mock: Mock) -> None:
-    json_mock.loads.side_effect = ValueError
+def test_nordigen_secrets_reading(os_mock: Mock) -> None:
     runner = CliRunner()
-    result = runner.invoke(fetch_transactions, ["-s dummy_secrets.json"])
-    assert result.exit_code != 0
-    assert isinstance(
-        result.exception, ValueError
-    ), f"Expected an ValueError, but got {type(result.exception).__name__}"
+    result = runner.invoke(fetch_transactions, [])
+
+    assert result.exit_code == 0
+    os_mock.environ.__getitem__.assert_has_calls(
+        [call("NORDIGEN_SECRET_ID"), call("NORDIGEN_SECRET_KEY")]
+    )
 
 
-def test_json_missing_key(json_mock: Mock) -> None:
-    json_mock.loads.return_value = {"secret_id": "dummy_data"}
+def test_nordigen_secrets_not_found_generate_keyerror(os_mock: Mock) -> None:
+    os_mock.environ.__getitem__.side_effect = KeyError
     runner = CliRunner()
-    result = runner.invoke(fetch_transactions, ["-s dummy_secrets.json"])
-    assert result.exit_code != 0
-    assert isinstance(
-        result.exception, KeyError
-    ), f"Expected an KeyError, but got {type(result.exception).__name__}"
-
-    json_mock.loads.return_value = {"secret_key": "dummy_data"}
-    runner = CliRunner()
-    result = runner.invoke(fetch_transactions, ["-s dummy_secrets.json"])
+    result = runner.invoke(fetch_transactions, [])
     assert result.exit_code != 0
     assert isinstance(
         result.exception, KeyError
