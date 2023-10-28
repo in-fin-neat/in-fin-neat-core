@@ -21,6 +21,19 @@ Three reports will be saved into `/reports` folder:
 #### Command
 `pipenv run generate_reports --start-time <ISO8061 DATETIME> --end-time <ISO8061 DATETIME>`
 
+### Config Nordigen Secrets
+The nordigen secrets id and key should be stored in environment variables. For that, you can create a file `.env` inside the project root folder, containing the `NORDIGEN_SECRET_ID` and `NORDIGEN_SECRET_KEY`keys
+
+#### Command
+
+Create the `.env` file and add the first var:
+
+`echo NORDIGEN_SECRET_ID=SecretIdFromNordigen >.env`
+
+Append the seccond var to the `.env` file
+
+`echo NORDIGEN_SECRET_KEY=SecretKeyFromNordigen >>.env`
+
 ## Developing
 1. `gh repo clone diegotsutsumi/personal_finances`
 1. `pipenv run build`
