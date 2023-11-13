@@ -22,11 +22,13 @@ Three reports will be saved into `/reports` folder:
 `pipenv run generate_reports --start-time <ISO8061 DATETIME> --end-time <ISO8061 DATETIME>`
 
 ### Config Nordigen Secrets
-The nordigen secrets id and key should be stored in environment variables. For that, you can create a file `.env` inside the project root folder, containing the `NORDIGEN_SECRET_ID` and `NORDIGEN_SECRET_KEY`keys
+The nordigen secrets id and key should be stored in environment variables. An alternative option for that is to use a `.env` file, containing the `NORDIGEN_SECRET_ID` and `NORDIGEN_SECRET_KEY`keys inside. The pipenv will load those variables automaticaly. More information can be found here 
+https://pypi.org/project/python-dotenv/. 
+
 
 #### Command
 
-Create the `.env` file and add the first var:
+Create the `.env` file in the project root folder and add the first var:
 
 `echo NORDIGEN_SECRET_ID=SecretIdFromNordigen >.env`
 
