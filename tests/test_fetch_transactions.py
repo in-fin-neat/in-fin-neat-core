@@ -58,17 +58,35 @@ def test_data_path_is_created_if_not_exists(os_mock: Mock) -> None:
     os_mock.makedirs.assert_called_once_with("data")
 
 
-def test_nordigen_secrets_reading(os_mock: Mock) -> None:
+def test_nordigen_secrets_reading(os_mock: Mock, bank_client_mock: Mock) -> None:
+    """
+    Check if the nordigen secrets get read and used
+    to in the auth parameter for creating the banking client object
+    """
+    os_mock.environ.__getitem__.side_effect = {
+        "NORDIGEN_SECRET_ID": "nordigen_dummy_id",
+        "NORDIGEN_SECRET_KEY": "nordigen_dummy_key",
+    }.get
+
     runner = CliRunner()
     result = runner.invoke(fetch_transactions, [])
 
-    assert result.exit_code == 0
     os_mock.environ.__getitem__.assert_has_calls(
         [call("NORDIGEN_SECRET_ID"), call("NORDIGEN_SECRET_KEY")]
     )
 
+    auth_argument = bank_client_mock.call_args.kwargs.get("auth")
+
+    assert auth_argument.secret_id == "nordigen_dummy_id"
+    assert auth_argument.secret_key == "nordigen_dummy_key"
+    assert result.exit_code == 0
+
 
 def test_nordigen_secrets_not_found_generate_keyerror(os_mock: Mock) -> None:
+    """
+    Check if a key error is generated in case of the nordigen
+    secrets doesn't exist on the environment variables
+    """
     os_mock.environ.__getitem__.side_effect = KeyError
     runner = CliRunner()
     result = runner.invoke(fetch_transactions, [])
