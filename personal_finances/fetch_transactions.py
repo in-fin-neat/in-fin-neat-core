@@ -32,8 +32,8 @@ def fetch_transactions() -> None:
     _ensure_data_path_exist()
     secret_id, secret_key = _read_secrets()
     with BankClient(
-        NordigenAuth(secret_id, secret_key),
-        [
+        auth=NordigenAuth(secret_id, secret_key),
+        bank_details=[
             BankDetails(name="Revolut", country="LV"),
             BankDetails(name="N26", country="DE"),
             BankDetails(name="Allied Irish Banks", country="IE"),
