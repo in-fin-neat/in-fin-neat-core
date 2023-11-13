@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _read_secrets() -> Tuple[str, str]:
-    return os.environ["NORDIGEN_SECRET_ID"], os.environ["NORDIGEN_SECRET_KEY"]
+    return os.environ["GOCARDLESS_SECRET_ID"], os.environ["GOCARDLESS_SECRET_KEY"]
 
 
 def _ensure_data_path_exist() -> None:

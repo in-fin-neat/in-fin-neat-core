@@ -64,15 +64,15 @@ def test_nordigen_secrets_reading(os_mock: Mock, bank_client_mock: Mock) -> None
     to in the auth parameter for creating the banking client object
     """
     os_mock.environ.__getitem__.side_effect = {
-        "NORDIGEN_SECRET_ID": "nordigen_dummy_id",
-        "NORDIGEN_SECRET_KEY": "nordigen_dummy_key",
+        "GOCARDLESS_SECRET_ID": "nordigen_dummy_id",
+        "GOCARDLESS_SECRET_KEY": "nordigen_dummy_key",
     }.get
 
     runner = CliRunner()
     result = runner.invoke(fetch_transactions, [])
 
     os_mock.environ.__getitem__.assert_has_calls(
-        [call("NORDIGEN_SECRET_ID"), call("NORDIGEN_SECRET_KEY")]
+        [call("GOCARDLESS_SECRET_ID"), call("GOCARDLESS_SECRET_KEY")]
     )
 
     auth_argument = bank_client_mock.call_args.kwargs.get("auth")
