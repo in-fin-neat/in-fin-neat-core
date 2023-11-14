@@ -3,3 +3,4 @@ data/
 reports/
 .coverage
 coverage.xml
+.env

@@ -15,9 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _read_secrets() -> Tuple[str, str]:
-    with open("/home/tsutsumi/Downloads/nord-diego.json", "r") as f:
-        secrets = json.loads(f.read())
-    return secrets["secret_id"], secrets["secret_key"]
+    return os.environ["GOCARDLESS_SECRET_ID"], os.environ["GOCARDLESS_SECRET_KEY"]
 
 
 def _ensure_data_path_exist() -> None:
@@ -34,8 +32,8 @@ def fetch_transactions() -> None:
     _ensure_data_path_exist()
     secret_id, secret_key = _read_secrets()
     with BankClient(
-        NordigenAuth(secret_id, secret_key),
-        [
+        auth=NordigenAuth(secret_id, secret_key),
+        bank_details=[
             BankDetails(name="Revolut", country="LV"),
             BankDetails(name="N26", country="DE"),
             BankDetails(name="Allied Irish Banks", country="IE"),
