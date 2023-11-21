@@ -1,114 +1,42 @@
-from typing import Dict, Iterable, List, Optional, Set
+from typing import Dict, Iterable, List, Optional, Set, Callable
 import uuid
 import logging
+from ..config import get_user_configuration, CategoryDefinition
+from functools import cache
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-EXPENSE_CATEGORY_REFERENCES: Dict[str, List[str]] = {
-    "house": [
-        "woodies",
-        "ikea",
-        "b & q",
-        "mortgage",
-        "zara",
-        "etsy",
-        "homestore",
-        "home store & more",
-        "floor",
-        "graydon",
-        "furniture",
-        "callaghan",
-        "emma mat",
-        "tile merchant",
-        "vidaxlie",
-        "johnstown garden centr",
-    ],
-    "travel": ["travel"],
-    "groceries": [
-        "dealz",
-        "tesco",
-        "lidl",
-        "dunnes",
-        "polonez",
-        "aldi",
-        "spar",
-        "dropchef",
-        "hellofresh",
-    ],
-    "restaurants/pubs": [
-        "restaurant",
-        "pub",
-        "sushi",
-        "beer",
-        "cafe",
-        "bread 41",
-        "o briens",
-        "wagamama",
-        "just eat",
-        "costa",
-        "gelato",
-        "milano",
-        "an poitin",
-        "pizza",
-        "pasta",
-        "coffee",
-        "avoca",
-        "strudel",
-        "bunsen",
-        "deliveroo",
-        "delhi rasoi",
-        "annie mays",
-        "asahi",
-        "reyna",
-        "village inn",
-    ],
-    "entertainment": [
-        "hilfiger",
-        "puma",
-        "odeon",
-        "spotify",
-        "entertainment",
-        "penneys",
-        "ticketmaster",
-        "kildare",
-        "regatta",
-        "amazon prime",
-    ],
-    "health": ["boots", "drugstore", "pharmacy"],
-    "transport": [
-        "circle k",
-        "freenow",
-        "leap card",
-        "applegreen",
-        "partkingtag",
-        "eflow.ie",
-        "dublin airport car",
-        "payzone park",
-    ],
-}
+@cache
+def _get_expense_category_references() -> Dict[str, List[str]]:
+    return _index_field_by_category_name(
+        get_user_configuration().ExpenseCategoryDefinition,
+        lambda category_definition: category_definition.CategoryReferences,
+    )
 
 
-INCOME_CATEGORY_REFERENCES: Dict[str, List[str]] = {
-    "salary amanda": ["irish manufacturing research", "imr"],
-    "salary diego": ["amazon development centre ireland"],
-    "income rent": [],
-    "income other": [],
-}
+@cache
+def _get_expense_category_tags() -> Dict[str, List[str]]:
+    return _index_field_by_category_name(
+        get_user_configuration().ExpenseCategoryDefinition,
+        lambda category_definition: category_definition.CategoryTags,
+    )
 
 
-# Tags are manually included in each bank app
-# and have priority over plain transaction references
-EXPENSE_CATEGORY_TAGS = {
-    "house": ["#house"],
-    "travel": ["#travel"],
-    "groceries": ["#grocery"],
-    "restaurants/pubs": ["#restaurant", "#pub", "#coffee"],
-    "entertainment": ["#entertainment"],
-    "health": ["#health"],
-    "transport": ["#transport"],
-}
+@cache
+def _get_income_category_references() -> Dict[str, List[str]]:
+    return _index_field_by_category_name(
+        get_user_configuration().IncomeCategoryDefinition,
+        lambda category_definition: category_definition.CategoryReferences,
+    )
+
+
+def _index_field_by_category_name(
+    category_definitions: List[CategoryDefinition],
+    field: Callable[[CategoryDefinition], List[str]],
+) -> Dict[str, List[str]]:
+    return {cat_def.CategoryName: field(cat_def) for cat_def in category_definitions}
 
 
 def _invert_index(category_index: Dict[str, List]) -> Dict[str, str]:
@@ -151,7 +79,7 @@ def _resolve_ambiguous_matching_categories(
 
 
 def _get_tag_matching_category(transaction_reference: str) -> Optional[str]:
-    tag_index = _invert_index(EXPENSE_CATEGORY_TAGS)
+    tag_index = _invert_index(_get_expense_category_tags())
     tag_matching_categories = _get_matching_categories(transaction_reference, tag_index)
     return _resolve_ambiguous_matching_categories(
         tag_matching_categories, transaction_reference
@@ -160,7 +88,10 @@ def _get_tag_matching_category(transaction_reference: str) -> Optional[str]:
 
 def _get_group_ref_matching_category(group_references: Iterable[str]) -> Optional[str]:
     reference_index = _invert_index(
-        {**EXPENSE_CATEGORY_REFERENCES, **INCOME_CATEGORY_REFERENCES}
+        {
+            **_get_expense_category_references(),
+            **_get_income_category_references(),
+        }
     )
     group_ref_matching_categories = _get_matching_categories(
         "".join(group_references), reference_index

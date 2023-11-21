@@ -17,6 +17,7 @@ from personal_finances.transaction.type import (
 from personal_finances.transaction.definition import SimpleTransaction
 from personal_finances.transaction.categorizing import get_category
 from personal_finances.file_helper import write_json
+from personal_finances.config import cache_user_configuration
 from typing import Dict, List, Tuple, Callable, Any, Union, cast
 from functools import partial
 import dateutil.parser
@@ -59,6 +60,8 @@ def _add_group_category_field(
 
 def _split_by_type(transactions: List[SimpleTransaction]) -> Tuple[List, List]:
     income_transactions = get_income_transactions(transactions)
+
+    # Treating unknown as expenses
     expense_transactions = get_expense_transactions(
         transactions
     ) + get_unknown_type_transactions(transactions)
@@ -108,7 +111,6 @@ def _write_balance(
     context: Dict,
     file_prefix: str,
 ) -> None:
-
     file_path = f"{file_prefix}balance.json"
     write_json(
         file_path,
@@ -190,10 +192,20 @@ def write_reports(
     default="data/merged_transactions.json",
     help="File path of transactions fetched previously.",
 )
+@click.option(
+    "-ucfp",
+    "--user-config-file-path",
+    default="config/user_config.yaml",
+    help="File path of user configuration.",
+)
 def generate_reports(
-    start_time: str, end_time: str, transactions_file_path: str
+    start_time: str,
+    end_time: str,
+    transactions_file_path: str,
+    user_config_file_path: str,
 ) -> None:
     """Generates reports from transactions according to the time filter specified."""
+    cache_user_configuration(user_config_file_path)
     with open(transactions_file_path, "r") as transactions_file:
         transactions: List[SimpleTransaction] = list(
             map(

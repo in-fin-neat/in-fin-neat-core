@@ -4,6 +4,7 @@ from functools import reduce
 from enum import Enum
 from typing import Tuple, List, Dict, Set, Iterable, NotRequired, cast
 from itertools import chain
+from ..config import get_user_configuration
 import re
 
 
@@ -13,26 +14,9 @@ class TransactionGroupingType(Enum):
     AmountRange = "AmountRange"
 
 
-WORDS_NOT_PART_OF_REFERENCE = [
-    ",",
-    "*mobi",
-    "vdp-",
-    "vdc-",
-    "vda-",
-    "*inet",
-    "amanda trojan fenerich",
-    "diego tsutsumi",
-    "ltd",
-    "limited",
-    "ireland",
-    ".com",
-    "refund from",
-]
-
-
 def _clean_reference(reference: str) -> str:
     clean_reference = reference
-    for to_remove in WORDS_NOT_PART_OF_REFERENCE:
+    for to_remove in get_user_configuration().FilterReferenceWordsForGrouping:
         clean_reference = clean_reference.replace(to_remove, "")
 
     clean_reference = re.sub(r"\d{4,}", "", clean_reference)
