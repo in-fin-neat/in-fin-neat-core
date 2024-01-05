@@ -22,7 +22,6 @@ def _drop_dict_keys(
 CORRECT_USER_CONFIG_FULL_DICT: Dict[str, Any] = {
     "InternalTransferReferences": ["mock", "internal"],
     "BankProcessingTimeInDays": 2,
-    "IncomeReferences": ["mocked", "income", "refs"],
     "ExpenseTransactionCodes": ["test", "transaction_code"],
     "FilterReferenceWordsForGrouping": ["non-sense", "characters"],
     "ExpenseCategoryDefinition": [
@@ -53,10 +52,6 @@ CORRECT_USER_CONFIG_FULL_DICT: Dict[str, Any] = {
 
 CORRECT_USER_CONFIG_MISSING_EXPENSE_TRANS_CODE = _drop_dict_keys(
     copy.deepcopy(CORRECT_USER_CONFIG_FULL_DICT), ["ExpenseTransactionCodes"]
-)
-
-MISSING_INCOME_REFERENCES: Dict[str, Any] = _drop_dict_keys(
-    copy.deepcopy(CORRECT_USER_CONFIG_FULL_DICT), ["IncomeReferences"]
 )
 
 MISSING_EXPENSE_CATEGORY_DEFINITION: Dict[str, Any] = _drop_dict_keys(
@@ -115,11 +110,6 @@ def _yamlify_first_element(list_of_user: List[Tuple]) -> List[Tuple]:
                     CORRECT_USER_CONFIG_MISSING_EXPENSE_TRANS_CODE,
                     UserConfiguration(**CORRECT_USER_CONFIG_MISSING_EXPENSE_TRANS_CODE),
                     None,
-                ),
-                (
-                    MISSING_INCOME_REFERENCES,
-                    None,
-                    UserConfigurationParseError,
                 ),
                 (
                     MISSING_EXPENSE_CATEGORY_DEFINITION,

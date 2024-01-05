@@ -37,7 +37,6 @@ class UserConfiguration(BaseModel):
     # Required Attributes
     InternalTransferReferences: List[str]
     BankProcessingTimeInDays: int
-    IncomeReferences: List[str]
     FilterReferenceWordsForGrouping: List[str]
     ExpenseCategoryDefinition: List[CategoryDefinition]
     IncomeCategoryDefinition: List[CategoryDefinition]
