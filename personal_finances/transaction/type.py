@@ -1,21 +1,7 @@
 from enum import Enum
 from typing import List
 from .definition import SimpleTransaction
-
-
-EXPENSE_TRANSACTION_CODES = [
-    "CARD_PAYMENT",
-    "Mobile TopUp",
-    "CARD_REFUND",
-    "Direct Debt",
-]
-INCOME_TRANSACTION_CODES = ["Credit Transfer"]
-
-INCOME_REFERENCES = [
-    "irish manufacturing research",
-    "amazon development centre ireland",
-    "rent",
-]
+from ..config import get_user_configuration
 
 
 class TransactionType(Enum):
@@ -35,14 +21,15 @@ def get_transaction_type(transaction: SimpleTransaction) -> TransactionType:
 def is_income(transaction: SimpleTransaction) -> bool:
     return transaction["amount"] > 0 and any(
         income_reference in transaction["referenceText"]
-        for income_reference in INCOME_REFERENCES
+        for income_reference in get_user_configuration().IncomeReferences
     )
 
 
 def is_expense(transaction: SimpleTransaction) -> bool:
     return (
         transaction["amount"] < 0
-        and transaction["bankTransactionCode"] in EXPENSE_TRANSACTION_CODES
+        and transaction["bankTransactionCode"]
+        in get_user_configuration().ExpenseTransactionCodes
     )
 
 

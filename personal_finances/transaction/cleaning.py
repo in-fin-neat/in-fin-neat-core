@@ -2,28 +2,17 @@ from typing import List, Tuple
 from datetime import timedelta
 from itertools import chain
 from .definition import SimpleTransaction
+from ..config import get_user_configuration
 import logging
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-INTERNAL_TRANSFER_CUSTOM_REFERENCES = [
-    "revolut",
-    "google pay top-up",
-    "n26",
-    "aib",
-    "amanda",
-    "diego",
-    "sent from",
-]
-BANK_PROCESSING_TIME_IN_DAYS = 4
-
-
 def _has_internal_transfer_features(transaction: SimpleTransaction) -> bool:
     return transaction["amount"] != 0 and any(
         transfer_ref in transaction["referenceText"]
-        for transfer_ref in INTERNAL_TRANSFER_CUSTOM_REFERENCES
+        for transfer_ref in get_user_configuration().InternalTransferReferences
     )
 
 
@@ -49,7 +38,7 @@ def _get_internal_transfers(
             if _has_internal_transfer_features(transaction)
             and current_amount == -transaction["amount"]
             and abs(current_datetime - transaction["datetime"])
-            < timedelta(days=BANK_PROCESSING_TIME_IN_DAYS)
+            < timedelta(days=get_user_configuration().BankProcessingTimeInDays)
         ]
 
         if len(matching_transactions) > 1:
