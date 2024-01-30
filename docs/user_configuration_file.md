@@ -14,11 +14,6 @@ BankProcessingTimeInDays
       Type: Integer
       Context: Related to "get_internal_transfer_references", it restricts the time window considered by the internal transfer cleaning algorithm.
 
-IncomeReferences
-    - Description: These are strings present in transactions references representing actual income.
-      Type: List of Strings
-      Context: Not all positive transactions are considered income, they can also be total or partial refunds. In order to avoid skewing income and expense numbers, positive transactions not matching strings configured in "IncomeReferences" are summed together with "expenses". In this way any refund, which is one case of a positive value not matching "IncomeReferences", automatically subtracts from "expenses".
-
 ExpenseTransactionCodes
     - Description: A list of transaction codes that absolutely identify an expense, for example "CARD_PAYMENT". This is an optional configuration
       Type: List of Strings, optional
@@ -33,21 +28,21 @@ FilterReferenceWordsForGrouping
 ExpenseCategoryDefinition
     - Description: A list of expense category names with their respective tags and references.
       Type: A list of objects as follows,
-          - categoryName: "restaurant"  # simple string
-            categoryTags: # list of strings
+          - CategoryName: "restaurant"  # simple string
+            CategoryTags: # list of strings
                 - "#pub"
                 - "#coffee"
-            categoryReferences: # list of strings
+            CategoryReferences: # list of strings
                 - "mcdonalds"
-    - Context: Expenses are categorized primarily using "categoryTags" that appear in transaction references. Tags are intended to be manually inserted by the using through bank applications. Since that's time consuming, the fallback categorizer searches the full transaction reference for other strings like "macdonalds".
+    - Context: Expenses are categorized primarily using "CategoryTags" that appear in transaction references. Tags are intended to be manually inserted by the using through bank applications. Since that's time consuming, the fallback categorizer searches the full transaction reference for other strings like "macdonalds".
 
 IncomeCategoryDefinition
-    - Description: A list of income category names with their respective tags and references.
+    - Description: A list of income category names with their respective tags and references. The "CategoryReferences" field is used to distinguish income transaction type from expense transaction type.
       Type: A list of objects as follows,
-          - categoryName: "husband-income"  # simple string
-            categoryTags: # list of strings
+          - CategoryName: "husband-income"  # simple string
+            CategoryTags: # list of strings
                 - "#husband-income"
-            categoryReferences: # list of strings
+            CategoryReferences: # list of strings
                 - "husband's company"
-      Context: Incomes are categorized primarily using "categoryTags" that appear in transaction references. Tags are intended to be manually inserted by the using through bank applications. Since that's time consuming, the fallback categorizer searches the full transaction reference for other strings like "husband's company".
+      Context: Incomes are categorized primarily using "CategoryTags" that appear in transaction references. Tags are intended to be manually inserted by the using through bank applications. Since that's time consuming, the fallback categorizer searches the full transaction reference for other strings like "husband's company". Note that not all positive transactions are considered income, they can also be total or partial refunds. In order to avoid skewing income and expense numbers, positive transactions not matching strings configured in "CategoryReferences" for "IncomeCategoryDefinition" are summed together with "expenses". In this way any refund, which is one case of a positive value not matching "CategoryReferences" for "IncomeCategoryDefinition", automatically subtracts from "expenses".
 ```

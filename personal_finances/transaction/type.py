@@ -19,9 +19,14 @@ def get_transaction_type(transaction: SimpleTransaction) -> TransactionType:
 
 
 def is_income(transaction: SimpleTransaction) -> bool:
+    income_references = (
+        income_reference
+        for income_category in get_user_configuration().IncomeCategoryDefinition
+        for income_reference in income_category.CategoryReferences
+    )
     return transaction["amount"] > 0 and any(
         income_reference in transaction["referenceText"]
-        for income_reference in get_user_configuration().IncomeReferences
+        for income_reference in income_references
     )
 
 
