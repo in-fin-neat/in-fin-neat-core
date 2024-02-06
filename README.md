@@ -26,7 +26,7 @@ Three reports will be saved into `/reports` folder:
 #### Command
 `pipenv run generate_reports --start-time <ISO8061 DATETIME> --end-time <ISO8061 DATETIME> --user-config-file-path`
 
-> eg: `pipenv run generate_reports --start-time 2023-12-01T00:00+0100 --end-time 2024-02-29T00:00+0100 --user-config-file-path execution_config_file.yaml`
+> eg: `pipenv run generate_reports --start-time 2023-12-01T00:00+0100 --end-time 2024-02-29T00:00+0100 --user-config-file-path user_configuration_file.yaml`
 
 ## Configuring
 ### Config Nordigen Credentials
