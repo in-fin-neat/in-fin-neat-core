@@ -13,6 +13,9 @@ This command merges all transactions previously saved into a single file to be p
 ### Generating reports
 Reports are generated for a given time period selected using two parameters `--start-time <ISO8061 DATETIME>` and `--end-time <ISO8061 DATETIME>`.
 
+> It's a must for generating report that both datetime entries should include time and timezone, following the ISO8061 format, eg: 
+`-start-time 2023-12-01T00:00+0100 --end-time 2024-02-29T00:00+0100`
+
 Additionally, a user configuration file[^user_config] path is necessary. For convenience, a default file path is set to be `config/user_config.yaml`, however you can override it using `--user-configuration-file-path <file_path>`.
 
 Three reports will be saved into `/reports` folder:
@@ -22,6 +25,8 @@ Three reports will be saved into `/reports` folder:
 
 #### Command
 `pipenv run generate_reports --start-time <ISO8061 DATETIME> --end-time <ISO8061 DATETIME> --user-config-file-path`
+
+> eg: `pipenv run generate_reports --start-time 2023-12-01T00:00+0100 --end-time 2024-02-29T00:00+0100 --user-config-file-path execution_config_file.yaml`
 
 ## Configuring
 ### Config Nordigen Credentials
@@ -39,7 +44,7 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 
 ## Developing
 1. `gh repo clone diegotsutsumi/personal_finances`
-1. `pipenv run install --dev`
+1. `pipenv install --dev`
 1. `pipenv run bash -c 'mypy .; mypy --install-types --non-interactive'`
 1. `pipenv run build`
 1. `pipenv run tests`
