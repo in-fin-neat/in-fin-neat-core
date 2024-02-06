@@ -1,0 +1,22 @@
+InternalTransferReferences:
+  - internal transfer reference 1
+BankProcessingTimeInDays: 30
+FilterReferenceWordsForGrouping:
+  - words for grouping 1
+  - words for grouping 2
+ExpenseCategoryDefinition:
+  - CategoryName: expense_name
+    CategoryTags:
+      - '#expense tag 1'
+      - '#expense tag 2'
+    CategoryReferences:
+      - category reference 1
+      - category reference 2
+IncomeCategoryDefinition:
+  - CategoryName: income name
+    CategoryTags:
+      - '#income tag 1'
+      - '#income tag 2'
+    CategoryReferences:
+      - income reference 1
+      - income reference 2

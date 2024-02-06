@@ -3,6 +3,8 @@ A file defined by users aimed at communicating specific user behavior is require
 
 The file format is YAML and its location can be passed as parameters to user requests requiring user-specific configuration. The YAML document fields are described below (also in YAML, so you get used to the user config format).
 
+You can use the `template_user_configuration_file.yaml` as a reference file.
+
 ```yaml
 InternalTransferReferences:
     - Description: References that appear in transfers between banks of the same user.
