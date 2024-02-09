@@ -13,9 +13,6 @@ This command merges all transactions previously saved into a single file to be p
 ### Generating reports
 Reports are generated for a given time period selected using two parameters `--start-time <ISO8061 DATETIME>` and `--end-time <ISO8061 DATETIME>`.
 
-> It's a must for generating report that both datetime entries should include time and timezone, following the ISO8061 format, eg: 
-`-start-time 2023-12-01T00:00+0100 --end-time 2024-02-29T00:00+0100`
-
 Additionally, a user configuration file[^user_config] path is necessary. For convenience, a default file path is set to be `config/user_config.yaml`, however you can override it using `--user-configuration-file-path <file_path>`.
 
 Three reports will be saved into `/reports` folder:
