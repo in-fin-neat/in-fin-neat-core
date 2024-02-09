@@ -23,6 +23,8 @@ Three reports will be saved into `/reports` folder:
 #### Command
 `pipenv run generate_reports --start-time <ISO8061 DATETIME> --end-time <ISO8061 DATETIME> --user-config-file-path`
 
+> eg: `pipenv run generate_reports --start-time 2023-12-01T00:00+0100 --end-time 2024-02-29T00:00+0100 --user-config-file-path user_configuration_file.yaml`
+
 ## Configuring
 ### Config Nordigen Credentials
 The personal finances application connects to GoCardless Bank Account Data API using their [official python client](https://github.com/nordigen/nordigen-python). Two secret values are needed to connect to their API, a secret id and a secret key. These values are read by the `personal_finances` application through OS environment variables named respectively, `GOCARDLESS_SECRET_ID` and `GOCARDLESS_SECRET_KEY`.
@@ -39,7 +41,7 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 
 ## Developing
 1. `gh repo clone diegotsutsumi/personal_finances`
-1. `pipenv run install --dev`
+1. `pipenv install --dev`
 1. `pipenv run bash -c 'mypy .; mypy --install-types --non-interactive'`
 1. `pipenv run build`
 1. `pipenv run tests`
