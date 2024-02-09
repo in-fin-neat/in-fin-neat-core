@@ -1,22 +1,30 @@
 InternalTransferReferences:
-  - internal transfer reference 1
-BankProcessingTimeInDays: 30
+  - reference words
+  - to identify
+  - transfers to yourself, like
+  - a value from your
+  - paypal to bank account
+BankProcessingTimeInDays: 3
 FilterReferenceWordsForGrouping:
-  - words for grouping 1
-  - words for grouping 2
+  - words to be
+  - filtered when grouping transactions, like
+  - credit card
+  - VDP (accronyms that appear in all transactions)
+  - internet
 ExpenseCategoryDefinition:
-  - CategoryName: expense_name
+  - CategoryName: restaurant
     CategoryTags:
-      - '#expense tag 1'
-      - '#expense tag 2'
+      - '#travelLunch'
+      - '#burger'
     CategoryReferences:
-      - category reference 1
-      - category reference 2
+      - mc donauld
+      - burguer king
+      - kfc
 IncomeCategoryDefinition:
-  - CategoryName: income name
+  - CategoryName: Salary
     CategoryTags:
-      - '#income tag 1'
-      - '#income tag 2'
+      - '#MySalary'
+      - '#SideJobSalary'
     CategoryReferences:
-      - income reference 1
-      - income reference 2
+      - Company Name
+      - Sidejob Company Name
