@@ -1,5 +1,6 @@
 import pytest
 from datetime import datetime
+from typing import List
 
 from personal_finances.transaction.definition import SimpleTransaction
 from personal_finances.transaction.filtering import transaction_datetime_filter
@@ -150,8 +151,8 @@ from personal_finances.transaction.filtering import transaction_datetime_filter
 def test_transaction_datetime_filter(
     start_datetime: datetime,
     end_datetime: datetime,
-    transactions: SimpleTransaction,
-    filtered_transactions: SimpleTransaction,
+    transactions: List[SimpleTransaction],
+    filtered_transactions: List[SimpleTransaction],
 ) -> None:
     assert (
         transaction_datetime_filter(start_datetime, end_datetime, transactions)
