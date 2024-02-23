@@ -152,7 +152,7 @@ def _process_transactions(
     return income_transactions, expense_transactions
 
 
-def write_reports(
+def _write_reports(
     transactions: List[SimpleTransaction], start_time: datetime, end_time: datetime
 ) -> None:
     (
@@ -214,7 +214,7 @@ def generate_reports(
             )
         )
 
-    write_reports(
+    _write_reports(
         transactions,
         dateutil.parser.isoparse(start_time),
         dateutil.parser.isoparse(end_time),
