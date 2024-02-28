@@ -145,3 +145,16 @@ def test_list_with_duplicated_internal_transfer_() -> None:
     assert_transaction_list(transaction_list, expected_cleaned_list)
 
 
+def test_list_with_invalid_internal_transfer() -> None:
+    for key in INTERNAL_TRANSFER_LIST[0].keys():
+        invalid_list = deepcopy(INTERNAL_TRANSFER_LIST)
+        invalid_list[0][key] = None  # type: ignore[literal-required]
+        transaction_list = NO_INTERNAL_TRANSFER_LIST + invalid_list
+        try:
+            remove_internal_transfers(transaction_list)
+        except Exception as e:
+            assert isinstance(e, TypeError)
+        else:
+            pytest.fail(
+                "TypeError was expected but not raised by key '{0}'".format(key)
+            )

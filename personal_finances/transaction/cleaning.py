@@ -8,6 +8,17 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
+def _validate_transaction(transaction: SimpleTransaction) -> None:
+    for key, expected_type in SimpleTransaction.__annotations__.items():
+        value = transaction.get(key, None)
+        if key == "amount" and (isinstance(value, float) or isinstance(value, int)):
+            continue  # Allow integers for 'amount' as well as floats
+        if not isinstance(value, expected_type):
+            raise TypeError(
+                f"Invalid type for {key}, expected {expected_type.__name__}"
+            )
+
+
 def _has_internal_transfer_features(transaction: SimpleTransaction) -> bool:
     return transaction["amount"] != 0 and any(
         transfer_ref in transaction["referenceText"]
@@ -20,7 +31,7 @@ def _get_internal_transfers(
 ) -> set[int]:
     internal_transfers = set()
     for index, current_transaction in enumerate(transactions):
-        
+        _validate_transaction(current_transaction)
 
         current_datetime = current_transaction["datetime"]
         current_amount = current_transaction["amount"]
