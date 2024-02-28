@@ -135,3 +135,13 @@ def test_list_with_zero_amount_in_internal_transfer() -> None:
     expected_list = NO_INTERNAL_TRANSFER_LIST + zero_amount_pair
     assert_transaction_list(transaction_list, expected_list)
 
+
+def test_list_with_duplicated_internal_transfer_() -> None:
+    duplicated_transfer = INTERNAL_TRANSFER_LIST + [INTERNAL_TRANSFER_LIST[0]]
+
+    transaction_list = NO_INTERNAL_TRANSFER_LIST + duplicated_transfer
+    expected_cleaned_list = NO_INTERNAL_TRANSFER_LIST + [INTERNAL_TRANSFER_LIST[0]]
+
+    assert_transaction_list(transaction_list, expected_cleaned_list)
+
+
