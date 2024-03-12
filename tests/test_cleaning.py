@@ -1,5 +1,5 @@
 from unittest.mock import Mock, patch
-from typing import List, Generator, Optional, Union
+from typing import List, Generator, Optional
 from personal_finances.transaction.cleaning import remove_internal_transfers
 from personal_finances.transaction.definition import (
     SimpleTransaction,
@@ -86,7 +86,7 @@ def create_list_with_internal_transactions(
 
 def copy_first_element(
     internal_transfer_pair: List[SimpleTransaction],
-) -> List[SimpleTransaction]:
+) -> SimpleTransaction:
 
     duplicated_transfer_element = deepcopy(internal_transfer_pair[0])
     duplicated_transfer_element["transactionId"] = str(random.random())
@@ -118,6 +118,7 @@ def test_list_with_internal_transfer_should_get_cleaned() -> None:
     one_internal_transaction = (
         REGULAR_TRANSACTIONS_LIST + create_list_with_internal_transactions()
     )
+
     assert_transaction_list(one_internal_transaction, REGULAR_TRANSACTIONS_LIST)
 
 
@@ -154,7 +155,8 @@ def test_list_with_duplicated_internal_transfer_one_element() -> None:
     """
     Assesses the handling of duplicated transactions in a list that includes
     internal transfers. It tests whether remove_internal_transfers can correctly
-    identify and process a list with one element of an internal transfer pair duplicated.
+    identify and process a list with one element of an internal transfer pair
+    duplicated.
     """
     pair_internal_transaction = create_pair_internal_transaction()
     duplicated_element = copy_first_element(pair_internal_transaction)
@@ -162,6 +164,7 @@ def test_list_with_duplicated_internal_transfer_one_element() -> None:
     transaction_list = (
         REGULAR_TRANSACTIONS_LIST + pair_internal_transaction + [duplicated_element]
     )
+
     expected_cleaned_list = REGULAR_TRANSACTIONS_LIST + [duplicated_element]
 
     assert_transaction_list(transaction_list, expected_cleaned_list)
@@ -169,9 +172,10 @@ def test_list_with_duplicated_internal_transfer_one_element() -> None:
 
 def test_list_with_internal_transfer_with_same_ammount() -> None:
     """
-    Tests the function's ability to handle multiple internal transfer transactions
-    with the same amount. It verifies that remove_internal_transfers correctly identifies
-    and removes all internal transfer transactions when they have identical amounts.
+    Tests the function's ability to handle multiple internal transfer
+    transactions with the same amount. It verifies that remove_internal_transfers
+    correctly identifies and removes all internal transfer transactions when
+    they have identical amounts.
     """
     same_amount_internal_transfers = create_list_with_internal_transactions(amount=3)
 
