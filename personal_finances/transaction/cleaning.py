@@ -1,22 +1,12 @@
-from typing import List
+from typing import List, Tuple
 from datetime import timedelta
+from itertools import chain
 from .definition import SimpleTransaction
 from ..config import get_user_configuration
 import logging
 
 
 LOGGER = logging.getLogger(__name__)
-
-
-def _validate_transaction(transaction: SimpleTransaction) -> None:
-    for key, expected_type in SimpleTransaction.__annotations__.items():
-        value = transaction.get(key, None)
-        if key == "amount" and (isinstance(value, float) or isinstance(value, int)):
-            continue  # Allow integers for 'amount' as well as floats
-        if not isinstance(value, expected_type):
-            raise TypeError(
-                f"Invalid type for {key}, expected {expected_type.__name__}"
-            )
 
 
 def _has_internal_transfer_features(transaction: SimpleTransaction) -> bool:
@@ -28,27 +18,28 @@ def _has_internal_transfer_features(transaction: SimpleTransaction) -> bool:
 
 def _get_internal_transfers(
     transactions: List[SimpleTransaction],
-) -> set[int]:
-    internal_transfers = set()
-    for index, current_transaction in enumerate(transactions):
-        _validate_transaction(current_transaction)
-
-        current_datetime = current_transaction["datetime"]
+) -> List[Tuple[str, str]]:
+    skip_processing = set()
+    internal_transfers = list()
+    internal_transfer_ids = list()
+    for current_transaction in transactions:
+        current_id = current_transaction["transactionId"]
         current_amount = current_transaction["amount"]
+        current_datetime = current_transaction["datetime"]
 
-        if index in internal_transfers or not _has_internal_transfer_features(
+        if current_id in skip_processing or not _has_internal_transfer_features(
             current_transaction
         ):
             continue
 
         matching_transactions = [
             transaction
-            for index, transaction in enumerate(transactions)
+            for transaction in transactions
             if _has_internal_transfer_features(transaction)
             and current_amount == -transaction["amount"]
             and abs(current_datetime - transaction["datetime"])
             < timedelta(days=get_user_configuration().BankProcessingTimeInDays)
-            and index not in internal_transfers
+            and transaction["transactionId"] not in skip_processing
         ]
 
         if len(matching_transactions) > 1:
@@ -63,24 +54,28 @@ def _get_internal_transfers(
         if len(matching_transactions) == 0:
             continue
 
-        internal_transfers.add(transactions.index(current_transaction))
-        internal_transfers.add(transactions.index(matching_transactions[0]))
-
+        internal_transfers.append((current_transaction, matching_transactions[0]))
+        internal_transfer_ids.append(
+            (current_id, matching_transactions[0]["transactionId"])
+        )
+        skip_processing.add(current_id)
+        skip_processing.add(matching_transactions[0]["transactionId"])
         LOGGER.info(
             f"""
             internal transfer pair detected
             {current_transaction} {matching_transactions[0]}
             """
         )
-    return internal_transfers
+
+    return internal_transfer_ids
 
 
 def remove_internal_transfers(
     transactions: List[SimpleTransaction],
 ) -> List[SimpleTransaction]:
-    internal_transfer_ids = _get_internal_transfers(transactions)
+    internal_transfer_ids = set(chain(*_get_internal_transfers(transactions)))
     return [
         transaction
-        for index, transaction in enumerate(transactions)
-        if index not in internal_transfer_ids
+        for transaction in transactions
+        if transaction["transactionId"] not in internal_transfer_ids
     ]
