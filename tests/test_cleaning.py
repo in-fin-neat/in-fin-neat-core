@@ -1,10 +1,7 @@
 from unittest.mock import Mock, patch
 from typing import List, Generator, Optional
 from personal_finances.transaction.cleaning import remove_internal_transfers
-from personal_finances.transaction.definition import (
-    SimpleTransaction,
-    simple_transaction_builder,
-)
+from personal_finances.transaction.definition import SimpleTransaction
 from datetime import datetime, timedelta
 import random
 import pytest
@@ -52,7 +49,7 @@ def create_pair_internal_transaction(
     transfer_datetime = datetime.now()
 
     internal_trasaction_pair = [
-        simple_transaction_builder(
+        SimpleTransaction(
             transactionId=str(random.random()),
             datetime=transfer_datetime,
             amount=transfer_amount,
@@ -61,7 +58,7 @@ def create_pair_internal_transaction(
             + "data dummy data dummy",
             bankTransactionCode="dummy_transaction_code",
         ),
-        simple_transaction_builder(
+        SimpleTransaction(
             transactionId=str(random.random()),
             datetime=transfer_datetime,
             amount=-transfer_amount,
