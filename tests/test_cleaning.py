@@ -101,6 +101,13 @@ def assert_transaction_list(
     assert remove_internal_transfers(input_transaction_list) == expected_cleaned_list
 
 
+def test_empty_list() -> None:
+    """
+    Validates if an empty input list return an empty output list.
+    """
+    assert_transaction_list([], [])
+
+
 def test_list_without_internal_transfer_should_get_untouched() -> None:
     """
     Validates that a list of transactions without internal transfers
