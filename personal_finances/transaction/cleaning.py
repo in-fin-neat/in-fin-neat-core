@@ -39,6 +39,7 @@ def _get_internal_transfers(
             and current_amount == -transaction["amount"]
             and abs(current_datetime - transaction["datetime"])
             < timedelta(days=get_user_configuration().BankProcessingTimeInDays)
+            and transaction["transactionId"] not in skip_processing
         ]
 
         if len(matching_transactions) > 1:
