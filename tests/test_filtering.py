@@ -97,3 +97,25 @@ def test_transactions_without_range_should_get_filtered() -> None:
         within_range_transactions,
     )
 
+
+def test_invalid_date_input_should_raise_exception() -> None:
+    transaction_list = create_transactions_in_range(
+        TEST_TRANSACTIONS_QTD_TO_GENERATE,
+        TEST_TRANSACTION_START_DATETIME,
+    )
+
+    with pytest.raises(ValueError):
+        transaction_datetime_filter(
+            start=TEST_TRANSACTION_END_DATETIME,
+            end=TEST_TRANSACTION_START_DATETIME,
+            transactions=transaction_list,
+        )
+
+
+def test_invalid_transaction_list_input_should_raise_exception() -> None:
+    with pytest.raises(ValueError):
+        transaction_datetime_filter(
+            start=TEST_TRANSACTION_START_DATETIME,
+            end=TEST_TRANSACTION_END_DATETIME,
+            transactions=[],
+        )
