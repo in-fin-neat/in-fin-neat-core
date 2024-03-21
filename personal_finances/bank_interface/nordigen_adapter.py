@@ -15,8 +15,9 @@ class TransactionAmount(TypedDict):
 
 
 class NordigenTransaction(TypedDict):
-    bookingDatetime: str
-    bookingDate: str
+    # Either bookingDatetime or bookingDate
+    bookingDatetime: NotRequired[str]
+    bookingDate: NotRequired[str]
     internalTransactionId: NotRequired[str]
     transactionAmount: TransactionAmount
     transactionId: NotRequired[str]
@@ -31,6 +32,18 @@ class NordigenTransaction(TypedDict):
 class NordigenTransactions(TypedDict):
     booked: List[NordigenTransaction]
     pending: List[NordigenTransaction]
+
+
+EMPTY_NORDIGEN_TRANSACTIONS: NordigenTransactions = {"booked": [], "pending": []}
+
+
+def concat_nordigen_transactions(
+    first: NordigenTransactions, second: NordigenTransactions
+) -> NordigenTransactions:
+    return {
+        "booked": first["booked"] + second["booked"],
+        "pending": first["pending"] + second["pending"],
+    }
 
 
 def as_simple_transaction(transaction: NordigenTransaction) -> SimpleTransaction:

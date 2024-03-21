@@ -18,3 +18,13 @@ def write_json(
     create_dirs(path)
     with open(path, "w") as o_file:
         o_file.write(json.dumps(content, indent=4, default=json_converter))
+
+
+def write_string(
+    path: str, content: str, json_converter: Optional[Callable] = str
+) -> str:
+    create_dirs(path)
+    with open(path, "w+") as o_file:
+        previous_content = o_file.read()
+        o_file.write(content)
+        return previous_content

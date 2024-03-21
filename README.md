@@ -37,6 +37,8 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 
 1. `echo GOCARDLESS_SECRET_ID=SecretIdFromGoCardless >.env`
 1. `echo GOCARDLESS_SECRET_KEY=SecretKeyFromGoCardless >>.env`
+1. `echo TOKEN_DISK_PATH_PREFIX=/path/to/token/folder >>.env`
+1. `echo REQUISITION_DISK_PATH_PREFIX=/path/to/token/folder >>.env`
 1. `pipenv run <command> <arguments>`
 
 ## Developing
