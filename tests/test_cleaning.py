@@ -84,7 +84,6 @@ def create_list_with_internal_transactions(
 def copy_first_element(
     internal_transfer_pair: List[SimpleTransaction],
 ) -> SimpleTransaction:
-
     duplicated_transfer_element = deepcopy(internal_transfer_pair[0])
     duplicated_transfer_element["transactionId"] = str(random.random())
 

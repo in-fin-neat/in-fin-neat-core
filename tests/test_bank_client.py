@@ -169,12 +169,12 @@ def test_bank_client_calls_nordigen_client(
         [
             call(
                 institution_id="inst1",
-                redirect_uri="http://localhost:8000/validations/inst1",
+                redirect_uri="http://127.0.0.1:8000/validations/inst1",
                 reference_id="Diego Personal PC 1",
             ),
             call(
                 institution_id="inst2",
-                redirect_uri="http://localhost:8000/validations/inst2",
+                redirect_uri="http://127.0.0.1:8000/validations/inst2",
                 reference_id="Diego Personal PC 2",
             ),
         ]
@@ -192,7 +192,7 @@ def test_bank_client_calls_nordigen_client(
         [call(), call()]
     )
     requests_mock.get.assert_has_calls(
-        [call("http://localhost:8000/validations/", verify=False), call().json()] * 6
+        [call("http://127.0.0.1:8000/validations/", verify=False), call().json()] * 6
     )
 
     assert webbrowser_mock.open.call_count == 2

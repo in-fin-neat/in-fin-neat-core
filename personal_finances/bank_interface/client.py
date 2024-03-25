@@ -83,7 +83,7 @@ class BankClient:
             lambda institution_id: log_wrapper(
                 self._nordigen_client.initialize_session,
                 institution_id=institution_id,
-                redirect_uri=f"http://localhost:8000/validations/{institution_id}",
+                redirect_uri=f"http://127.0.0.1:8000/validations/{institution_id}",
                 reference_id=f"Diego Personal PC {time.time()}",
             ),
             institution_ids,
@@ -98,7 +98,7 @@ class BankClient:
         # TODO: validate content, not only length
         while len(validations) < len(self.bank_details):
             validations = requests.get(
-                "http://localhost:8000/validations/", verify=False
+                "http://127.0.0.1:8000/validations/", verify=False
             ).json()
             LOGGER.info(validations)
             time.sleep(1)
