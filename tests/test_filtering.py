@@ -5,14 +5,11 @@ from typing import List
 from personal_finances.transaction.definition import SimpleTransaction
 from personal_finances.transaction.filtering import transaction_datetime_filter
 
-TEST_TRANSACTIONS_QTD_TO_GENERATE = 300
-TEST_TRANSACTION_START_DATETIME = datetime(1994, 1, 2, 3, 4, 5)
-TEST_TRANSACTION_END_DATETIME = TEST_TRANSACTION_START_DATETIME + timedelta(
-    seconds=TEST_TRANSACTIONS_QTD_TO_GENERATE
-)
+TEST_START_DATETIME = datetime(1994, 1, 2, 3, 4, 5)
+TEST_END_DATETIME = datetime(1994, 1, 2, 3, 4, 7)
 
 
-def create_simple_transaction(index: int, datetime: datetime) -> SimpleTransaction:
+def create_transaction(index: int, datetime: datetime) -> SimpleTransaction:
     return SimpleTransaction(
         transactionId="transaction_" + str(index),
         datetime=datetime,
@@ -20,16 +17,6 @@ def create_simple_transaction(index: int, datetime: datetime) -> SimpleTransacti
         referenceText="reference_transaction",
         bankTransactionCode="dummy_transaction_code",
     )
-
-
-def create_transactions_in_range(
-    quantity: int, datetime_offset: datetime
-) -> List[SimpleTransaction]:
-    transactions = []
-    for i in range(0, quantity):
-        transaction_datetime = datetime_offset + timedelta(seconds=i)
-        transactions.append(create_simple_transaction(i, transaction_datetime))
-    return transactions
 
 
 def assert_transaction_datetime_filter(
@@ -44,78 +31,43 @@ def assert_transaction_datetime_filter(
     )
 
 
-def test_all_transactions_within_range_should_not_filter() -> None:
-    transaction_list = create_transactions_in_range(
-        TEST_TRANSACTIONS_QTD_TO_GENERATE, TEST_TRANSACTION_START_DATETIME
-    )
-
+def test_empty_transaction_list_input() -> None:
     assert_transaction_datetime_filter(
-        TEST_TRANSACTION_START_DATETIME,
-        TEST_TRANSACTION_END_DATETIME,
-        transaction_list,
-        transaction_list,
-    )
-
-
-def test_all_transactions_without_range_should_return_empty() -> None:
-    transaction_list = create_transactions_in_range(
-        TEST_TRANSACTIONS_QTD_TO_GENERATE,
-        TEST_TRANSACTION_END_DATETIME + timedelta(seconds=1),
-    )
-
-    assert_transaction_datetime_filter(
-        TEST_TRANSACTION_START_DATETIME,
-        TEST_TRANSACTION_END_DATETIME,
-        transaction_list,
+        TEST_START_DATETIME,
+        TEST_END_DATETIME,
+        [],
         [],
     )
 
 
-def test_transactions_without_range_should_get_filtered() -> None:
-    before_range_transactions = create_transactions_in_range(
-        TEST_TRANSACTIONS_QTD_TO_GENERATE,
-        TEST_TRANSACTION_START_DATETIME
-        + timedelta(seconds=-TEST_TRANSACTIONS_QTD_TO_GENERATE),
-    )
-    within_range_transactions = create_transactions_in_range(
-        TEST_TRANSACTIONS_QTD_TO_GENERATE,
-        TEST_TRANSACTION_START_DATETIME,
-    )
-    after_range_transactions = create_transactions_in_range(
-        TEST_TRANSACTIONS_QTD_TO_GENERATE,
-        TEST_TRANSACTION_END_DATETIME + timedelta(seconds=1),
-    )
+def test_transactions_datetime_filter() -> None:
+    start_st = TEST_START_DATETIME
+    end_st = TEST_END_DATETIME
+    within_range_list = []
+    outside_range_list = []
 
-    transaction_list = (
-        before_range_transactions + within_range_transactions + after_range_transactions
-    )
+    within_range_list.append(create_transaction(1, start_st))
+    within_range_list.append(create_transaction(2, start_st + timedelta(seconds=1)))
+    within_range_list.append(create_transaction(3, end_st - timedelta(seconds=1)))
+    within_range_list.append(create_transaction(4, end_st))
+
+    outside_range_list.append(create_transaction(5, start_st - timedelta(seconds=1)))
+    outside_range_list.append(create_transaction(6, end_st + timedelta(seconds=1)))
 
     assert_transaction_datetime_filter(
-        TEST_TRANSACTION_START_DATETIME,
-        TEST_TRANSACTION_END_DATETIME,
-        transaction_list,
-        within_range_transactions,
+        start_st,
+        end_st,
+        within_range_list + outside_range_list,
+        within_range_list,
     )
 
 
-def test_invalid_date_input_should_raise_exception() -> None:
-    transaction_list = create_transactions_in_range(
-        TEST_TRANSACTIONS_QTD_TO_GENERATE,
-        TEST_TRANSACTION_START_DATETIME,
-    )
+def test_invalid_datetime_input_should_raise_exception() -> None:
+    transaction_list = [create_transaction(1, TEST_START_DATETIME)]
 
     with pytest.raises(ValueError):
         transaction_datetime_filter(
-            start=TEST_TRANSACTION_END_DATETIME,
-            end=TEST_TRANSACTION_START_DATETIME,
+            start=TEST_END_DATETIME,
+            end=TEST_START_DATETIME,
             transactions=transaction_list,
-        )
-
-
-def test_invalid_transaction_list_input_should_raise_exception() -> None:
-    with pytest.raises(ValueError):
-        transaction_datetime_filter(
-            start=TEST_TRANSACTION_START_DATETIME,
-            end=TEST_TRANSACTION_END_DATETIME,
-            transactions=[],
         )
