@@ -18,8 +18,6 @@ def transaction_datetime_filter(
 ) -> List[SimpleTransaction]:
     if start > end:
         raise ValueError("Start date cannot be greater than end date")
-    if not transactions:
-        raise ValueError("Transaction list should not be empty")
 
     return _filter_by_property_range(
         start, end, lambda transaction: transaction["datetime"], transactions
