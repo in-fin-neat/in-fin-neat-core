@@ -1,0 +1,26 @@
+InternalTransferReferences:
+  - leo-paypal
+BankProcessingTimeInDays: 3
+FilterReferenceWordsForGrouping:
+  - words to be
+  - filtered when grouping transactions, like
+  - credit card
+  - VDP (accronyms that appear in all transactions)
+  - internet
+ExpenseCategoryDefinition:
+  - CategoryName: restaurant
+    CategoryTags:
+      - '#travelLunch'
+      - '#burger'
+    CategoryReferences:
+      - mc donauld
+      - burguer king
+      - kfc
+IncomeCategoryDefinition:
+  - CategoryName: Salary
+    CategoryTags:
+      - '#MySalary'
+      - '#SideJobSalary'
+    CategoryReferences:
+      - Company Name
+      - Sidejob Company Name
