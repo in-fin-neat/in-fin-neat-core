@@ -48,6 +48,9 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 1. `pipenv run format`
 1. `gh pr create --title "brand new feature"`
 
+### Writing Tests
+This repository implments tests using [pytest](https://docs.pytest.org/), the test files are in the folder `personal_finances/tests/`, it has one test file per source file and the file structure follows the source file structure in `personal_finances/personal_finances/`.
+
 
 [^env_vars]: [For linux](https://www.gnu.org/software/bash/manual/bash.html#Environment) you can either prepend as in `NAME=value pipenv ...` or use `export NAME=value`, [for windows](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/set_1) you can use `set`.
 [^user_config]: A more detailed documentation on [the user configuration file can be found here](docs/user_configuration_file.md).
