@@ -1,0 +1,223 @@
+{
+    "booked": [
+        {
+            "endToEndId": "MDSSSDG",
+            "mandateId": "12312",
+            "bookingDate": "2024-03-25",
+            "valueDate": "2024-03-25",
+            "transactionAmount": {
+                "amount": "-2.99",
+                "currency": "EUR"
+            },
+            "creditorName": "GOOGLE-GOOGLE PLAY APP G.CO HELPPAY# IE",
+            "remittanceInformationUnstructured": "GOOGLE-GOOGLE PLAY APP  G.CO HELPPA\nY# IE\nKarte Nr. 9999 9999 9999 9999\nMastercard Debit\nGOOGLE-GOOGLE PLAY APP   G.CO/HELPP\nAY#IRL\n2024-03-",
+            "remittanceInformationUnstructuredArray": [
+                "GOOGLE-GOOGLE PLAY APP G.CO HELPPA",
+                "Y# IE",
+                "Karte Nr. 9999 9999 9999 9999",
+                "Mastercard Debit",
+                "GOOGLE-GOOGLE PLAY APP G.CO/HELPP",
+                "AY#IRL",
+                "2024-03-20T",
+                "15:26:15 Kartenzahlung"
+            ],
+            "remittanceInformationStructured": "GOOGLE-GOOGLE PLAY APP G.CO HELPPA Y# IE Karte Nr. 9999 9999 9999 9999 Mastercard Debit GOOGLE-GOOGLE PLAY APP G.CO/HELPP AY#IRL 2024-03-20T",
+            "internalTransactionId": "74de476eeac8930411373b8477525198"
+        },
+        {
+            "endToEndId": "D-421421",
+            "mandateId": "4214421",
+            "bookingDate": "2024-03-25",
+            "valueDate": "2024-03-25",
+            "transactionAmount": {
+                "amount": "-68.31",
+                "currency": "EUR"
+            },
+            "creditorName": "GC RE OCTOPUS ENERGY",
+            "remittanceInformationUnstructured": "GC RE OCTOPUS ENERGY\nREF-3142513262316231621\nEnd-to-End-Ref.: D-2731857981237\nMandatsref: 6262132\nGl\u00e4ubiger-ID:\n12236437684594865643s",
+            "remittanceInformationUnstructuredArray": [
+                "GC RE OCTOPUS ENERGY",
+                "REF-3142513262316231621",
+                "End-to-End-Ref.: D-2731857981237",
+                "Mandatsref: 6262132",
+                "Gl\u00e4ubiger-ID:",
+                "12236437684594865643s",
+                "SEPA-BASISLASTSCHRIFT wiederholend"
+            ],
+            "remittanceInformationStructured": "GC RE OCTOPUS ENERGY REF-3142513262316231621 End-to-End-Ref.: D-2731857981237 Mandatsref: 6262132 Gl\u00e4ubiger-ID: 12236437684594865643s",
+            "internalTransactionId": "3dee9b3917469d706e6531db74d3c2bd"
+        },
+        {
+            "endToEndId": "00521421442214",
+            "mandateId": "HIGH-1252135213",
+            "bookingDate": "2024-03-18",
+            "valueDate": "2024-03-18",
+            "transactionAmount": {
+                "amount": "-15",
+                "currency": "EUR"
+            },
+            "creditorName": "mobilezone data plan",
+            "remittanceInformationUnstructured": "mobilezone \n1235123512335\nEnd-to-End-Ref.:\n135212353523151325\nMandatsref: HIGH-235215213-01\nGl\u00e4ubiger-ID: ADSGSDGZ512353\nSEPA-BASISLAS",
+            "remittanceInformationUnstructuredArray": [
+                "mobilezone ",
+                "1235123512335",
+                "End-to-End-Ref.:",
+                "135212353523151325",
+                "Mandatsref: HIGH-235215213-01",
+                "Gl\u00e4ubiger-ID: ADSGSDGZ512353",
+                "SEPA-BASISLAS",
+                "TSCHRIFT wiederholend"
+            ],
+            "remittanceInformationStructured": "mobilezone  1235123512335 End-to-End-Ref.: 135212353523151325 Mandatsref: HIGH-235215213-01 Gl\u00e4ubiger-ID: ADSGSDGZ512353 SEPA-BASISLAS",
+            "internalTransactionId": "b1add240c5a4c9a1d65ced8fe52d742d"
+        },
+        {
+            "endToEndId": "1235231521365477457",
+            "mandateId": "123515",
+            "bookingDate": "2024-03-21",
+            "valueDate": "2024-03-21",
+            "transactionAmount": {
+                "amount": "-9.99",
+                "currency": "EUR"
+            },
+            "creditorName": "00300 MCDONALDS MUENCHEN DE",
+            "remittanceInformationUnstructured": "00300 MCDONALDS//MUENCHEN/DE\n2024-03-20T12:31:09 KFN 0 \nKartenzahlung",
+            "remittanceInformationUnstructuredArray": [
+                "00300 MCDONALDS//MUENCHEN/DE",
+                "2024-03-20T12:31:09 KFN 0 ",
+                "Kartenzahlung"
+            ],
+            "remittanceInformationStructured": "00300 MCDONALDS//MUENCHEN/DE 2024-03-20T12:31:09 KFN 0  Kartenzahlung",
+            "internalTransactionId": "63d4888ce9bb1d02ff39a1052681dfe9"
+        },
+        {
+            "endToEndId": "12353215123512363216",
+            "mandateId": "3463466",
+            "bookingDate": "2024-03-20",
+            "valueDate": "2024-03-20",
+            "transactionAmount": {
+                "amount": "-1.6",
+                "currency": "EUR"
+            },
+            "creditorName": "BURGUER KING S AG PLATTLING DE",
+            "remittanceInformationUnstructured": "BURGUER KING S AG//PLATTLING/DE\n2024-03-19T08:16:00 KFN \nKartenzahlung",
+            "remittanceInformationUnstructuredArray": [
+                "BURGUER KING S AG//PLATTLING/DE",
+                "2024-03-19T08:16:00 KFN ",
+                "Kartenzahlung"
+            ],
+            "remittanceInformationStructured": "BURGUER KING S AG//PLATTLING/DE 2024-03-19T08:16:00 KFN  Kartenzahlung",
+            "internalTransactionId": "129fcc88c458f9028e71ed06c68c588d"
+        },
+        {
+            "endToEndId": "23153251512 16434326324",
+            "mandateId": "1235213521352315",
+            "bookingDate": "2024-03-06",
+            "valueDate": "2024-03-06",
+            "transactionAmount": {
+                "amount": "-49",
+                "currency": "EUR"
+            },
+            "creditorName": "TRAIN TICKET",
+            "remittanceInformationUnstructured": "TRAIN TICKET\nAbo 123532152 zum 01.03.2024\nEnd-to-End-Ref.:\n231512521514 143512351235\nMandatsref: 1235213521352315\nGl\u00e4ubiger-ID: DEDE231F",
+            "remittanceInformationUnstructuredArray": [
+                "TRAIN TICKET",
+                "Abo 123532152 zum 01.03.2024",
+                "End-to-End-Ref.:",
+                "231512521514 143512351235",
+                "Mandatsref: 1235213521352315",
+                "Gl\u00e4ubiger-ID: DEDE231F",
+                "SEPA-BASISLASTSCHRIFT wiederholend"
+            ],
+            "remittanceInformationStructured": "TRAIN TICKET Abo 123532152 zum 01.03.2024 End-to-End-Ref.: 231512521514 143512351235 Mandatsref: 1235213521352315 Gl\u00e4ubiger-ID: DEDE231F",
+            "internalTransactionId": "97091ce7ad16291ade174c934c124494"
+        },
+        {
+            "endToEndId": "100017590657 050055002452",
+            "mandateId": "1235213521352315",
+            "bookingDate": "2024-01-05",
+            "valueDate": "2024-01-05",
+            "transactionAmount": {
+                "amount": "-49",
+                "currency": "EUR"
+            },
+            "creditorName": "TRAIN TICKET",
+            "remittanceInformationUnstructured": "TRAIN TICKET\nAbo 123532152 zum 01.01.2024\nEnd-to-End-Ref.:\n100017590657 050055002452\nMandatsref: 1235213521352315\nGl\u00e4ubiger-ID: DEDE231F",
+            "remittanceInformationUnstructuredArray": [
+                "TRAIN TICKET",
+                "Abo 123532152 zum 01.01.2024",
+                "End-to-End-Ref.:",
+                "100017590657 050055002452",
+                "Mandatsref: 1235213521352315",
+                "Gl\u00e4ubiger-ID: DEDE231F",
+                "SEPA-BASISLASTSCHRIFT wiederholend"
+            ],
+            "remittanceInformationStructured": "TRAIN TICKET Abo 123532152 zum 01.01.2024 End-to-End-Ref.: 100017590657 050055002452 Mandatsref: 1235213521352315 Gl\u00e4ubiger-ID: DEDE231F",
+            "internalTransactionId": "4dd99d3dd2a66105f441459561e5abcc"
+        },
+        {
+            "endToEndId": "347588",
+            "bookingDate": "2024-03-21",
+            "valueDate": "2024-03-21",
+            "transactionAmount": {
+                "amount": "98",
+                "currency": "EUR"
+            },
+            "debtorName": "Company Name",
+            "remittanceInformationUnstructured": "Company Name\nIhre Spesenabrechnung 12536 Ihre Sp\nesenabrechnung 62347\nEnd-to-End-Ref.: 347588\nKundenreferenz:\nNSSD2401235123512360",
+            "remittanceInformationUnstructuredArray": [
+                "Company Name",
+                "Ihre Spesenabrechnung 12536 Ihre Sp",
+                "esenabrechnung 62347",
+                "End-to-End-Ref.: 347588",
+                "Kundenreferenz:",
+                "NSSD2401235123512360",
+                "0000000001"
+            ],
+            "remittanceInformationStructured": "Company Name Ihre Spesenabrechnung 12536 Ihre Sp esenabrechnung 62347 End-to-End-Ref.: 347588 Kundenreferenz: NSSD2401235123512360",
+            "internalTransactionId": "f8ca9991a65f4230d108d47514696580"
+        },
+        {
+            "endToEndId": "1325213553-000007528135",
+            "bookingDate": "2024-02-29",
+            "valueDate": "2024-02-29",
+            "transactionAmount": {
+                "amount": "3000.09",
+                "currency": "EUR"
+            },
+            "debtorName": "Company Name",
+            "remittanceInformationUnstructured": "Company Name\nLOHN / GEHALT 02/24\nEnd-to-End-Ref.:\n1325213553-000007528135\nKundenreferenz:\nNSDD24512325333333333333535351252",
+            "remittanceInformationUnstructuredArray": [
+                "Company Name",
+                "LOHN / GEHALT 02/24",
+                "End-to-End-Ref.:",
+                "1325213553-000007528135",
+                "Kundenreferenz:",
+                "NSDD24512325333333333333535351252"
+            ],
+            "remittanceInformationStructured": "Company Name LOHN / GEHALT 02/24 End-to-End-Ref.: 1325213553-000007528135 Kundenreferenz: NSDD24512325333333333333535351252",
+            "internalTransactionId": "3ea2a786b654b213c19b333fb8748922"
+        }
+    ],
+    "pending": [
+        {
+            "endToEndId": "53123525321325131664",
+            "mandateId": "215325",
+            "bookingDate": "2024-03-18",
+            "valueDate": "2024-03-18",
+            "transactionAmount": {
+                "amount": "-12.7",
+                "currency": "EUR"
+            },
+            "creditorName": "Biergarten am Chinesischen Turm Mu",
+            "remittanceInformationUnstructured": "Biergarten am Chinesischen Turm//Mu\n2024-03-10T15:46:37 KFN 0  \nKartenzahlung",
+            "remittanceInformationUnstructuredArray": [
+                "Biergarten am Chinesischen Turm//Mu",
+                "2024-03-10T15:46:37 KFN 0 ",
+                "Kartenzahlung"
+            ],
+            "remittanceInformationStructured": "Biergarten am Chinesischen Turm//Mu 2024-03-10T15:46:37 KFN 0  Kartenzahlung",
+            "internalTransactionId": "b364b686783a1a79caa4cf811d80025d"
+        }
+    ]
+}
