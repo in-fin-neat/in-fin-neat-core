@@ -30,6 +30,14 @@ LOGGER = logging.getLogger(__name__)
 ProcessorDataType = Union[Any, Tuple[Any, Any]]
 
 
+class InvalidDatatime(Exception):
+    pass
+
+
+class InvalidDatatimeRange(Exception):
+    pass
+
+
 class CategorizedTransaction(GroupedTransaction):
     customCategory: str
 
@@ -205,6 +213,17 @@ def generate_reports(
     user_config_file_path: str,
 ) -> None:
     """Generates reports from transactions according to the time filter specified."""
+    try:
+        start_datetime = dateutil.parser.isoparse(start_time)
+        end_datetime = dateutil.parser.isoparse(end_time)
+    except ValueError as e:
+        raise InvalidDatatime(e)
+
+    if start_datetime > end_datetime:
+        raise InvalidDatatimeRange(
+            f"invalid input: start time {start_time} greater than end_time {end_time}"
+        )
+
     cache_user_configuration(user_config_file_path)
     with open(transactions_file_path, "r") as transactions_file:
         transactions: List[SimpleTransaction] = list(
@@ -216,8 +235,8 @@ def generate_reports(
 
     _write_reports(
         transactions,
-        dateutil.parser.isoparse(start_time),
-        dateutil.parser.isoparse(end_time),
+        start_datetime,
+        end_datetime,
     )
     LOGGER.info("finished reports")
 
