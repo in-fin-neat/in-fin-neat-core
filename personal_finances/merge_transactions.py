@@ -7,7 +7,7 @@ import json
 from collections import defaultdict
 from personal_finances.file_helper import write_json
 from .bank_interface.nordigen_adapter import NordigenTransaction, get_id
-
+from datetime import datetime
 
 LOGGER = logging.getLogger(__name__)
 
@@ -68,7 +68,11 @@ def merge_transactions() -> None:
             # transactions += file_transactions["pending"]
 
     deduped_transactions = dedupe_transactions(transactions)
-    write_json("data/merged_transactions.json", deduped_transactions)
+
+    write_json(
+        f"data/merged_transactions-{datetime.now().isoformat()}.json",
+        deduped_transactions,
+    )
 
 
 if __name__ == "__main__":
