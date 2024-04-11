@@ -74,7 +74,7 @@ TEST_SAME_ID_TRANSACTIONS = [
     ),
 ]
 TEST_SAME_ID_MERGED = [
-    # Only the first same_id entry will be considered. 
+    # Only the first same_id entry will be considered.
     # According to the Go cardless API, transactionId should not be repeated
     create_nordigen_transaction(amount=45.00, id="same_id"),
     create_nordigen_transaction(amount=40.00, internal_id="inter_id"),
@@ -108,6 +108,7 @@ TEST_WITHOUT_ID_MERGED = [
     create_nordigen_transaction(amount=-45.00),
     create_nordigen_transaction(amount=-40.00),
 ]
+
 
 @pytest.mark.parametrize(
     "transactions_name_list, transactions_list, merged_expected",
