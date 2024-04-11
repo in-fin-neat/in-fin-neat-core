@@ -14,10 +14,10 @@ class TransactionAmount(TypedDict):
     currency: str
 
 
-class NordigenTransaction(TypedDict):
+class NordigenTransaction(TypedDict, total=False):
     bookingDatetime: str
     bookingDate: str
-    internalTransactionId: str
+    internalTransactionId: NotRequired[str]
     transactionAmount: TransactionAmount
     transactionId: NotRequired[str]
     creditorName: NotRequired[str]
@@ -26,6 +26,11 @@ class NordigenTransaction(TypedDict):
     remittanceInformationUnstructuredArray: NotRequired[List[str]]
     merchantCategoryCode: NotRequired[str]
     proprietaryBankTransactionCode: NotRequired[str]
+
+
+class NordigenTransactions(TypedDict):
+    booked: List[NordigenTransaction]
+    pending: List[NordigenTransaction]
 
 
 def as_simple_transaction(transaction: NordigenTransaction) -> SimpleTransaction:
