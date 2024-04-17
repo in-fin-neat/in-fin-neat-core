@@ -21,8 +21,8 @@ def _get_deduped_transaction(
     LOGGER.info(f"deduping: {dupe_transactions}")
     return sorted(
         dupe_transactions,
-        key=lambda dupe_transaction: len(dupe_transaction.keys()),
-        reverse=True,
+        key=lambda dupe_transaction: str(dupe_transaction.keys())
+        + str(dupe_transaction.values()),
     )[0]
 
 
