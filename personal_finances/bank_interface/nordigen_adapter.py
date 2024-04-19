@@ -17,7 +17,7 @@ class TransactionAmount(TypedDict):
 class NordigenTransaction(TypedDict):
     bookingDatetime: str
     bookingDate: str
-    internalTransactionId: str
+    internalTransactionId: NotRequired[str]
     transactionAmount: TransactionAmount
     transactionId: NotRequired[str]
     creditorName: NotRequired[str]
@@ -26,6 +26,11 @@ class NordigenTransaction(TypedDict):
     remittanceInformationUnstructuredArray: NotRequired[List[str]]
     merchantCategoryCode: NotRequired[str]
     proprietaryBankTransactionCode: NotRequired[str]
+
+
+class NordigenTransactions(TypedDict):
+    booked: List[NordigenTransaction]
+    pending: List[NordigenTransaction]
 
 
 def as_simple_transaction(transaction: NordigenTransaction) -> SimpleTransaction:
@@ -53,6 +58,10 @@ def get_amount(transaction: NordigenTransaction) -> float:
     return float(transaction["transactionAmount"]["amount"])
 
 
+def get_currency(transaction: NordigenTransaction) -> str:
+    return transaction["transactionAmount"]["currency"]
+
+
 def _get_internal_transaction_id(transaction: NordigenTransaction) -> str:
     if "internalTransactionId" in transaction:
         return transaction["internalTransactionId"]
@@ -65,7 +74,8 @@ def get_id(transaction: NordigenTransaction) -> str:
             uuid.uuid5(
                 uuid.UUID("29fff09d-93fa-49d2-a902-eb39f25ba953"),
                 _get_internal_transaction_id(transaction)
-                + str(get_amount(transaction)),
+                + str(get_amount(transaction))
+                + str(get_currency(transaction)),
             )
         )
 
