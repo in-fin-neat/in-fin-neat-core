@@ -93,18 +93,6 @@ def create_nordigen_tranctions(transaction_list: List[NordigenTransaction]) -> s
     )
 
 
-def swap_transactions(
-    transaciton_list: List[NordigenTransaction],
-) -> List[NordigenTransaction]:
-
-    for i in range(0, len(transaciton_list) - 1):
-        temp = transaciton_list[i]
-        transaciton_list[i] = transaciton_list[i + 1]
-        transaciton_list[i + 1] = temp
-
-    return transaciton_list
-
-
 SAME_ID_TRANSACTIONS = [
     # An identical transactionId represents the same
     # transaction regardless of any other parameter.
@@ -182,9 +170,9 @@ def assert_is_list_equal(
             ["transactions_a.json", "transnoise2.jpg", "transactions_b.json"],
             2,
             [
-                create_nordigen_tranctions(swap_transactions(SAME_ID_TRANSACTIONS)),
+                create_nordigen_tranctions(list(reversed(SAME_ID_TRANSACTIONS))),
                 create_nordigen_tranctions(
-                    swap_transactions(SAME_INTERNAL_ID_TRANSACTIONS)
+                    list(reversed(SAME_INTERNAL_ID_TRANSACTIONS))
                 ),
             ],
             EXPECTED_SAME_ID_MERGED,
