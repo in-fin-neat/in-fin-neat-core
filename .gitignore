@@ -4,3 +4,4 @@ reports/
 .coverage
 coverage.xml
 .env
+.vscode/
