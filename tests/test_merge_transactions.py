@@ -198,7 +198,6 @@ def test_merge_transaction(
     write_json_mock: Mock,
     datetime_mock: Mock,
 ) -> None:
-
     listdir_mock.return_value = transactions_file_names
     open_mock.return_value.read.side_effect = transactions_list
     mock_dummy_datetime = "2024-01-01T10:00:00.00000"
@@ -222,7 +221,6 @@ def test_merge_transaction(
 def test_invalid_transaction_json_input(
     open_mock: Mock, listdir_mock: Mock, write_json_mock: Mock
 ) -> None:
-
     mocked_files_names = [
         "transactions-2024-04-07.json",
     ]
@@ -254,7 +252,6 @@ def test_empty_data_folder_should_create_empty_output(
     write_json_mock: Mock,
     datetime_mock: Mock,
 ) -> None:
-
     listdir_mock.return_value = []
     mock_dummy_datetime = "2024-01-01T10:00:00.00000"
     datetime_mock.now.return_value.isoformat.return_value = mock_dummy_datetime
