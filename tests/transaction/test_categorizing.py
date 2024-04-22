@@ -4,7 +4,7 @@ import re
 from typing import List, Generator
 
 from personal_finances.config import CategoryDefinition
-from personal_finances.transaction.categorizing import get_category
+from personal_finances.transaction.categorizing import get_category, _get_expense_category_references, _get_expense_category_tags, _get_income_category_references
 
 
 UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
@@ -15,6 +15,9 @@ def user_config_mock() -> Generator[Mock, None, None]:
     with patch(
         "personal_finances.transaction.categorizing.get_user_configuration"
     ) as u_mock:
+        _get_expense_category_references.cache_clear(),
+        _get_expense_category_tags.cache_clear()
+        _get_income_category_references.cache_clear()
         u_mock.return_value.ExpenseCategoryDefinition = [
             CategoryDefinition(
                 CategoryName="house",
@@ -57,10 +60,11 @@ def test_get_category(
     fallback_reference: str,
     expected_pattern: str,
 ) -> None:
+    result = get_category(transaction_reference, group_references, fallback_reference)
     assert (
         re.match(
             expected_pattern,
-            get_category(transaction_reference, group_references, fallback_reference),
+            result,
         )
         is not None
     )

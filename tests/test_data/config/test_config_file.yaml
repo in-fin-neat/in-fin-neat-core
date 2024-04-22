@@ -2,11 +2,8 @@ InternalTransferReferences:
   - leo-paypal
 BankProcessingTimeInDays: 3
 FilterReferenceWordsForGrouping:
-  - words to be
-  - filtered when grouping transactions, like
-  - credit card
-  - VDP (accronyms that appear in all transactions)
-  - internet
+  - train ticket
+  - spesenabrechnung
 ExpenseCategoryDefinition:
   - CategoryName: restaurant
     CategoryTags:
@@ -16,11 +13,19 @@ ExpenseCategoryDefinition:
       - mc donauld
       - burguer king
       - kfc
+  - CategoryName: entertainment
+    CategoryTags:
+      - '#netflix'
+      - '#disney'
+    CategoryReferences:
+      - netflix
+      - disney plus
+      - hbo max
 IncomeCategoryDefinition:
   - CategoryName: Salary
     CategoryTags:
       - '#MySalary'
       - '#SideJobSalary'
     CategoryReferences:
-      - Company Name
-      - Sidejob Company Name
+      - company name
+      - sidejob company name

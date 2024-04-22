@@ -116,14 +116,16 @@ def _write_category_amounts(
 def _write_balance(
     total_income: float,
     total_expense: float,
-    context: Dict,
+    start_time: datetime,
+    end_time: datetime,
     file_prefix: str,
 ) -> None:
     file_path = f"{file_prefix}balance.json"
     write_json(
         file_path,
         {
-            **context,
+            "start_time": start_time,
+            "end_time": end_time,
             "total_income": total_income,
             "total_expense": total_expense,
             "total_balance": total_income + total_expense,
@@ -172,10 +174,11 @@ def _write_reports(
     time_range = f"{start_time.isoformat()}_{end_time.isoformat()}"
 
     _write_balance(
-        total_income,
-        total_expense,
-        {"start_time": start_time.isoformat(), "end_time": end_time.isoformat()},
-        f"reports/{time_range}/",
+        total_income=total_income,
+        total_expense=total_expense,
+        start_time=start_time,
+        end_time=end_time,
+        file_prefix=f"reports/{time_range}/",
     )
     _write_category_amounts(income_transactions, f"reports/{time_range}/income")
     _write_category_amounts(expense_transactions, f"reports/{time_range}/expense")
