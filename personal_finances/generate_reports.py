@@ -18,7 +18,7 @@ from personal_finances.transaction.definition import SimpleTransaction
 from personal_finances.transaction.categorizing import get_category
 from personal_finances.file_helper import write_json
 from personal_finances.config import cache_user_configuration
-from typing import Dict, List, Tuple, Callable, Any, Union, cast
+from typing import List, Tuple, Callable, Any, Union, cast
 from functools import partial
 import dateutil.parser
 import click
