@@ -1,16 +1,18 @@
 InternalTransferReferences:
-  - leo-paypal
+  - train
+  - spesenabrechnung
+
 BankProcessingTimeInDays: 3
 FilterReferenceWordsForGrouping:
-  - train ticket
-  - spesenabrechnung
+  - muenchen
+  - gmbh
 ExpenseCategoryDefinition:
   - CategoryName: restaurant
     CategoryTags:
       - '#travelLunch'
       - '#burger'
     CategoryReferences:
-      - mc donauld
+      - mcdonaulds
       - burguer king
       - kfc
   - CategoryName: entertainment
@@ -29,3 +31,8 @@ IncomeCategoryDefinition:
     CategoryReferences:
       - company name
       - sidejob company name
+  - CategoryName: Rental
+    CategoryTags:
+      - '#MyRental'
+    CategoryReferences:
+      - tentant name

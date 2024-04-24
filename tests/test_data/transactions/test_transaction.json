@@ -3,7 +3,7 @@
         "bookingDate": "2024-03-25",
         "valueDate": "2024-03-25",
         "transactionAmount": {
-            "amount": "-2.99",
+            "amount": "-22.99",
             "currency": "EUR"
         },
         "creditorName": "NETFLIX# IE",
@@ -29,9 +29,9 @@
             "currency": "EUR"
         },
         "creditorName": "GC RE DISNEY PLUS",
-        "remittanceInformationUnstructured": "GC RE DISNEY PLUS\nREF-3142513262316231621\nEnd-to-End-Ref.: D-2731857981237\nMandatsref: 6262132\nGl\u00e4ubiger-ID:\n12236437684594865643s",
+        "remittanceInformationUnstructured": "GC RE DISNEY PLUS MUENCHEN\nREF-3142513262316231621\nEnd-to-End-Ref.: D-2731857981237\nMandatsref: 6262132\nGl\u00e4ubiger-ID:\n12236437684594865643s",
         "remittanceInformationUnstructuredArray": [
-            "GC RE DISNEY PLUS",
+            "GC RE DISNEY PLUS MUENCHEN",
             "REF-3142513262316231621",
             "End-to-End-Ref.: D-2731857981237",
             "Mandatsref: 6262132",
@@ -39,7 +39,7 @@
             "12236437684594865643s",
             "SEPA-BASISLASTSCHRIFT wiederholend"
         ],
-        "remittanceInformationStructured": "GC RE DISNEY PLUS REF-3142513262316231621 End-to-End-Ref.: D-2731857981237 Mandatsref: 6262132 Gl\u00e4ubiger-ID: 12236437684594865643s",
+        "remittanceInformationStructured": "GC RE DISNEY PLUS MUENCHEN REF-3142513262316231621 End-to-End-Ref.: D-2731857981237 Mandatsref: 6262132 Gl\u00e4ubiger-ID: 12236437684594865643s",
         "transactionId": "3dee9b3917469d706e6531db74d3c2bd"
     },
     {
@@ -63,7 +63,7 @@
         "bookingDate": "2024-03-20",
         "valueDate": "2024-03-20",
         "transactionAmount": {
-            "amount": "-1.6",
+            "amount": "-10.6",
             "currency": "EUR"
         },
         "creditorName": "BURGUER KING S AG PLATTLING DE",
@@ -84,9 +84,9 @@
             "currency": "EUR"
         },
         "creditorName": "train ticket",
-        "remittanceInformationUnstructured": "TRAIN TICKET\nAbo 123532152 zum 01.01.2024\nEnd-to-End-Ref.:\n100017590657 050055002452\nMandatsref: 1235213521352315\nGl\u00e4ubiger-ID: DEDE231F",
+        "remittanceInformationUnstructured": "train ticket\nAbo 123532152 zum 01.01.2024\nEnd-to-End-Ref.:\n100017590657 050055002452\nMandatsref: 1235213521352315\nGl\u00e4ubiger-ID: DEDE231F",
         "remittanceInformationUnstructuredArray": [
-            "TRAIN TICKET",
+            "train ticket",
             "Abo 123532152 zum 01.01.2024",
             "End-to-End-Ref.:",
             "100017590657 050055002452",
@@ -94,7 +94,7 @@
             "Gl\u00e4ubiger-ID: DEDE231F",
             "SEPA-BASISLASTSCHRIFT wiederholend"
         ],
-        "remittanceInformationStructured": "TRAIN TICKET Abo 123532152 zum 01.01.2024 End-to-End-Ref.: 100017590657 050055002452 Mandatsref: 1235213521352315 Gl\u00e4ubiger-ID: DEDE231F",
+        "remittanceInformationStructured": "train ticket Abo 123532152 zum 01.01.2024 End-to-End-Ref.: 100017590657 050055002452 Mandatsref: 1235213521352315 Gl\u00e4ubiger-ID: DEDE231F",
         "transactionId": "4dd99d3dd2a66105f441459561e5abcc"
     },
     {
@@ -107,7 +107,7 @@
         "debtorName": "VISA Spesenabrechnung",
         "remittanceInformationUnstructured": "VISA Spesenabrechnung\nIhre train ticket Spesenabrechnung 12536 Ihre Sp\nesenabrechnung 62347\nEnd-to-End-Ref.: 347588\nKundenreferenz:\nNSSD2401235123512360",
         "remittanceInformationUnstructuredArray": [
-            "VISA Spesenabrechnung",
+            "VISA Spesenabrechnung train ticket",
             "Ihre Spesenabrechnung 12536 Ihre Sp",
             "esenabrechnung 62347",
             "End-to-End-Ref.: 347588",
@@ -126,16 +126,36 @@
             "currency": "EUR"
         },
         "debtorName": "Company Name",
-        "remittanceInformationUnstructured": "Company Name\nLOHN / GEHALT 02/24\nEnd-to-End-Ref.:\n1325213553-000007528135\nKundenreferenz:\nNSDD24512325333333333333535351252",
+        "remittanceInformationUnstructured": "Company Name\nLOHN / GEHALT 02/24\nEnd-to-End-Ref.:\n1325213553-000007528135\nKundenreferenz:\nAADD24542225333333333333535351252",
         "remittanceInformationUnstructuredArray": [
             "Company Name",
             "LOHN / GEHALT 02/24",
             "End-to-End-Ref.:",
             "1325213553-000007528135",
             "Kundenreferenz:",
-            "NSDD24512325333333333333535351252"
+            "AADD24542225333333333333535351252"
         ],
-        "remittanceInformationStructured": "Company Name LOHN / GEHALT 02/24 End-to-End-Ref.: 1325213553-000007528135 Kundenreferenz: NSDD24512325333333333333535351252",
+        "remittanceInformationStructured": "Company Name LOHN / GEHALT 02/24 End-to-End-Ref.: 1325213553-000007528135 Kundenreferenz: AADD24542225333333333333535351252",
         "transactionId": "3ea2a786b654b213c19b333fb8748922"
+    },
+    {
+        "bookingDate": "2024-02-28",
+        "valueDate": "2024-02-28",
+        "transactionAmount": {
+            "amount": "1000",
+            "currency": "EUR"
+        },
+        "debtorName": "Tentant Name",
+        "remittanceInformationUnstructured": "Tentant Name\nafffestest\nEnd-to-End-Ref.:\n1242154354-3634342632\nKundenreferenz:\nAADD24542225333333333333535351252",
+        "remittanceInformationUnstructuredArray": [
+            "Tentant Name",
+            "afffestest",
+            "End-to-End-Ref.:",
+            "1242154354-3634342632",
+            "Kundenreferenz:",
+            "AADD24542225333333333333535351252"
+        ],
+        "remittanceInformationStructured": "Tentant Name afffestest End-to-End-Ref.: 1242154354-3634342632 Kundenreferenz: AADD24542225333333333333535351252",
+        "transactionId": "3ea2a7862dbacf13c19b333fb8748922"
     }
 ]
