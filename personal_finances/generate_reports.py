@@ -124,8 +124,8 @@ def _write_balance(
     write_json(
         file_path,
         {
-            "start_time": start_time,
-            "end_time": end_time,
+            "start_time": start_time.isoformat(),
+            "end_time": end_time.isoformat(),
             "total_income": total_income,
             "total_expense": total_expense,
             "total_balance": total_income + total_expense,
