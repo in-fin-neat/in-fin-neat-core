@@ -1,0 +1,42 @@
+[
+    {
+        "transactionId": "74de476eeac8930411373b8477525198",
+        "datetime": "2024-03-25T00:00:00+00:00",
+        "amount": -22.99,
+        "referenceText": "netflix play app  g.co helppa\ny# ie\nkarte nr. 9999 9999 9999 9999\nmastercard debit\nnetflix play app   g.co/helpp\nay#irl\n2024-03-, netflix play app g.co helppa, y# ie, karte nr. 9999 9999 9999 9999, mastercard debit, netflix play app g.co/helpp, ay#irl, 2024-03-20t, 15:26:15 kartenzahlung, netflix# ie",
+        "bankTransactionCode": "UNKNOWN_PROPRIETARY_TRANSACTION_CODE",
+        "groupNumber": 0,
+        "groupName": "netflix play app  g.co helppa\ny# ie\nkarte nr. \nmastercard debit\nnetflix",
+        "customCategory": "entertainment"
+    },
+    {
+        "transactionId": "3dee9b3917469d706e6531db74d3c2bd",
+        "datetime": "2024-03-25T00:00:00+00:00",
+        "amount": -68.31,
+        "referenceText": "gc re disney plus, gc re disney plus muenchen\nref-3142513262316231621\nend-to-end-ref.: d-2731857981237\nmandatsref: 6262132\ngl\u00e4ubiger-id:\n12236437684594865643s, gc re disney plus muenchen, ref-3142513262316231621, end-to-end-ref.: d-2731857981237, mandatsref: 6262132, gl\u00e4ubiger-id:, 12236437684594865643s, sepa-basislastschrift wiederholend",
+        "bankTransactionCode": "UNKNOWN_PROPRIETARY_TRANSACTION_CODE",
+        "groupNumber": 1,
+        "groupName": "gc re disney plus, plus \nref-\nend-to-end-ref.: d-\nmandatsref: \ngl\u00e4ubiger-id:\ns, , ref-,",
+        "customCategory": "entertainment"
+    },
+    {
+        "transactionId": "63d4888ce9bb1d02ff39a1052681dfe9",
+        "datetime": "2024-03-21T00:00:00+00:00",
+        "amount": -9.99,
+        "referenceText": "00300 mcdonalds muenchen de, 00300 mcdonalds//muenchen/de\n2024-03-20t12:31:09 kfn 0 \nkartenzahlung, 00300 mcdonalds//muenchen/de, burger, 2024-03-20t12:31:09 kfn 0 , kartenzahlung",
+        "bankTransactionCode": "UNKNOWN_PROPRIETARY_TRANSACTION_CODE",
+        "groupNumber": 2,
+        "groupName": " mcdonalds de, mcdonalds///de\n-03-20t12:31:09 0 \n, mcdonalds///de, burger, -03-20t12:31:09 ,",
+        "customCategory": "restaurant"
+    },
+    {
+        "transactionId": "129fcc88c458f9028e71ed06c68c588d",
+        "datetime": "2024-03-20T00:00:00+00:00",
+        "amount": -10.6,
+        "referenceText": "burger king s ag plattling de, burger king s ag//plattling/de\n2024-03-19t08:16:00 kfn \nkartenzahlung, burger king s ag//plattling/de, 2024-03-19t08:16:00 kfn , kartenzahlung",
+        "bankTransactionCode": "UNKNOWN_PROPRIETARY_TRANSACTION_CODE",
+        "groupNumber": 3,
+        "groupName": "burger king s ag  de, ag///de\n-03-19t08:16:00 \n, ag///de, -03-19t08:16:00",
+        "customCategory": "restaurant"
+    }
+]

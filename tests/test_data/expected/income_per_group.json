@@ -1,0 +1,18 @@
+[
+    {
+        "key": 1,
+        "amount": 1000.0,
+        "references": [
+            "tentant name, tentant name\nafffestest, tentant name, afffestest"
+        ],
+        "groupName": "tentant name, name\nafffestest, afffestest"
+    },
+    {
+        "key": 0,
+        "amount": 3000.09,
+        "references": [
+            "company name, company name\nlohn / gehalt 02/24\nend-to-end-ref.:\n1325213553-000007528135\nkundenreferenz:\naadd24542225333333333333535351252, company name, lohn / gehalt 02/24, end-to-end-ref.:, 1325213553-000007528135, kundenreferenz:, aadd24542225333333333333535351252"
+        ],
+        "groupName": "company name, name\nlohn / gehalt 02/24\nend-to-end-ref.:\n-\nkundenreferenz:\naadd, lohn 02/24, end-to-end-ref.:, -,"
+    }
+]
