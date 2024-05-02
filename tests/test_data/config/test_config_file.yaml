@@ -6,14 +6,18 @@ BankProcessingTimeInDays: 3
 FilterReferenceWordsForGrouping:
   - muenchen
   - gmbh
+  - kartenzahlung
+  - plattling
+  - kfn
+  - visa
 ExpenseCategoryDefinition:
   - CategoryName: restaurant
     CategoryTags:
       - '#travelLunch'
       - '#burger'
     CategoryReferences:
-      - mcdonaulds
-      - burguer king
+      - mcdonalds
+      - burger king
       - kfc
   - CategoryName: entertainment
     CategoryTags:

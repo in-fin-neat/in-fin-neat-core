@@ -53,6 +53,7 @@
         "remittanceInformationUnstructured": "00300 MCDONALDS//MUENCHEN/DE\n2024-03-20T12:31:09 KFN 0 \nKartenzahlung",
         "remittanceInformationUnstructuredArray": [
             "00300 MCDONALDS//MUENCHEN/DE",
+            "Burger",
             "2024-03-20T12:31:09 KFN 0 ",
             "Kartenzahlung"
         ],
@@ -66,10 +67,10 @@
             "amount": "-10.6",
             "currency": "EUR"
         },
-        "creditorName": "BURGUER KING S AG PLATTLING DE",
-        "remittanceInformationUnstructured": "BURGUER KING S AG//PLATTLING/DE\n2024-03-19T08:16:00 KFN \nKartenzahlung",
+        "creditorName": "BURGER KING S AG PLATTLING DE",
+        "remittanceInformationUnstructured": "BURGER KING S AG//PLATTLING/DE\n2024-03-19T08:16:00 KFN \nKartenzahlung",
         "remittanceInformationUnstructuredArray": [
-            "BURGUER KING S AG//PLATTLING/DE",
+            "BURGER KING S AG//PLATTLING/DE",
             "2024-03-19T08:16:00 KFN ",
             "Kartenzahlung"
         ],
@@ -146,16 +147,12 @@
             "currency": "EUR"
         },
         "debtorName": "Tentant Name",
-        "remittanceInformationUnstructured": "Tentant Name\nafffestest\nEnd-to-End-Ref.:\n1242154354-3634342632\nKundenreferenz:\nAADD24542225333333333333535351252",
+        "remittanceInformationUnstructured": "Tentant Name\nafffestest",
         "remittanceInformationUnstructuredArray": [
             "Tentant Name",
-            "afffestest",
-            "End-to-End-Ref.:",
-            "1242154354-3634342632",
-            "Kundenreferenz:",
-            "AADD24542225333333333333535351252"
+            "afffestest"
         ],
-        "remittanceInformationStructured": "Tentant Name afffestest End-to-End-Ref.: 1242154354-3634342632 Kundenreferenz: AADD24542225333333333333535351252",
+        "remittanceInformationStructured": "Tentant Name afffestest",
         "transactionId": "3ea2a7862dbacf13c19b333fb8748922"
     }
 ]
