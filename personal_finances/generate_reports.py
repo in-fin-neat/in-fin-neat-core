@@ -30,11 +30,11 @@ LOGGER = logging.getLogger(__name__)
 ProcessorDataType = Union[Any, Tuple[Any, Any]]
 
 
-class InvalidDatatime(Exception):
+class InvalidDatetime(Exception):
     pass
 
 
-class InvalidDatatimeRange(Exception):
+class InvalidDatetimeRange(Exception):
     pass
 
 
@@ -220,10 +220,10 @@ def generate_reports(
         start_datetime = dateutil.parser.isoparse(start_time)
         end_datetime = dateutil.parser.isoparse(end_time)
     except ValueError as e:
-        raise InvalidDatatime(e)
+        raise InvalidDatetime(e)
 
     if start_datetime > end_datetime:
-        raise InvalidDatatimeRange(
+        raise InvalidDatetimeRange(
             f"invalid input: start time {start_time} greater than end_time {end_time}"
         )
 
