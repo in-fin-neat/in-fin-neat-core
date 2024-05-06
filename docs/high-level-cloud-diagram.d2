@@ -1,0 +1,32 @@
+direction: right
+
+Admin
+Admin.shape: person
+
+EndUser
+EndUser.shape: person
+
+Infineat: Infineat Service {
+  style: {
+    stroke-dash: 3
+  }
+  UserAPI
+  AuthAPI
+  ReportAPI
+  TransactionAPI
+
+  TransactionAPI -> AuthAPI: Get Bank Token
+}
+
+Admin -> Infineat.UserAPI: CRUD
+EndUser -> Infineat.UserAPI: Configure
+EndUser -> Infineat.UserAPI: Get Token
+EndUser -> Infineat.AuthAPI: Authorize My Banks
+Infineat.AuthAPI -> Bank: Authorization Request
+Infineat.AuthAPI <- Bank: Authorization Validation (Webhook)
+
+EndUser -> Infineat.ReportAPI: Get Report
+EndUser -> Infineat.TransactionAPI: Get/Edit Transactions
+Infineat.AuthAPI -> Bank: Authorization Request
+
+Infineat.TransactionAPI -> Bank: Sync Transactions

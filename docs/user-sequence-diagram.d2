@@ -1,0 +1,21 @@
+User Authentication Process: {
+  shape: sequence_diagram
+
+  Admin
+  Client
+  UserAPI
+  TransactionsAPI
+
+  Admin.create_user -> UserAPI.create: POST /user (with secret)
+  Admin.create_user <- UserAPI.create: new user id
+  Admin -> Client: securely hands the secret and user id
+
+  Client.login -> UserAPI.login: POST /user/<user-id>/login (with secret)
+  Client.login <- UserAPI.login: temporary_jwt
+
+  Client.get_trans -> TransactionsAPI.get: GET /transactions (token: temporary_jwt)
+  Client.get_trans <- TransactionsAPI.get: Transactions
+
+  Client: {shape: person}
+  Admin: {shape: person}
+}
