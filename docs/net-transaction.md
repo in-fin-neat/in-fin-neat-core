@@ -1,6 +1,8 @@
 # Net Transaction
 
-![](high-level-architecture.png)
+![](net-transactions-diagram.png)
+
+# Net Transactions (to be implemented)
 
 The idea of net transactions is to group `BankTransaction` into a new
 resource called `NetTransaction`, so that multiple `BankTransactions`
@@ -32,12 +34,12 @@ determining the `datetime` for a single `NetTransaction` requires
 defining a rule to choose a datetime using related `BankTransactions`
 datetimes.
 
-![](net-transactions.png)
+![](net-transactions-relationship.png)
 
 ## NetTransaction processor
 
 In order to implement the `NetTransaction` set partitioning logic, user
-input is needed[^user_input] to determine which `BankTransactions` are part of a
+input is needed\[1\] to determine which `BankTransactions` are part of a
 single `NetTransaction`. There are two main ways of collecting this data
 from users:
 

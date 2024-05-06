@@ -1,0 +1,39 @@
+direction: right
+BankProvider: {
+  near: top-left
+  label: Bank Transactions Provider
+  BankTransaction: {shape: cylinder}
+}
+
+DataProcessing: {
+  direction: right
+  near: center-left
+  label: Data Processing
+  NewImplementation: {
+    style: {
+      fill: lightgreen
+      font-color: green
+    }
+    NetTransaction: {shape: cylinder}
+    NetTransactionProcessor -> NetTransaction
+  }
+  CategorizedTransaction: {shape: cylinder}
+
+  _.BankProvider.BankTransaction -> Filtering
+  Filtering -> NewImplementation.NetTransactionProcessor
+  NewImplementation.NetTransaction -> TypeDecorator
+  TypeDecorator -> Categorizing
+  Categorizing -> CategorizedTransaction
+}
+
+Reporting: {
+  near: bottom-left
+  direction: left
+  TimeAggregation
+  CategoryAggregation
+  Report: {shape: cylinder}
+
+  _.DataProcessing.CategorizedTransaction -> TimeAggregation
+  TimeAggregation -> CategoryAggregation
+  CategoryAggregation -> Report
+}
