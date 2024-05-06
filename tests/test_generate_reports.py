@@ -33,8 +33,8 @@ def json_mock() -> Generator[Mock, None, None]:
 
 
 @fixture()
-def write_json_mock() -> Generator[Mock, None, None]:
-    with patch("personal_finances.generate_reports.write_json") as m:
+def fh_open_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.file_helper.open") as m:
         yield m
 
 
@@ -126,11 +126,10 @@ def test_correct_cli_params(
         open_mock.assert_called_once_with(transactions_file_path, "r")
 
 
-def assert_file_content_json(file_path: str, result: dict) -> None:
+def assert_file_content_json(file_path: str, result: str) -> None:
     with open(file_path, "r") as expected_result:
         json_result = json.loads(expected_result.read())
-        result_str = json.dumps(result, default=lambda dt_obj: dt_obj.isoformat())
-        assert json_result == json.loads(result_str)
+        assert json_result == json.loads(result)
 
 
 def _run_generate_reports(transactions_path: str, configuration_path: str) -> int:
@@ -146,12 +145,14 @@ def _run_generate_reports(transactions_path: str, configuration_path: str) -> in
     ).exit_code
 
 
-def test_generate_reports_output(write_json_mock: Mock) -> None:
+def test_generate_reports_output(fh_open_mock: Mock) -> None:
 
     transactions_test_file_path = "tests/test_data/transactions/test_transaction.json"
     configuration_test_file_path = "tests/test_data/config/test_config_file.yaml"
 
-    expected_result_path_prefix = "reports/1970-01-01T00:00:00+00:00_2100-01-01T00:00:00+00:00/"
+    expected_result_path_prefix = (
+        "reports/1970-01-01T00:00:00+00:00_2100-01-01T00:00:00+00:00/"
+    )
     expected_content_path_prefix = "tests/test_data/expected/"
     expected_file_name_list = (
         "balance.json",
@@ -168,20 +169,22 @@ def test_generate_reports_output(write_json_mock: Mock) -> None:
     )
     assert exit_code == 0
 
+    open_paths = fh_open_mock.call_args_list
+    write_content_list = fh_open_mock.return_value.__enter__.return_value.write
+
     result_calls = {
         result_call.args[0].removeprefix(expected_result_path_prefix): {
             "file_path": result_call.args[0],
-            "file_content": result_call.args[1],
+            "file_content": write_content_list.call_args_list[idx].args[0],
         }
-        for result_call in write_json_mock.call_args_list
+        for idx, result_call in enumerate(open_paths)
     }
-    
+
     for expected_file_name in expected_file_name_list:
         result_file_path = result_calls[expected_file_name]["file_path"]
         result_file_content = result_calls[expected_file_name]["file_content"]
 
         assert result_file_path == expected_result_path_prefix + expected_file_name
         assert_file_content_json(
-            expected_content_path_prefix + expected_file_name,
-            result_file_content
+            expected_content_path_prefix + expected_file_name, result_file_content
         )
