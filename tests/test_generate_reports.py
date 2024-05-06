@@ -10,7 +10,7 @@ from personal_finances.generate_reports import (
 )
 from typing import Generator, Any, List
 
-transactions_file = '{"test" : "teste" }'
+transactions_file = '{"test" : "teste"}'
 
 
 @fixture()
@@ -36,15 +36,6 @@ def json_mock() -> Generator[Mock, None, None]:
 def write_json_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.generate_reports.write_json") as m:
         yield m
-
-
-def assert_is_list_equal(
-    return_list: List[Any],
-    expected_list: List[Any],
-) -> None:
-    for expected_item in expected_list:
-        assert expected_item in return_list
-    assert len(expected_list) == len(return_list)
 
 
 @pytest.mark.parametrize(
@@ -135,7 +126,7 @@ def test_correct_cli_params(
         open_mock.assert_called_once_with(transactions_file_path, "r")
 
 
-def assert_files_are_equal(file_path: str, result: dict) -> None:
+def assert_file_content_json(file_path: str, result: dict) -> None:
     with open(file_path, "r") as expected_result:
         json_result = json.loads(expected_result.read())
         result_str = json.dumps(result, default=lambda dt_obj: dt_obj.isoformat())
@@ -160,15 +151,8 @@ def test_generate_reports_output(write_json_mock: Mock) -> None:
     transactions_test_file_path = "tests/test_data/transactions/test_transaction.json"
     configuration_test_file_path = "tests/test_data/config/test_config_file.yaml"
 
-    exit_code = _run_generate_reports(
-        transactions_test_file_path, configuration_test_file_path
-    )
-    assert exit_code == 0
-
-    result_calls = write_json_mock.call_args_list
-
-    expected_path_name = "reports/1970-01-01T00:00:00+00:00_2100-01-01T00:00:00+00:00/"
-    expected_file_path_prefix = "tests/test_data/expected/"
+    expected_result_path_prefix = "reports/1970-01-01T00:00:00+00:00_2100-01-01T00:00:00+00:00/"
+    expected_content_path_prefix = "tests/test_data/expected/"
     expected_file_name_list = (
         "balance.json",
         "income_per_group.json",
@@ -179,8 +163,25 @@ def test_generate_reports_output(write_json_mock: Mock) -> None:
         "expense_categorized_transactions.json",
     )
 
-    for idx, file_name in enumerate(expected_file_name_list):
-        assert result_calls[idx].args[0] == expected_path_name + file_name
-        assert_files_are_equal(
-            expected_file_path_prefix + file_name, result_calls[idx].args[1]
+    exit_code = _run_generate_reports(
+        transactions_test_file_path, configuration_test_file_path
+    )
+    assert exit_code == 0
+
+    result_calls = {
+        result_call.args[0].removeprefix(expected_result_path_prefix): {
+            "file_path": result_call.args[0],
+            "file_content": result_call.args[1],
+        }
+        for result_call in write_json_mock.call_args_list
+    }
+    
+    for expected_file_name in expected_file_name_list:
+        result_file_path = result_calls[expected_file_name]["file_path"]
+        result_file_content = result_calls[expected_file_name]["file_content"]
+
+        assert result_file_path == expected_result_path_prefix + expected_file_name
+        assert_file_content_json(
+            expected_content_path_prefix + expected_file_name,
+            result_file_content
         )
