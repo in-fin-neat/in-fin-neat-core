@@ -18,7 +18,7 @@ from personal_finances.transaction.definition import SimpleTransaction
 from personal_finances.transaction.categorizing import get_category
 from personal_finances.file_helper import write_json
 from personal_finances.config import cache_user_configuration
-from typing import Dict, List, Tuple, Callable, Any, Union, cast
+from typing import List, Tuple, Callable, Any, Union, cast
 from functools import partial
 import dateutil.parser
 import click
@@ -28,6 +28,14 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 ProcessorDataType = Union[Any, Tuple[Any, Any]]
+
+
+class InvalidDatetime(Exception):
+    pass
+
+
+class InvalidDatetimeRange(Exception):
+    pass
 
 
 class CategorizedTransaction(GroupedTransaction):
@@ -108,14 +116,16 @@ def _write_category_amounts(
 def _write_balance(
     total_income: float,
     total_expense: float,
-    context: Dict,
+    start_time: datetime,
+    end_time: datetime,
     file_prefix: str,
 ) -> None:
     file_path = f"{file_prefix}balance.json"
     write_json(
         file_path,
         {
-            **context,
+            "start_time": start_time.isoformat(),
+            "end_time": end_time.isoformat(),
             "total_income": total_income,
             "total_expense": total_expense,
             "total_balance": total_income + total_expense,
@@ -152,7 +162,7 @@ def _process_transactions(
     return income_transactions, expense_transactions
 
 
-def write_reports(
+def _write_reports(
     transactions: List[SimpleTransaction], start_time: datetime, end_time: datetime
 ) -> None:
     (
@@ -164,10 +174,11 @@ def write_reports(
     time_range = f"{start_time.isoformat()}_{end_time.isoformat()}"
 
     _write_balance(
-        total_income,
-        total_expense,
-        {"start_time": start_time.isoformat(), "end_time": end_time.isoformat()},
-        f"reports/{time_range}/",
+        total_income=total_income,
+        total_expense=total_expense,
+        start_time=start_time,
+        end_time=end_time,
+        file_prefix=f"reports/{time_range}/",
     )
     _write_category_amounts(income_transactions, f"reports/{time_range}/income")
     _write_category_amounts(expense_transactions, f"reports/{time_range}/expense")
@@ -205,6 +216,17 @@ def generate_reports(
     user_config_file_path: str,
 ) -> None:
     """Generates reports from transactions according to the time filter specified."""
+    try:
+        start_datetime = dateutil.parser.isoparse(start_time)
+        end_datetime = dateutil.parser.isoparse(end_time)
+    except ValueError as e:
+        raise InvalidDatetime(e)
+
+    if start_datetime > end_datetime:
+        raise InvalidDatetimeRange(
+            f"invalid input: start time {start_time} greater than end_time {end_time}"
+        )
+
     cache_user_configuration(user_config_file_path)
     with open(transactions_file_path, "r") as transactions_file:
         transactions: List[SimpleTransaction] = list(
@@ -214,10 +236,10 @@ def generate_reports(
             )
         )
 
-    write_reports(
+    _write_reports(
         transactions,
-        dateutil.parser.isoparse(start_time),
-        dateutil.parser.isoparse(end_time),
+        start_datetime,
+        end_datetime,
     )
     LOGGER.info("finished reports")
 

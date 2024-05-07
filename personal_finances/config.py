@@ -1,6 +1,6 @@
 from typing import List, Optional
 import yaml
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, ConfigDict
 import logging
 
 
@@ -16,6 +16,8 @@ class UserConfigurationCacheEmpty(Exception):
 
 
 class CategoryDefinition(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     CategoryName: str
     CategoryReferences: List[str]
     CategoryTags: List[str]
@@ -26,6 +28,14 @@ class CategoryDefinition(BaseModel):
         for category_tag in category_tags:
             assert category_tag[0] == "#"
         return category_tags
+
+    def __hash__(self) -> int:
+        hashable_attributes = [
+            self.CategoryName,
+            tuple(self.CategoryReferences),
+            tuple(self.CategoryTags),
+        ]
+        return int(sum(map(hash, hashable_attributes)) / 3)
 
 
 class UserConfiguration(BaseModel):

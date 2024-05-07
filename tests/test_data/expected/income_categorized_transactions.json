@@ -1,0 +1,22 @@
+[
+    {
+        "transactionId": "3ea2a786b654b213c19b333fb8748922",
+        "datetime": "2024-02-29T00:00:00+00:00",
+        "amount": 3000.09,
+        "referenceText": "company name, company name\nlohn / gehalt 02/24\nend-to-end-ref.:\n1325213553-000007528135\nkundenreferenz:\naadd24542225333333333333535351252, company name, lohn / gehalt 02/24, end-to-end-ref.:, 1325213553-000007528135, kundenreferenz:, aadd24542225333333333333535351252",
+        "bankTransactionCode": "UNKNOWN_PROPRIETARY_TRANSACTION_CODE",
+        "groupNumber": 0,
+        "groupName": "company name, name\nlohn / gehalt 02/24\nend-to-end-ref.:\n-\nkundenreferenz:\naadd, lohn 02/24, end-to-end-ref.:, -,",
+        "customCategory": "Salary"
+    },
+    {
+        "transactionId": "3ea2a7862dbacf13c19b333fb8748922",
+        "datetime": "2024-02-28T00:00:00+00:00",
+        "amount": 1000.0,
+        "referenceText": "tentant name, tentant name\nafffestest, tentant name, afffestest",
+        "bankTransactionCode": "UNKNOWN_PROPRIETARY_TRANSACTION_CODE",
+        "groupNumber": 1,
+        "groupName": "tentant name, name\nafffestest, afffestest",
+        "customCategory": "Rental"
+    }
+]

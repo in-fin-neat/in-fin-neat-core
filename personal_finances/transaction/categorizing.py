@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Optional, Set, Callable
+from typing import Dict, Iterable, List, Optional, Set, Callable, Tuple
 import uuid
 import logging
 from ..config import get_user_configuration, CategoryDefinition
@@ -8,32 +8,30 @@ from functools import cache
 LOGGER = logging.getLogger(__name__)
 
 
-@cache
 def _get_expense_category_references() -> Dict[str, List[str]]:
     return _index_field_by_category_name(
-        get_user_configuration().ExpenseCategoryDefinition,
+        tuple(get_user_configuration().ExpenseCategoryDefinition),
         lambda category_definition: category_definition.CategoryReferences,
     )
 
 
-@cache
 def _get_expense_category_tags() -> Dict[str, List[str]]:
     return _index_field_by_category_name(
-        get_user_configuration().ExpenseCategoryDefinition,
+        tuple(get_user_configuration().ExpenseCategoryDefinition),
         lambda category_definition: category_definition.CategoryTags,
     )
 
 
-@cache
 def _get_income_category_references() -> Dict[str, List[str]]:
     return _index_field_by_category_name(
-        get_user_configuration().IncomeCategoryDefinition,
+        tuple(get_user_configuration().IncomeCategoryDefinition),
         lambda category_definition: category_definition.CategoryReferences,
     )
 
 
+@cache
 def _index_field_by_category_name(
-    category_definitions: List[CategoryDefinition],
+    category_definitions: Tuple[CategoryDefinition],  # tuple is hashable for caching
     field: Callable[[CategoryDefinition], List[str]],
 ) -> Dict[str, List[str]]:
     return {cat_def.CategoryName: field(cat_def) for cat_def in category_definitions}
