@@ -1,0 +1,62 @@
+Bank Authorization Process: {
+  shape: sequence_diagram
+
+  Client
+  AuthAPI
+  TransactionsAPI
+  BankAPI
+
+  Client.authorize -> AuthAPI.create_token: POST /auth/bank-token/
+  AuthAPI.create_token -> BankAPI.new_session: new session with validation URL
+  BankAPI.new_session -> AuthAPI: Authorization URL
+  AuthAPI.create_token -> Client.authorize: Authorization URL
+  Client.authorize -> BankAPI.auth: Open the authorization URL
+
+  BankAPI.auth -> Client.authorize: Client/Bank authorization process
+  Client.authorize -> BankAPI.auth: Authorize my account
+  BankAPI.auth -> AuthAPI: POST /auth/bank-token/validate
+
+  Client.get_transactions -> TransactionsAPI.get: GET /transactions
+  TransactionsAPI.get -> AuthAPI.get_token: GET /auth/bank-token/
+  AuthAPI.get_token -> TransactionsAPI.get: validated token
+  TransactionsAPI.get -> BankAPI.transactions: get transactions with validated token
+  BankAPI.transactions -> TransactionsAPI.get: User Transactions
+  TransactionsAPI.get -> Client.get_transactions: Transactions
+
+  Client: {shape: person}
+  AuthAPI.*.style: {
+    stroke: green
+    font-color: darkgreen
+    fill: lightgreen
+  }
+  AuthAPI.style: {
+    stroke: green
+    font-color: darkgreen
+    fill: lightgreen
+  }
+  TransactionsAPI.*.style: {
+    stroke: green
+    font-color: darkgreen
+    fill: lightgreen
+  }
+  TransactionsAPI.style: {
+    stroke: green
+    font-color: darkgreen
+    fill: lightgreen
+  }
+}
+
+Legend: {
+  direction: right
+  near: bottom-center
+  External.shape: circle
+  InfineatAPIs.shape: circle
+  InfineatAPIs.style: {
+    stroke: green
+    font-color: darkgreen
+    fill: lightgreen
+  }
+  (InfineatAPIs -> External).style: {
+    stroke: transparent
+  }
+}
