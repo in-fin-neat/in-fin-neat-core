@@ -32,3 +32,28 @@ format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"
 merge_transactions = "python -m personal_finances.merge_transactions"
+pack="""
+    bash -c ' \
+    # Generate requirements.txt from Pipenv
+    pipenv requirements > requirements.txt && \
+
+    # Create package directory and install dependencies using aws python image
+    mkdir -p package && \
+    sudo docker run --rm -v $(pwd):/var/task --entrypoint /bin/bash public.ecr.aws/lambda/python:3.11 -c "\
+    pip install boto3 -t ./package && \
+    pip install -r requirements.txt -t ./package"
+
+    # Remove old ZIP file if it exists
+    rm -f in_fin_core_package.zip && \
+
+    # Zip the contents of the package directory
+    (cd package && zip -r ../in_fin_core_package.zip ./*) && \
+
+    # Add the personal_finances directory to the existing ZIP
+    zip -r in_fin_core_package.zip personal_finances && \
+    
+    # Cleaning 
+    rm requirements.txt && \
+    mv in_fin_core_package.zip ./package/in_fin_core_package.zip'
+"""
+
