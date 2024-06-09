@@ -11,6 +11,8 @@ python-dateutil = "*"
 click = "*"
 uvicorn = "*"
 pyyaml = "*"
+bcrypt = "*"
+pyjwt = "*"
 
 [dev-packages]
 pytest = "*"
