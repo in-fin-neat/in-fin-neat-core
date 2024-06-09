@@ -38,13 +38,11 @@ pack="""
     pipenv requirements > requirements.txt && \
 
     # Create package directory and install dependencies using aws python image
-    mkdir -p package && \
+    rm -rf package && \
+    mkdir package && \
     sudo docker run --rm -v $(pwd):/var/task --entrypoint /bin/bash public.ecr.aws/lambda/python:3.11 -c "\
     pip install boto3 -t ./package && \
     pip install -r requirements.txt -t ./package"
-
-    # Remove old ZIP file if it exists
-    rm -f in_fin_core_package.zip && \
 
     # Zip the contents of the package directory
     (cd package && zip -r ../in_fin_core_package.zip ./*) && \
