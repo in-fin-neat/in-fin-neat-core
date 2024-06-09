@@ -4,7 +4,7 @@ from typing import Any, Tuple
 import boto3
 import bcrypt
 import jwt
-
+import os
 
 class AuthorizationNotFound(Exception):
     pass
@@ -37,9 +37,9 @@ def _get_auth_header(event: dict) -> str:
 
 def _get_user(userId: str) -> dict[Any, Any]:
     dynamodb = boto3.client("dynamodb")
-
+    
     response = dynamodb.get_item(
-        TableName="InFinNeatCdkStack-UserServiceuserTable949F323B-6TDADGI3HR8B",
+        TableName=os.environ['INFINEAT_DYNAMODB_USER_TABLE_NAME'],
         Key={"userId": {"S": userId}},
     )
 
@@ -86,6 +86,11 @@ def user_handler(event: dict, context: str) -> dict:
         return {
             "statusCode": 400,
             "body": "Error decoding authentication header",
+        }
+    except KeyError:
+        return {
+            "statusCode": 500,
+            "body": "Internal Server Error",
         }
     except Exception as e:
         return {
