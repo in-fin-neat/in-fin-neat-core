@@ -1,29 +1,40 @@
 import base64
-from datetime import datetime, timedelta
-from typing import Any, Tuple
+import json
+import logging
 import boto3
 import bcrypt
 import jwt
 import os
+from datetime import datetime, timedelta
+from typing import Any, Tuple
+
+LOGGER = logging.getLogger(__name__)
+
 
 class AuthorizationNotFound(Exception):
-    pass
+    def __str__(self) -> str:
+        return "AuthorizationNotFoundException"
 
 
 class UserNotFound(Exception):
-    pass
+    def __str__(self) -> str:
+        return "UserNotFoundException"
 
 
 class UserInvalidPassword(Exception):
-    pass
+    def __str__(self) -> str:
+        return "UserInvalidPasswordException"
 
 
 def _decode_basic_auth(auth_header: str) -> Tuple[str, str]:
-    auth_value = auth_header.replace("Basic ", "")
-    decoded_bytes = base64.b64decode(auth_value)
-    decoded_str = decoded_bytes.decode("utf-8")
-    userId, password = decoded_str.split(":", 1)
-    return userId, password
+    try:
+        auth_value = auth_header.replace("Basic ", "")
+        decoded_bytes = base64.b64decode(auth_value)
+        decoded_str = decoded_bytes.decode("utf-8")
+        userId, password = decoded_str.split(":", 1)
+        return userId, password
+    except Exception:
+        raise AuthorizationNotFound()
 
 
 def _get_auth_header(event: dict) -> str:
@@ -37,9 +48,8 @@ def _get_auth_header(event: dict) -> str:
 
 def _get_user(userId: str) -> dict[Any, Any]:
     dynamodb = boto3.client("dynamodb")
-    
     response = dynamodb.get_item(
-        TableName=os.environ['INFINEAT_DYNAMODB_USER_TABLE_NAME'],
+        TableName=os.environ["INFINEAT_DYNAMODB_USER_TABLE_NAME"],
         Key={"userId": {"S": userId}},
     )
 
@@ -50,10 +60,20 @@ def _get_user(userId: str) -> dict[Any, Any]:
     return user
 
 
-def _generate_token() -> str:
+def _get_jwt_secret() -> str:
+    jwt_session = boto3.client("secretsmanager")
+
+    get_secret_value_response = jwt_session.get_secret_value(
+        SecretId=os.environ["INFINEAT_JWT_SECRET_ID"]
+    )
+
+    return str(get_secret_value_response["SecretString"])
+
+
+def _generate_token(user: dict) -> str:
     return jwt.encode(
-        {"exp": datetime.now() + timedelta(hours=1)},
-        "03468f8c63a5a4f0dd9fba96b6ba849a4a5092573ec7eeefeff2437e08dc633e",
+        {"exp": datetime.now() + timedelta(hours=1), "userId": user["userId"]["S"]},
+        _get_jwt_secret(),
         algorithm="HS256",
     )
 
@@ -71,32 +91,33 @@ def user_handler(event: dict, context: str) -> dict:
         auth_header = _get_auth_header(event)
         userId, recv_password = _decode_basic_auth(auth_header)
         user = _get_user(userId)
-
         token = ""
         if _password_match(recv_password, user):
-            token = _generate_token()
+            token = _generate_token(user)
         else:
             raise UserInvalidPassword()
 
-        return {"statusCode": 200, "body": token}
+        token_json = json.dumps({"token": token})
+        return {"statusCode": 200, "body": f"{token_json}"}
 
-    except (UserNotFound, UserInvalidPassword):
-        return {"statusCode": 401, "body": "User or password incorrect"}
-    except AuthorizationNotFound:
-        return {
-            "statusCode": 400,
-            "body": "Error decoding authentication header",
-        }
-    except KeyError:
-        return {
-            "statusCode": 500,
-            "body": "Internal Server Error",
-        }
     except Exception as e:
-        return {
-            "statusCode": 400,
-            "body": f"Error on user login procedure: {str(e)}",
-        }
+        LOGGER.exception(
+            f"""
+            An error at the user authentication lambda has happened {e}
+            """
+        )
+        fail_response = None
+
+        if isinstance(e, UserNotFound) or isinstance(e, UserInvalidPassword):
+            fail_response = {"statusCode": 401, "body": "User or password incorrect"}
+        elif isinstance(e, AuthorizationNotFound):
+            fail_response = {
+                "statusCode": 400,
+                "body": "Malformed authentication header",
+            }
+        else:
+            fail_response = {"statusCode": 500, "body": "Internal Server Error"}
+        return fail_response
 
 
 def create_user_hash_password(password: str) -> bytes:
