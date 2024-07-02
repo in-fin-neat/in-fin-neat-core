@@ -46,6 +46,7 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 1. `pipenv run build`
 1. `pipenv run tests`
 1. `pipenv run format`
+1. `pipenv run aws_pack`
 1. `gh pr create --title "brand new feature"`
 
 ### Writing Tests
@@ -54,3 +55,51 @@ This repository implments tests using [pytest](https://docs.pytest.org/), the te
 
 [^env_vars]: [For linux](https://www.gnu.org/software/bash/manual/bash.html#Environment) you can either prepend as in `NAME=value pipenv ...` or use `export NAME=value`, [for windows](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/set_1) you can use `set`.
 [^user_config]: A more detailed documentation on [the user configuration file can be found here](docs/user_configuration_file.md).
+
+## AWS Packing
+Since some services from infin-neat-core code runs at AWS cloud services, it's necessary to properly pack the code to upload it using the web interface, AWS CLI, or AWS CDK. 
+
+For that, on specific script has been created and can be run using pipenv: 
+```
+pipenv run aws_pack
+```
+### Requirements:
+
+#### **Install Docker**: 
+Since in the packing processing Docker is used, it's necessary to install it. For installing Docker, the official documentation from Docker can be followed for [Linux](https://docs.docker.com/desktop/install/linux-install/), [Windows](https://docs.docker.com/desktop/install/windows-install/), and [MAC](https://docs.docker.com/desktop/install/mac-install/), 
+
+
+#### **Running Docker Rootless**: 
+
+Since the script uses **Docker** without root privileges, some extra steps are necessary to run the Docker daemon as a non-root user (check [Rootless mode](https://docs.docker.com/engine/security/rootless/) for more details). For it, follow the following steps:
+
+1. Install uidmap:
+    ``` bash
+    $ sudo apt-get install -y uidmap
+    ```
+
+1. If you installed Docker 20.10 or later with RPM/DEB packages, you should have `dockerd-rootless-setuptool.sh` in /usr/bin. Run `dockerd-rootless-setuptool.sh install` as a non-root user to set up the daemon:
+
+    ``` bash
+    $ dockerd-rootless-setuptool.sh install
+    [INFO] Creating /home/testuser/.config/systemd/user/docker.service
+    ...
+    [INFO] Installed docker.service successfully.
+    [INFO] To control docker.service, run: `systemctl --user (start|stop|restart) docker.service`
+    [INFO] To run docker.service on system startup, run: `sudo loginctl enable-linger testuser`
+
+    [INFO] Make sure the following environment variables are set (or add them to ~/.bashrc):
+
+    export PATH=/usr/bin:$PATH
+    export DOCKER_HOST=unix:///run/user/1000/docker.sock
+    ```
+
+1. Install the extra packages as well: 
+    ``` bash
+    $ sudo apt-get install -y docker-ce-rootless-extras`
+    ```
+
+1. Test it running: 
+    ``` bash
+    $ docker run hello-world
+    ```
