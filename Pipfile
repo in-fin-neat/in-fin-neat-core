@@ -32,7 +32,7 @@ format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"
 merge_transactions = "python -m personal_finances.merge_transactions"
-pack="""
+aws_pack="""
     bash -c ' \
     # Generate requirements.txt from Pipenv
     pipenv requirements > requirements.txt && \
@@ -40,7 +40,7 @@ pack="""
     # Create package directory and install dependencies using aws python image
     rm -rf package && \
     mkdir package && \
-    sudo docker run --rm -v $(pwd):/var/task --entrypoint /bin/bash public.ecr.aws/lambda/python:3.11 -c "\
+    docker run --rm -v $(pwd):/var/task --entrypoint /bin/bash public.ecr.aws/lambda/python:3.11 -c "\
     pip install boto3 -t ./package && \
     pip install -r requirements.txt -t ./package"
 
