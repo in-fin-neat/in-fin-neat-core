@@ -32,7 +32,7 @@ format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"
 merge_transactions = "python -m personal_finances.merge_transactions"
-aws_pack="""
+aws_lambda_pack="""
     bash -c ' \
     # Generate requirements.txt from Pipenv
     pipenv requirements > requirements.txt && \
@@ -40,9 +40,13 @@ aws_pack="""
     # Create package directory and install dependencies using aws python image
     rm -rf package && \
     mkdir package && \
-    docker run --rm -v $(pwd):/var/task --entrypoint /bin/bash public.ecr.aws/lambda/python:3.11 -c "\
-    pip install boto3 -t ./package && \
-    pip install -r requirements.txt -t ./package"
+    pip install \
+    --platform manylinux2014_x86_64 \
+    --target=package \
+    --implementation cp \
+    --python-version 3.11 \
+    --only-binary=:all: --upgrade \
+    --requirement requirements.txt && \
 
     # Zip the contents of the package directory
     (cd package && zip -r ../in_fin_core_package.zip ./*) && \
