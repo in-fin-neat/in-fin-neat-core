@@ -32,3 +32,30 @@ format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"
 merge_transactions = "python -m personal_finances.merge_transactions"
+aws_lambda_pack="""
+    bash -c ' \
+    # Generate requirements.txt from Pipenv
+    pipenv requirements > requirements.txt && \
+
+    # Create package directory and install dependencies using aws python image
+    rm -rf package && \
+    mkdir package && \
+    pip install \
+    --platform manylinux2014_x86_64 \
+    --target=package \
+    --implementation cp \
+    --python-version 3.11 \
+    --only-binary=:all: --upgrade \
+    --requirement requirements.txt && \
+
+    # Zip the contents of the package directory
+    (cd package && zip -r ../in_fin_core_package.zip ./*) && \
+
+    # Add the personal_finances directory to the existing ZIP
+    zip -r in_fin_core_package.zip personal_finances && \
+    
+    # Cleaning 
+    rm requirements.txt && \
+    mv in_fin_core_package.zip ./package/in_fin_core_package.zip'
+"""
+

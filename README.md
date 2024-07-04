@@ -46,6 +46,7 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 1. `pipenv run build`
 1. `pipenv run tests`
 1. `pipenv run format`
+1. `pipenv run aws_lambda_pack`
 1. `gh pr create --title "brand new feature"`
 
 ### Writing Tests
@@ -54,3 +55,12 @@ This repository implments tests using [pytest](https://docs.pytest.org/), the te
 
 [^env_vars]: [For linux](https://www.gnu.org/software/bash/manual/bash.html#Environment) you can either prepend as in `NAME=value pipenv ...` or use `export NAME=value`, [for windows](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/set_1) you can use `set`.
 [^user_config]: A more detailed documentation on [the user configuration file can be found here](docs/user_configuration_file.md).
+
+## AWS Lambda Packing
+In-fin-neat-core code runs on AWS Lambda and a "packing" command (`aws_lambda_pack`) is defined for generating a zip file with python dependencies (defined in Pipfile) installed to run on the AWS Lambda runtime.
+
+The `aws_lambda_pack` command can be run using pipenv: 
+```
+pipenv run aws_lambda_pack
+```
+This script generates a requirements file using pipenv and install all dependencies in the `in_fin_core_package` zip file, created inside the `package` folder. This zip can be uploaded to aws lambda function.
