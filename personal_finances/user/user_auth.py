@@ -6,7 +6,8 @@ import bcrypt
 import jwt
 import os
 from datetime import datetime, timedelta
-from typing import Any, Tuple
+from typing import Any, Callable, Tuple
+from decorator import decorator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ def _get_jwt_secret() -> str:
     jwt_session = boto3.client("secretsmanager")
 
     get_secret_value_response = jwt_session.get_secret_value(
-        SecretId=os.environ["INFINEAT_JWT_SECRET_ID"]
+        SecretId=os.environ["INFINEAT_JWT_SECRET_NAME"]
     )
 
     return str(get_secret_value_response["SecretString"])
@@ -86,6 +87,16 @@ def _password_match(recv_password: str, user: dict) -> bool:
         return False
 
 
+def add_cors_to_dict(input_dict: dict) -> dict:
+    return {**input_dict, "headers": {"Access-Control-Allow-Origin": "*"}}
+
+
+@decorator
+def add_cors_decorator(handler: Callable, *args: Any, **kwargs: Any) -> dict:
+    return add_cors_to_dict(handler(*args, **kwargs))
+
+
+@add_cors_decorator
 def user_handler(event: dict, context: str) -> dict:
     try:
         auth_header = _get_auth_header(event)

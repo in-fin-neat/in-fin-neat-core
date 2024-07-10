@@ -5,7 +5,11 @@ import jwt
 import pytest
 from unittest.mock import Mock, patch
 from typing import Generator, Union
-from personal_finances.user.user_auth import user_handler, create_user_hash_password
+from personal_finances.user.user_auth import (
+    add_cors_to_dict,
+    user_handler,
+    create_user_hash_password,
+)
 
 
 TEST_USER_ID = "testuser"
@@ -133,7 +137,7 @@ def test_user_auth(
 
     response = user_handler(TEST_EVENT_INPUT, "")
 
-    assert response == expected_response
+    assert response == add_cors_to_dict(expected_response)
     if response["statusCode"] == 200:
         token = json.loads(response["body"])["token"]
         try:
