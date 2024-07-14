@@ -1,6 +1,7 @@
 import base64
 from datetime import datetime, timedelta
 import json
+import os
 import jwt
 import pytest
 from unittest.mock import Mock, patch
@@ -27,7 +28,7 @@ TEST_JWT_SECRETS = "jwt_secret"
 TEST_DATE_TIME_NOW = datetime(2060, 1, 1, 10, 00, 00)
 TEST_ENVAR_DICT = {
     "INFINEAT_DYNAMODB_USER_TABLE_NAME": "table_name",
-    "INFINEAT_JWT_SECRET_ID": "jwt_secret",
+    "INFINEAT_JWT_SECRET_NAME": "jwt_secret",
 }
 
 
@@ -37,12 +38,6 @@ def _encode_basic_auth(user: str, password: str) -> str:
     authorization_encoded = base64.b64encode(credentials_encoded)
     authorization = f"Basic {authorization_encoded.decode()}"
     return authorization
-
-
-@pytest.fixture(autouse=True)
-def os_mock() -> Generator[Mock, None, None]:
-    with patch("personal_finances.user.user_auth.os") as mock:
-        yield mock
 
 
 @pytest.fixture(autouse=True)
@@ -112,7 +107,7 @@ def _generate_test_jwt_token() -> str:
                 "body": "Internal Server Error",
             },
             TEST_USER_DYNAMO_RESPONSE,
-            Exception,
+            {},
         ),
     ],
 )
@@ -120,14 +115,9 @@ def test_user_auth(
     authorization_header: str,
     expected_response: dict,
     dynamo_response_dict: Union[dict, Exception],
-    env_var_dict: Union[dict, Exception],
-    os_mock: Mock,
+    env_var_dict: dict,
     boto3_mock: Mock,
 ) -> None:
-    if isinstance(env_var_dict, dict):
-        os_mock.environ.__getitem__.side_effect = env_var_dict.get
-    else:
-        os_mock.environ.__getitem__.side_effect = env_var_dict
 
     aws_client_mock = boto3_mock.return_value
     aws_client_mock.get_item.return_value = dynamo_response_dict
@@ -135,10 +125,11 @@ def test_user_auth(
 
     TEST_EVENT_INPUT = {"headers": {"Authorization": authorization_header}}
 
-    response = user_handler(TEST_EVENT_INPUT, "")
+    with patch.dict(os.environ, env_var_dict):
+        response = user_handler(TEST_EVENT_INPUT, "")
 
     assert response == add_cors_to_dict(expected_response)
-    if response["statusCode"] == 200:
+    if expected_response["statusCode"] == 200:
         token = json.loads(response["body"])["token"]
         try:
             jwt.decode(token, TEST_JWT_SECRETS, algorithms=["HS256"])
