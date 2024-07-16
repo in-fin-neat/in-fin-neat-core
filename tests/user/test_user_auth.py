@@ -14,16 +14,15 @@ from personal_finances.user.user_auth import (
 
 
 TEST_USER_ID = "testuser"
-TEST_USER_PASSWORD = "123"
+TEST_USER_PASSWORD = "|SkfzqE9h={!,o9BvQc{"
 TEST_USER_DYNAMO_RESPONSE = {
     "Item": {
-        "userId": {"S": TEST_USER_ID},
-        "password": {
-            # password "123" hashed by bcrypt
-            "S": "$2b$12$735jLXvW38meOqPXIwhsSO1bNP6AcFY7K4K3WuPiDsdD7wajOrhp2"
-        },
+        "userId": TEST_USER_ID,
+        "password": "$2b$12$tBzFe5aHXtLmOPWSQWcy2ekjqxf4R5p9C99oWDxv/EJz7bYHE2Ez2",
     }
 }
+
+
 TEST_JWT_SECRETS = "jwt_secret"
 TEST_DATE_TIME_NOW = datetime(2060, 1, 1, 10, 00, 00)
 TEST_ENVAR_DICT = {
@@ -41,8 +40,14 @@ def _encode_basic_auth(user: str, password: str) -> str:
 
 
 @pytest.fixture(autouse=True)
-def boto3_mock() -> Generator[Mock, None, None]:
+def boto3_client_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.user.user_auth.boto3.client") as mock:
+        yield mock
+
+
+@pytest.fixture(autouse=True)
+def boto3_resource_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.user.user_auth.boto3.resource") as mock:
         yield mock
 
 
@@ -62,37 +67,104 @@ def _generate_test_jwt_token() -> str:
 
 
 @pytest.mark.parametrize(
-    "authorization_header, expected_response, dynamo_response_dict, env_var_dict",
+    "event_input, expected_response, dynamo_response_dict_or_exception, env_var_dict",
     [
         (
-            _encode_basic_auth(TEST_USER_ID, "incorrect_password"),
-            {"statusCode": 401, "body": "User or password incorrect"},
-            TEST_USER_DYNAMO_RESPONSE,
-            TEST_ENVAR_DICT,
-        ),
-        (
-            _encode_basic_auth("incorrect_user", "incorrect_password"),
-            {"statusCode": 401, "body": "User or password incorrect"},
-            {"usernot": "found"},
-            TEST_ENVAR_DICT,
-        ),
-        (
-            "incorrect_header",
-            {"statusCode": 400, "body": "Malformed authentication header"},
-            TEST_USER_DYNAMO_RESPONSE,
-            TEST_ENVAR_DICT,
-        ),
-        (
-            _encode_basic_auth(TEST_USER_ID, TEST_USER_PASSWORD),
             {
-                "statusCode": 200,
-                "body": json.dumps({"token": _generate_test_jwt_token()}),
+                "headers": {
+                    "Authorization": _encode_basic_auth(
+                        TEST_USER_ID, "incorrect_password"
+                    )
+                }
             },
+            {"statusCode": 401, "body": "User or password incorrect"},
             TEST_USER_DYNAMO_RESPONSE,
             TEST_ENVAR_DICT,
         ),
         (
-            _encode_basic_auth(TEST_USER_ID, TEST_USER_PASSWORD),
+            {
+                "headers": {
+                    "Authorization": _encode_basic_auth(
+                        "incorrect_user", "incorrect_password"
+                    )
+                }
+            },
+            {"statusCode": 401, "body": "User or password incorrect"},
+            {},
+            TEST_ENVAR_DICT,
+        ),
+        (
+            {"headers": {"Authorization": "incorrect_header"}},
+            {"statusCode": 400, "body": "Invalid authentication input"},
+            TEST_USER_DYNAMO_RESPONSE,
+            TEST_ENVAR_DICT,
+        ),
+        (
+            {"headers": {"Authorization": ""}},
+            {"statusCode": 400, "body": "Invalid authentication input"},
+            TEST_USER_DYNAMO_RESPONSE,
+            TEST_ENVAR_DICT,
+        ),
+        (
+            {"headers": {}},
+            {"statusCode": 400, "body": "Invalid authentication input"},
+            TEST_USER_DYNAMO_RESPONSE,
+            TEST_ENVAR_DICT,
+        ),
+        (
+            {
+                "headers": {
+                    "Authorization": _encode_basic_auth("user", "dummy_password")
+                }
+            },
+            {
+                "statusCode": 400,
+                "body": (
+                    "Username or password does not match the minimal "
+                    + "security requirements"
+                ),
+            },
+            {},
+            {},
+        ),
+        (
+            {"headers": {"Authorization": _encode_basic_auth("dummy_user", "pass")}},
+            {
+                "statusCode": 400,
+                "body": (
+                    "Username or password does not match the minimal "
+                    + "security requirements"
+                ),
+            },
+            {},
+            {},
+        ),
+        (
+            {},
+            {"statusCode": 500, "body": "Internal Server Error"},
+            TEST_USER_DYNAMO_RESPONSE,
+            TEST_ENVAR_DICT,
+        ),
+        (
+            {
+                "headers": {
+                    "Authorization": _encode_basic_auth(
+                        TEST_USER_ID, TEST_USER_PASSWORD
+                    )
+                }
+            },
+            {"statusCode": 500, "body": "Internal Server Error"},
+            {"Item": {"dummyKey": "dummyValue"}},
+            TEST_ENVAR_DICT,
+        ),
+        (
+            {
+                "headers": {
+                    "Authorization": _encode_basic_auth(
+                        TEST_USER_ID, TEST_USER_PASSWORD
+                    )
+                }
+            },
             {
                 "statusCode": 500,
                 "body": "Internal Server Error",
@@ -101,7 +173,13 @@ def _generate_test_jwt_token() -> str:
             TEST_ENVAR_DICT,
         ),
         (
-            _encode_basic_auth(TEST_USER_ID, TEST_USER_PASSWORD),
+            {
+                "headers": {
+                    "Authorization": _encode_basic_auth(
+                        TEST_USER_ID, TEST_USER_PASSWORD
+                    )
+                }
+            },
             {
                 "statusCode": 500,
                 "body": "Internal Server Error",
@@ -109,24 +187,42 @@ def _generate_test_jwt_token() -> str:
             TEST_USER_DYNAMO_RESPONSE,
             {},
         ),
+        (
+            {
+                "headers": {
+                    "Authorization": _encode_basic_auth(
+                        TEST_USER_ID, TEST_USER_PASSWORD
+                    )
+                }
+            },
+            {
+                "statusCode": 200,
+                "body": json.dumps({"token": _generate_test_jwt_token()}),
+            },
+            TEST_USER_DYNAMO_RESPONSE,
+            TEST_ENVAR_DICT,
+        ),
     ],
 )
 def test_user_auth(
-    authorization_header: str,
+    event_input: str,
     expected_response: dict,
-    dynamo_response_dict: Union[dict, Exception],
+    dynamo_response_dict_or_exception: Union[dict, Exception],
     env_var_dict: dict,
-    boto3_mock: Mock,
+    boto3_resource_mock: Mock,
+    boto3_client_mock: Mock,
 ) -> None:
 
-    aws_client_mock = boto3_mock.return_value
-    aws_client_mock.get_item.return_value = dynamo_response_dict
+    aws_resource_mock = boto3_resource_mock.return_value
+    aws_dynamo_table = aws_resource_mock.Table.return_value
+    aws_dynamo_table.get_item.return_value = dynamo_response_dict_or_exception
+    aws_client_mock = boto3_client_mock.return_value
     aws_client_mock.get_secret_value.return_value = {"SecretString": TEST_JWT_SECRETS}
 
-    TEST_EVENT_INPUT = {"headers": {"Authorization": authorization_header}}
+    test_event_input = event_input
 
     with patch.dict(os.environ, env_var_dict):
-        response = user_handler(TEST_EVENT_INPUT, "")
+        response = user_handler(test_event_input, "")
 
     assert response == add_cors_to_dict(expected_response)
     if expected_response["statusCode"] == 200:
@@ -142,5 +238,5 @@ def test_user_auth(
 @patch("personal_finances.user.user_auth.bcrypt.gensalt")
 def test_password_creation(gensalt: Mock) -> None:
     gensalt.return_value = b"$2b$12$tBzFe5aHXtLmOPWSQWcy2e"
-    response = create_user_hash_password("123")
-    assert response == b"$2b$12$tBzFe5aHXtLmOPWSQWcy2ehgK4U2m2uZwvDIW1BXsoCnUVKNwzkdm"
+    response = create_user_hash_password(TEST_USER_PASSWORD)
+    assert response == b"$2b$12$tBzFe5aHXtLmOPWSQWcy2ekjqxf4R5p9C99oWDxv/EJz7bYHE2Ez2"
