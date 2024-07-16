@@ -26,6 +26,7 @@ flake8 = "*"
 diff-cover = "*"
 black = "*"
 boto3-stubs = "*"
+types-decorator = "*"
 
 [requires]
 python_version = "3.11"
