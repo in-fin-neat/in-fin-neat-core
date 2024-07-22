@@ -17,7 +17,6 @@ from personal_finances.user.user_auth_exceptions import (
     PasswordNotMatch,
     InvalidUserPassword,
     InvalidUserName,
-    ServerSecretNotFound,
     InvalidDynamoResponse,
     get_server_response_by_exception,
 )
@@ -38,7 +37,7 @@ def _decode_basic_auth(auth_header: str) -> Tuple[str, str]:
         raise InvalidAuthorizationHeader()
 
 
-def _get_auth_header(event: dict) -> Any:
+def _get_auth_header(event: dict) -> str:
     headers = event.get("headers", None)
     if headers is None:
         raise InvalidLambdaEventInput()
@@ -50,7 +49,7 @@ def _get_auth_header(event: dict) -> Any:
     if auth_header == "":
         raise AuthorizationHeaderEmptyContent()
 
-    return auth_header
+    return str(auth_header)
 
 
 def _get_user_password(userId: str) -> str:
@@ -60,7 +59,6 @@ def _get_user_password(userId: str) -> str:
     response = user_table.get_item(
         Key={"userId": userId},
     )
-    print(response)
     if "Item" not in response:
         raise UserNotFound(f"User not found: {userId}")
 
@@ -72,14 +70,9 @@ def _get_user_password(userId: str) -> str:
 
 
 def _get_jwt_secret() -> str:
+    secret_name = os.environ["INFINEAT_JWT_SECRET_NAME"]
     jwt_session = boto3.client("secretsmanager")
-
-    try:
-        get_secret_value_response = jwt_session.get_secret_value(
-            SecretId=os.environ["INFINEAT_JWT_SECRET_NAME"]
-        )
-    except Exception:
-        raise ServerSecretNotFound
+    get_secret_value_response = jwt_session.get_secret_value(SecretId=secret_name)
 
     return str(get_secret_value_response["SecretString"])
 
@@ -123,16 +116,21 @@ def user_handler(event: dict, context: str) -> dict:
     try:
         auth_header = _get_auth_header(event)
         userId, recv_password = _decode_basic_auth(auth_header)
+
         _check_user_id_constraints(userId)
         _check_user_password_constraints(recv_password)
+        LOGGER.info(f"New login attempt for user: {userId}")
+
         stored_password = _get_user_password(userId)
         token = ""
 
         if _password_match(recv_password, stored_password):
             token = _generate_token(userId)
         else:
+            LOGGER.info(f"Password does not match for user: {userId}")
             raise PasswordNotMatch()
 
+        LOGGER.info(f"Login sucessfuly for user: {userId}")
         token_json = json.dumps({"token": token})
         return {"statusCode": 200, "body": f"{token_json}"}
 
@@ -143,8 +141,6 @@ def user_handler(event: dict, context: str) -> dict:
             """
         )
         fail_response = get_server_response_by_exception(e)
-        if fail_response == {}:
-            fail_response = {"statusCode": 500, "body": "Internal Server Error"}
         return fail_response
 
 
