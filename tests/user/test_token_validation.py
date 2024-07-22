@@ -33,6 +33,10 @@ TEST_RESULT_OK = {
     "principalId": TEST_USER_ID,
 }
 
+TEST_DATE_TIME_NOW_MOCK = datetime(2060, 1, 1, 10, 00, 00, tzinfo=timezone.utc)
+TEST_NOT_EXPIRED_DATE_TIME = TEST_DATE_TIME_NOW_MOCK + timedelta(seconds=1)
+TEST_EXPIRED_DATE_TIME = TEST_DATE_TIME_NOW_MOCK
+
 
 def _get_input_without_auth_token() -> dict:
     return {
@@ -45,12 +49,6 @@ def _get_input_event(token: str) -> dict:
     response = _get_input_without_auth_token()
     response["authorizationToken"] = token
     return response
-
-
-@pytest.fixture(autouse=True)
-def boto3_mock() -> Generator[Mock, None, None]:
-    with patch("personal_finances.user.token_validation.boto3.client") as mock:
-        yield mock
 
 
 def _gen_jwt_without_name(exp_date: datetime, secret: str) -> str:
@@ -79,6 +77,19 @@ def _generate_jwt_token(
     )
 
 
+@pytest.fixture(autouse=True)
+def boto3_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.user.token_validation.boto3.client") as mock:
+        yield mock
+
+
+@pytest.fixture(autouse=True)
+def jwt_datetime_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.user.token_validation.jwt.api_jwt.datetime") as mock:
+        mock.now.return_value = TEST_DATE_TIME_NOW_MOCK
+        yield mock
+
+
 @pytest.mark.parametrize(
     "environment_variables, request_input, expected_exception_r",
     [
@@ -101,7 +112,9 @@ def _generate_jwt_token(
         (
             TEST_ENVAR_DICT,
             _get_input_event(
-                _gen_jwt_without_name(exp_date=datetime.now(), secret=TEST_JWT_SECRET)
+                _gen_jwt_without_name(
+                    exp_date=TEST_NOT_EXPIRED_DATE_TIME, secret=TEST_JWT_SECRET
+                )
             ),
             jwt.exceptions.MissingRequiredClaimError,
         ),
@@ -118,7 +131,9 @@ def _generate_jwt_token(
             TEST_ENVAR_DICT,
             _get_input_event(
                 _generate_jwt_token(
-                    exp_date=datetime.now(), secret=TEST_JWT_SECRET, user_id=""
+                    exp_date=TEST_NOT_EXPIRED_DATE_TIME,
+                    secret=TEST_JWT_SECRET,
+                    user_id="",
                 )
             ),
             EmptyUserID,
@@ -127,7 +142,7 @@ def _generate_jwt_token(
             TEST_ENVAR_DICT,
             _get_input_event(
                 _generate_jwt_token(
-                    exp_date=datetime.now(),
+                    exp_date=TEST_NOT_EXPIRED_DATE_TIME,
                     secret="invalid_secret",
                     user_id=TEST_USER_ID,
                 )
@@ -138,7 +153,7 @@ def _generate_jwt_token(
             TEST_ENVAR_DICT,
             _get_input_event(
                 _generate_jwt_token(
-                    exp_date=datetime.now(timezone.utc) - timedelta(seconds=1),
+                    exp_date=TEST_EXPIRED_DATE_TIME,
                     secret=TEST_JWT_SECRET,
                     user_id=TEST_USER_ID,
                 )
@@ -149,7 +164,7 @@ def _generate_jwt_token(
             {},
             _get_input_event(
                 _generate_jwt_token(
-                    exp_date=datetime.now(),
+                    exp_date=TEST_NOT_EXPIRED_DATE_TIME,
                     secret=TEST_JWT_SECRET,
                     user_id=TEST_USER_ID,
                 )
@@ -181,7 +196,7 @@ def test_token_validation_errors(
             TEST_ENVAR_DICT,
             _get_input_event(
                 _generate_jwt_token(
-                    exp_date=datetime.now(timezone.utc) + timedelta(hours=1),
+                    exp_date=TEST_NOT_EXPIRED_DATE_TIME + timedelta(hours=1),
                     secret=TEST_JWT_SECRET,
                     user_id=TEST_USER_ID,
                 )
