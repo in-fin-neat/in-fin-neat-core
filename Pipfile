@@ -11,6 +11,10 @@ python-dateutil = "*"
 click = "*"
 uvicorn = "*"
 pyyaml = "*"
+bcrypt = "*"
+pyjwt = "*"
+boto3 = "*"
+decorator = "*"
 
 [dev-packages]
 pytest = "*"
@@ -21,13 +25,15 @@ types-python-dateutil = "*"
 flake8 = "*"
 diff-cover = "*"
 black = "*"
+boto3-stubs = "*"
+types-decorator = "*"
 
 [requires]
 python_version = "3.11"
 
 [scripts]
 tests = "bash -c 'python -m pytest --cov=personal_finances --cov-report=xml --cov-report=term tests/ && diff-cover coverage.xml --compare-branch=origin/master && diff-quality --violations=flake8 --compare-branch=origin/master'"
-build = "bash -c 'mypy . && flake8 .'"
+build = "bash -c 'mypy personal_finances tests && flake8 personal_finances tests'"
 format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
 fetch_transactions = "python -m personal_finances.fetch_transactions"
