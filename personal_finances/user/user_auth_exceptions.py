@@ -73,7 +73,6 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
     (
         InvalidLambdaEventInput,
         InvalidDynamoResponse,
-        KeyError,
     ): {
         "statusCode": 500,
         "body": "Internal Server Error",
