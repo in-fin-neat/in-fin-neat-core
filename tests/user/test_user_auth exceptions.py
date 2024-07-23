@@ -1,5 +1,5 @@
 import pytest
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, Type
 from personal_finances.user.user_auth_exceptions import (
     get_server_response_by_exception,
     AuthorizationHeaderNotPresent,
@@ -97,28 +97,19 @@ _TEST_EMPTY_EXCEPTION_LIST_RESPONSE: Dict = {
     ],
 )
 def test_get_server_response_by_exception(
-    exception_type: Exception, expected_response: dict[str, Any]
+    exception_type: Type[Exception], expected_response: dict[str, Any]
 ) -> None:
-    try:
-        raise (exception_type)
-    except Exception as exception:
-        assert expected_response == get_server_response_by_exception(exception)
+    assert expected_response == get_server_response_by_exception(exception_type())
 
 
 def test_get_server_response_duplicated_exception_list() -> None:
-    try:
-        raise (KeyError)
-    except Exception as exception:
-        with pytest.raises(InconsistentExceptionDictionary):
-            get_server_response_by_exception(
-                exception, _TEST_DUPLICATED_EXCEPTION_TO_HTTP_RESPONSE
-            )
-
-
-def test_get_server_response_empty_exception_list() -> None:
-    try:
-        raise (KeyError)
-    except Exception as exception:
-        assert _TEST_EMPTY_EXCEPTION_LIST_RESPONSE == get_server_response_by_exception(
-            exception
+    with pytest.raises(InconsistentExceptionDictionary):
+        get_server_response_by_exception(
+            UserNotFound(), _TEST_DUPLICATED_EXCEPTION_TO_HTTP_RESPONSE
         )
+
+
+def test_get_server_response_empty_exception_list_input() -> None:
+    assert _TEST_EMPTY_EXCEPTION_LIST_RESPONSE == get_server_response_by_exception(
+        UserNotFound(), {}
+    )
