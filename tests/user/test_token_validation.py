@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 from typing import Generator, Type, Union
 from personal_finances.user.token_validation import (
     token_validation,
-    InvalidLambdaEventInput
+    InvalidLambdaEventInput,
 )
 
 
@@ -44,7 +44,7 @@ def _get_input_without_auth_token() -> dict:
 
 def _get_input_event(token: str) -> dict:
     response = _get_input_without_auth_token()
-    response["authorizationToken"] = token
+    response["authorizationToken"] = f"Bearer {token}"
     return response
 
 
@@ -125,7 +125,10 @@ def test_token_validation_exceptions(
     "environment_variables, request_input",
     [
         (TEST_ENVAR_DICT, _get_input_without_auth_token()),
-        (TEST_ENVAR_DICT, _get_input_event(token="")),
+        (
+            TEST_ENVAR_DICT,
+            {"authorizationToken": "", **_get_input_without_auth_token()},
+        ),
         (TEST_ENVAR_DICT, _get_input_event("invalid_token")),
         (
             TEST_ENVAR_DICT,
@@ -190,8 +193,10 @@ def test_invalid_tokens(
     aws_client_mock = boto3_mock.return_value
     aws_client_mock.get_secret_value.return_value = {"SecretString": TEST_JWT_SECRET}
 
-    with patch.dict(os.environ, environment_variables):
-        assert "unauthorized" == token_validation(request_input, "")
+    with pytest.raises(Exception) as exp, patch.dict(os.environ, environment_variables):
+        token_validation(request_input, "")
+
+    assert str(exp.value) == "Unauthorized"
 
 
 @pytest.mark.parametrize(

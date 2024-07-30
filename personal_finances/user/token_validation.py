@@ -28,11 +28,11 @@ def _get_token_from_event(event: dict) -> Any:
     if "authorizationToken" not in event:
         raise (AuthHeaderNotFound)
 
-    token = event.get("authorizationToken", None)
-    if token is None or token == "":
+    token = event["authorizationToken"]
+    if token == "":
         raise (AuthorizationHeaderEmptyContent)
 
-    return token
+    return str(token).replace("Bearer ", "")
 
 
 def _generate_policy(principalId: str, effect: str, resource: str) -> str:
@@ -67,6 +67,7 @@ def token_validation(event: dict, context: str) -> Any:
     try:
         token = _get_token_from_event(event)
         logging.info("New token validation check request")
+        logging.debug(f"Event input keys: {event.keys()}")
         decoded_token = decode_token(token)
         user_id = _get_user_from_decoded_token(decoded_token)
         logging.info(f"{user_id} token is still valid")
@@ -77,6 +78,6 @@ def token_validation(event: dict, context: str) -> Any:
         AuthorizationHeaderEmptyContent,
         EmptyUserID,
         jwt.exceptions.InvalidTokenError,
-        jwt.exceptions.DecodeError,
-    ):
-        return "unauthorized"
+    ) as e:
+        logging.info(f"Invalid token:{str(e)}")
+        raise Exception("Unauthorized")  # Return a 401 Unauthorized response
