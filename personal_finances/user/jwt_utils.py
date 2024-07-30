@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+from functools import cache
 import os
 from typing import Any
 import boto3
 import jwt
 
 
+@cache
 def _get_jwt_secret() -> str:
     secret_name = os.environ["INFINEAT_JWT_SECRET_NAME"]
     jwt_session = boto3.client("secretsmanager")
