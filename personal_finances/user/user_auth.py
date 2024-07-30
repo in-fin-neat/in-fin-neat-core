@@ -3,11 +3,10 @@ import json
 import logging
 import boto3
 import bcrypt
-import jwt
 import os
-from datetime import datetime, timedelta
 from typing import Any, Callable, Tuple
 from decorator import decorator
+from personal_finances.user.jwt_utils import generate_token
 from personal_finances.user.user_auth_exceptions import (
     AuthorizationHeaderNotPresent,
     AuthorizationHeaderEmptyContent,
@@ -69,22 +68,6 @@ def _get_user_password(userId: str) -> str:
     return str(user["password"])
 
 
-def _get_jwt_secret() -> str:
-    secret_name = os.environ["INFINEAT_JWT_SECRET_NAME"]
-    jwt_session = boto3.client("secretsmanager")
-    get_secret_value_response = jwt_session.get_secret_value(SecretId=secret_name)
-
-    return str(get_secret_value_response["SecretString"])
-
-
-def _generate_token(user_id: str) -> str:
-    return jwt.encode(
-        {"exp": datetime.now() + timedelta(hours=1), "userId": user_id},
-        _get_jwt_secret(),
-        algorithm="HS256",
-    )
-
-
 def _password_match(recv_password: str, stored_password: str) -> bool:
     if bcrypt.checkpw(recv_password.encode("utf-8"), stored_password.encode("utf-8")):
         return True
@@ -125,7 +108,7 @@ def user_handler(event: dict, context: str) -> dict:
         token = ""
 
         if _password_match(recv_password, stored_password):
-            token = _generate_token(userId)
+            token = generate_token(userId)
         else:
             LOGGER.info(f"Password does not match for user: {userId}")
             raise PasswordNotMatch()

@@ -31,14 +31,6 @@ TEST_ENVAR_DICT = {
 }
 
 
-def _encode_basic_auth(user: str, password: str) -> str:
-    credentials = f"{user}:{password}"
-    credentials_encoded = credentials.encode()
-    authorization_encoded = base64.b64encode(credentials_encoded)
-    authorization = f"Basic {authorization_encoded.decode()}"
-    return authorization
-
-
 @pytest.fixture(autouse=True)
 def boto3_client_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.user.user_auth.boto3.client") as mock:
@@ -52,8 +44,8 @@ def boto3_resource_mock() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def datetime_mock() -> Generator[Mock, None, None]:
-    with patch("personal_finances.user.user_auth.datetime") as mock:
+def jwt_datetime_utils_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.user.jwt_utils.datetime") as mock:
         mock.now.return_value = TEST_DATE_TIME_NOW
         yield mock
 
@@ -64,6 +56,14 @@ def _generate_test_jwt_token() -> str:
         TEST_JWT_SECRETS,
         algorithm="HS256",
     )
+
+
+def _encode_basic_auth(user: str, password: str) -> str:
+    credentials = f"{user}:{password}"
+    credentials_encoded = credentials.encode()
+    authorization_encoded = base64.b64encode(credentials_encoded)
+    authorization = f"Basic {authorization_encoded.decode()}"
+    return authorization
 
 
 @pytest.mark.parametrize(
