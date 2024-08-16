@@ -1,4 +1,5 @@
 import base64
+from functools import cache
 import json
 import logging
 import boto3
@@ -51,11 +52,16 @@ def _get_auth_header(event: dict) -> str:
     return str(auth_header)
 
 
-def _get_user_password(userId: str) -> str:
-    dynamodb = boto3.resource("dynamodb")
+@cache
+def _get_user_table() -> Any:
+    return boto3.resource("dynamodb").Table(
+        os.environ["INFINEAT_DYNAMODB_USER_TABLE_NAME"]
+    )
 
-    user_table = dynamodb.Table(os.environ["INFINEAT_DYNAMODB_USER_TABLE_NAME"])
-    response = user_table.get_item(
+
+def _get_user_password(userId: str) -> str:
+
+    response = _get_user_table().get_item(
         Key={"userId": userId},
     )
     if "Item" not in response:
