@@ -8,6 +8,7 @@ from personal_finances.user.token_validation import (
     token_validation,
     InvalidLambdaEventInput,
 )
+from personal_finances.user.jwt_utils import _get_jwt_secret
 
 
 TEST_USER_ID = "testuser"
@@ -111,14 +112,14 @@ def test_token_validation_exceptions(
     expected_exception: Type[Exception],
     boto3_mock: Mock,
 ) -> None:
-
+    _get_jwt_secret.cache_clear()
     aws_client_mock = boto3_mock.return_value
     aws_client_mock.get_secret_value.return_value = {"SecretString": TEST_JWT_SECRET}
 
     with pytest.raises(expected_exception), patch.dict(
         os.environ, environment_variables
     ):
-        token_validation(request_input, "")
+        print(token_validation(request_input, ""))
 
 
 @pytest.mark.parametrize(
