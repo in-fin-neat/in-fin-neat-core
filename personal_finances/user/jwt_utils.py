@@ -9,6 +9,7 @@ import logging
 
 LOGGER = logging.getLogger()
 
+
 @cache
 def _get_jwt_secret() -> str:
     secret_name = os.environ["INFINEAT_JWT_SECRET_NAME"]
