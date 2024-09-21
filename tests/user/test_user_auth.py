@@ -10,6 +10,7 @@ from personal_finances.user.user_auth import (
     add_cors_to_dict,
     user_handler,
     create_user_hash_password,
+    _get_user_table,
 )
 
 
@@ -213,6 +214,7 @@ def test_user_auth(
     boto3_client_mock: Mock,
 ) -> None:
 
+    _get_user_table.cache_clear()
     aws_resource_mock = boto3_resource_mock.return_value
     aws_dynamo_table = aws_resource_mock.Table.return_value
     aws_dynamo_table.get_item.return_value = dynamo_response_dict_or_exception
@@ -240,3 +242,25 @@ def test_password_creation(gensalt: Mock) -> None:
     gensalt.return_value = b"$2b$12$tBzFe5aHXtLmOPWSQWcy2e"
     response = create_user_hash_password(TEST_USER_PASSWORD)
     assert response == b"$2b$12$tBzFe5aHXtLmOPWSQWcy2ekjqxf4R5p9C99oWDxv/EJz7bYHE2Ez2"
+
+
+def test_user_table_cache(
+    boto3_resource_mock: Mock,
+) -> None:
+    _get_user_table.cache_clear()
+    aws_resource_mock = boto3_resource_mock.return_value
+    aws_dynamo_table = aws_resource_mock.Table.return_value
+    aws_dynamo_table.get_item.return_value = TEST_USER_DYNAMO_RESPONSE
+
+    test_input = {
+        "headers": {
+            "Authorization": _encode_basic_auth(TEST_USER_ID, TEST_USER_PASSWORD)
+        }
+    }
+
+    with patch.dict(os.environ, TEST_ENVAR_DICT):
+        user_handler(test_input, "")
+        user_handler(test_input, "")
+        user_handler(test_input, "")
+
+    aws_resource_mock.Table.assert_called_once()
