@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
 from nordigen.api import RequisitionsApi
-from nordigen.types import RequisitionDto
 from pydantic import BaseModel
-from typing import List, cast
+from typing import Iterable, List, cast
+
+from .bank_client import AuthorizationUrl
+
+
+# TODO: Transform this into a URL store for handling proper bank validations
 
 
 class Requisitions(BaseModel):
@@ -12,14 +16,11 @@ class Requisitions(BaseModel):
 EMPTY_REQUISITIONS: Requisitions = Requisitions(RequisitionIds=[])
 
 
-def gocardless_requisition_adapter(requisitions: List[RequisitionDto]) -> Requisitions:
+def gocardless_requisition_adapter(
+    auth_urls: Iterable[AuthorizationUrl],
+) -> Requisitions:
     return Requisitions.model_validate(
-        {
-            "RequisitionIds": [
-                gocardless_requisition.requisition_id
-                for gocardless_requisition in requisitions
-            ]
-        }
+        {"RequisitionIds": [auth_url.payload for auth_url in auth_urls]}
     )
 
 
@@ -64,7 +65,7 @@ class RequisitionStore(ABC):
         """
         pass
 
-    def are_all_requisition_valid(
+    def are_stored_requisitions_valid(
         self, user_id: str, validator: RequisitionValidator
     ) -> bool:
         last_requisitions = self.get_last_requisitions(user_id)

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from copy import deepcopy
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
@@ -13,6 +12,11 @@ class TokenObject(BaseModel):
     RefreshExpires: int
     CreationEpoch: int
     AccessRefreshEpoch: int
+
+
+class AccessTokenObject(BaseModel):
+    AccessToken: str
+    AccessExpires: int
 
 
 class GocardlessAccessToken(BaseModel):
@@ -32,14 +36,14 @@ def gocardless_token_adapter(gocardless_token: TokenType) -> TokenObject:
     return TokenObject.model_validate(token_dict)
 
 
-def gocardless_update_access_token(
-    access_token: GocardlessAccessToken, existing_token_object: TokenObject
-) -> TokenObject:
-    new_token_object = deepcopy(existing_token_object)
-    new_token_object.AccessToken = access_token.access
-    new_token_object.AccessExpires = access_token.access_expires
-    new_token_object.AccessRefreshEpoch = int(datetime.now().timestamp())
-    return new_token_object
+def gocardless_access_token_adapter(
+    gocardless_access_token: GocardlessAccessToken,
+) -> AccessTokenObject:
+    access_token_dict = {
+        "AccessToken": gocardless_access_token.access,
+        "AccessExpires": gocardless_access_token.access_expires,
+    }
+    return AccessTokenObject.model_validate(access_token_dict)
 
 
 class TokenNotFound(Exception):
