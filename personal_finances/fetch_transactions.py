@@ -1,6 +1,6 @@
+from personal_finances.bank_interface.bank_client import BankDetails
 from personal_finances.bank_interface.client import (
-    BankClient,
-    BankDetails,
+    BrowserAuthBankClient,
     NordigenAuth,
 )
 import logging
@@ -31,7 +31,7 @@ def fetch_transactions() -> None:
     """
     _ensure_data_path_exist()
     secret_id, secret_key = _read_secrets()
-    with BankClient(
+    with BrowserAuthBankClient(
         auth=NordigenAuth(secret_id, secret_key),
         bank_details=[
             BankDetails(name="Revolut", country="LV"),

@@ -15,6 +15,11 @@ class TokenObject(BaseModel):
     AccessRefreshEpoch: int
 
 
+class AccessTokenObject(BaseModel):
+    AccessToken: str
+    AccessExpires: int
+
+
 class GocardlessAccessToken(BaseModel):
     access: str
     access_expires: int
@@ -30,6 +35,16 @@ def gocardless_token_adapter(gocardless_token: TokenType) -> TokenObject:
         "AccessRefreshEpoch": int(datetime.now().timestamp()),
     }
     return TokenObject.model_validate(token_dict)
+
+
+def gocardless_access_token_adapter(
+    gocardless_access_token: GocardlessAccessToken,
+) -> AccessTokenObject:
+    access_token_dict = {
+        "AccessToken": gocardless_access_token.access,
+        "AccessExpires": gocardless_access_token.access_expires,
+    }
+    return AccessTokenObject.model_validate(access_token_dict)
 
 
 def gocardless_update_access_token(
