@@ -45,7 +45,7 @@ def test_requisition_store_valid_access_requisition() -> None:
     gocardless_api_mock = Mock()
     gocardless_api_mock.get_requisition_by_id.return_value = {"status": "LN"}
     validator = GocardlessRequisitionValidator(gocardless_api_mock)
-    assert test_store.are_all_requisition_valid("my-user-id", validator) is True
+    assert test_store.are_stored_requisitions_valid("my-user-id", validator) is True
     requisition_store_mock.get_last_requisition.assert_called_once_with("my-user-id")
 
 
@@ -61,7 +61,7 @@ def test_requisition_store_one_invalid() -> None:
         {"status": "INVALID"},
     ]
     validator = GocardlessRequisitionValidator(gocardless_api_mock)
-    assert test_store.are_all_requisition_valid("my-user-id", validator) is False
+    assert test_store.are_stored_requisitions_valid("my-user-id", validator) is False
     requisition_store_mock.get_last_requisition.assert_called_once_with("my-user-id")
 
 
@@ -70,5 +70,5 @@ def test_requisition_store_empty_is_invalid() -> None:
     requisition_store_mock.get_last_requisition.return_value = EMPTY_REQUISITIONS
     test_store = MockRequisitionStore(requisition_store_mock)
     validator = GocardlessRequisitionValidator(Mock())
-    assert test_store.are_all_requisition_valid("my-user-id", validator) is False
+    assert test_store.are_stored_requisitions_valid("my-user-id", validator) is False
     requisition_store_mock.get_last_requisition.assert_called_once_with("my-user-id")

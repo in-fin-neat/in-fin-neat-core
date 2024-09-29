@@ -1,8 +1,8 @@
 from unittest.mock import patch, call, Mock
 from pytest import fixture
+from personal_finances.bank_interface.bank_client import BankDetails
 from personal_finances.bank_interface.client import (
-    BankClient,
-    BankDetails,
+    BrowserAuthBankClient,
     NordigenAuth,
 )
 from personal_finances.bank_interface.requisition_store import (
@@ -155,7 +155,7 @@ def test_bank_client_initializes_valid_access_token(
     nordigen_client_mock: Mock, disk_token_store_mock: Mock
 ) -> None:
     disk_token_store_mock.return_value.is_access_token_valid.return_value = True
-    BankClient(
+    BrowserAuthBankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),
@@ -180,7 +180,7 @@ def test_bank_client_initializes_valid_refresh_token(
         "access": "newly-generated-token",
         "access_expires": 10,
     }
-    BankClient(
+    BrowserAuthBankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),
@@ -222,7 +222,7 @@ def test_bank_client_initializes_invalid_token(
         "refresh_expires": 50,
     }
 
-    BankClient(
+    BrowserAuthBankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),
@@ -250,7 +250,7 @@ def test_bank_client_initializes_invalid_token(
 
 
 def test_bank_client_scope(subprocess_mock: Mock, os_mock: Mock) -> None:
-    with BankClient(
+    with BrowserAuthBankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),
@@ -273,11 +273,12 @@ def test_bank_client_empty_requisition_store(
     requests_mock: Mock,
     webbrowser_mock: Mock,
 ) -> None:
-    disk_requisition_store_mock.return_value.are_all_requisition_valid.return_value = (
-        False
-    )
+    disk_requisition_store_mock. \
+        return_value.are_stored_requisitions_valid.return_value = (
+            False
+        )
     nordigen_client = nordigen_client_mock.return_value
-    with BankClient(
+    with BrowserAuthBankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),
@@ -318,15 +319,13 @@ def test_bank_client_empty_requisition_store(
         ]
     )
     assert (
-        disk_requisition_store_mock.return_value.are_all_requisition_valid.call_args[0][
-            0
-        ]
-        == "temporary-user-id"
+        disk_requisition_store_mock.
+        return_value.are_stored_requisitions_valid.call_args[0][0] ==
+        "temporary-user-id"
     )
     assert isinstance(
-        disk_requisition_store_mock.return_value.are_all_requisition_valid.call_args[0][
-            1
-        ],
+        disk_requisition_store_mock.
+        return_value.are_stored_requisitions_valid.call_args[0][1],
         GocardlessRequisitionValidator,
     )
     disk_requisition_store_mock.return_value.save_requisitions.assert_called_once_with(
@@ -363,12 +362,13 @@ def test_bank_client_existing_requisition_store(
     requests_mock: Mock,
     webbrowser_mock: Mock,
 ) -> None:
-    disk_requisition_store_mock.return_value.are_all_requisition_valid.return_value = (
-        True
-    )
+    disk_requisition_store_mock. \
+        return_value.are_stored_requisitions_valid.return_value = (
+            True
+        )
 
     nordigen_client = nordigen_client_mock.return_value
-    with BankClient(
+    with BrowserAuthBankClient(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
         [
             BankDetails(name="mock_name1", country="mock_country1"),
@@ -396,15 +396,13 @@ def test_bank_client_existing_requisition_store(
     }
     nordigen_client.initialize_session.assert_not_called()
     assert (
-        disk_requisition_store_mock.return_value.are_all_requisition_valid.call_args[0][
-            0
-        ]
+        disk_requisition_store_mock.
+        return_value.are_stored_requisitions_valid.call_args[0][0]
         == "temporary-user-id"
     )
     assert isinstance(
-        disk_requisition_store_mock.return_value.are_all_requisition_valid.call_args[0][
-            1
-        ],
+        disk_requisition_store_mock.
+        return_value.are_stored_requisitions_valid.call_args[0][1],
         GocardlessRequisitionValidator,
     )
 
