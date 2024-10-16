@@ -12,8 +12,8 @@ def os_mock() -> Generator[Mock, None, None]:
 
 
 @fixture(autouse=True)
-def bank_client_mock() -> Generator[Mock, None, None]:
-    with patch("personal_finances.fetch_transactions.BankClient") as mock:
+def bank_auth_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.fetch_transactions.BankAuthorizationHandler") as mock:
         yield mock
 
 
@@ -58,7 +58,7 @@ def test_data_path_is_created_if_not_exists(os_mock: Mock) -> None:
     os_mock.makedirs.assert_called_once_with("data")
 
 
-def test_nordigen_secrets_reading(os_mock: Mock, bank_client_mock: Mock) -> None:
+def test_nordigen_secrets_reading(os_mock: Mock, bank_auth_mock: Mock) -> None:
     """
     Check if the nordigen secrets get read and used
     to in the auth parameter for creating the banking client object
@@ -75,7 +75,7 @@ def test_nordigen_secrets_reading(os_mock: Mock, bank_client_mock: Mock) -> None
         [call("GOCARDLESS_SECRET_ID"), call("GOCARDLESS_SECRET_KEY")]
     )
 
-    auth_argument = bank_client_mock.call_args.kwargs.get("auth")
+    auth_argument = bank_auth_mock.call_args.kwargs.get("auth")
 
     assert auth_argument.secret_id == "nordigen_dummy_id"
     assert auth_argument.secret_key == "nordigen_dummy_key"

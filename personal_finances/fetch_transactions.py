@@ -1,8 +1,8 @@
-from personal_finances.bank_interface.client import (
-    BankClient,
-    BankDetails,
+from personal_finances.bank_interface.bank_auth_handler import (
+    BankAuthorizationHandler,
     NordigenAuth,
 )
+from personal_finances.bank_interface.bank_client import BankDetails
 import logging
 from typing import Tuple
 from datetime import datetime
@@ -31,17 +31,21 @@ def fetch_transactions() -> None:
     """
     _ensure_data_path_exist()
     secret_id, secret_key = _read_secrets()
-    with BankClient(
+    auth_handler = BankAuthorizationHandler(
         auth=NordigenAuth(secret_id, secret_key),
         bank_details=[
             BankDetails(name="Revolut", country="LV"),
             BankDetails(name="N26", country="DE"),
             BankDetails(name="Allied Irish Banks", country="IE"),
         ],
-    ) as bank_client, open(
+    )
+
+    with open(
         f"data/transactions-{datetime.now().isoformat()}.json", "w"
     ) as output_file:
-        transactions = bank_client.get_transactions()
+        transactions = auth_handler.gocardless_client.get_transactions(
+            map(lambda url: url.payload, auth_handler.auth_urls)
+        )
         output_file.write(json.dumps(transactions, indent=4))
         LOGGER.info(
             f"""
