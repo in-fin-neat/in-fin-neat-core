@@ -29,10 +29,10 @@ boto3-stubs = "*"
 types-decorator = "*"
 
 [requires]
-python_version = "3.11"
+python_version = "3.12"
 
 [scripts]
-tests = "bash -c 'python -m pytest --cov=personal_finances --cov-report=xml --cov-report=term tests/ && diff-cover coverage.xml --compare-branch=origin/master && diff-quality --violations=flake8 --compare-branch=origin/master'"
+tests = "bash -c 'python -m pytest -vv --cov=personal_finances --cov-report xml --cov-report html --cov-report term-missing tests/ && diff-cover coverage.xml --compare-branch=origin/master && diff-quality --violations=flake8 --compare-branch=origin/master'"
 build = "bash -c 'mypy personal_finances tests && flake8 personal_finances tests'"
 format = "black ."
 generate_reports = "python -m personal_finances.generate_reports"
@@ -50,7 +50,7 @@ aws_lambda_pack="""
     --platform manylinux2014_x86_64 \
     --target=package \
     --implementation cp \
-    --python-version 3.11 \
+    --python-version 3.12 \
     --only-binary=:all: --upgrade \
     --requirement requirements.txt && \
 
