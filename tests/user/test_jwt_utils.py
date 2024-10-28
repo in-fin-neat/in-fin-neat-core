@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import os
 from typing import Generator
 from unittest.mock import Mock, patch
@@ -13,6 +14,13 @@ TEST_ENVAR_DICT = {
 @pytest.fixture(autouse=True)
 def boto3_mock() -> Generator[Mock, None, None]:
     with patch("personal_finances.user.jwt_utils.boto3.client") as mock:
+        yield mock
+
+
+@pytest.fixture(autouse=True)
+def jwt_datetime_mock() -> Generator[Mock, None, None]:
+    with patch("personal_finances.user.jwt_utils.datetime") as mock:
+        mock.now.return_value = datetime(2160, 1, 1, 10, 00, 00, tzinfo=timezone.utc)
         yield mock
 
 
