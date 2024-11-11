@@ -15,6 +15,7 @@ bcrypt = "*"
 pyjwt = "*"
 boto3 = "*"
 decorator = "*"
+schwifty = "*"
 
 [dev-packages]
 pytest = "*"
