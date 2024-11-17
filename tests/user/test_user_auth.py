@@ -26,9 +26,12 @@ TEST_USER_DYNAMO_RESPONSE = {
 
 TEST_JWT_SECRETS = "jwt_secret"
 TEST_DATE_TIME_NOW = datetime(2060, 1, 1, 10, 00, 00)
+
+TEST_ALLOWED_ORIGINS = {"ALLOWED_ORIGIN_DOMAINS": "some-test-domain"}
 TEST_ENVAR_DICT = {
     "INFINEAT_DYNAMODB_USER_TABLE_NAME": "table_name",
     "INFINEAT_JWT_SECRET_NAME": "jwt_secret",
+    **TEST_ALLOWED_ORIGINS,
 }
 
 
@@ -126,7 +129,7 @@ def _encode_basic_auth(user: str, password: str) -> str:
                 ),
             },
             {},
-            {},
+            TEST_ALLOWED_ORIGINS,
         ),
         (
             {"headers": {"Authorization": _encode_basic_auth("dummy_user", "pass")}},
@@ -138,7 +141,7 @@ def _encode_basic_auth(user: str, password: str) -> str:
                 ),
             },
             {},
-            {},
+            TEST_ALLOWED_ORIGINS,
         ),
         (
             {},
@@ -186,7 +189,7 @@ def _encode_basic_auth(user: str, password: str) -> str:
                 "body": "Internal Server Error",
             },
             TEST_USER_DYNAMO_RESPONSE,
-            {},
+            TEST_ALLOWED_ORIGINS,
         ),
         (
             {
@@ -225,8 +228,8 @@ def test_user_auth(
 
     with patch.dict(os.environ, env_var_dict):
         response = user_handler(test_event_input, "")
+        assert response == add_cors_to_dict(expected_response)
 
-    assert response == add_cors_to_dict(expected_response)
     if expected_response["statusCode"] == 200:
         token = json.loads(response["body"])["token"]
         try:
