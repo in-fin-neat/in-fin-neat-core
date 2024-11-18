@@ -16,6 +16,7 @@ pyjwt = "*"
 boto3 = "*"
 decorator = "*"
 schwifty = "*"
+pydantic ="*"
 
 [dev-packages]
 pytest = "*"

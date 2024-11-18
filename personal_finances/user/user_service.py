@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from typing import Any, Callable
 from decorator import decorator
 from personal_finances.user.user_login import user_login
@@ -29,8 +30,22 @@ def _get_auth_header(event: dict) -> str:
     return str(auth_header)
 
 
+def get_allowed_domain() -> str:
+    # TODO: allow for multiple origins
+    # fetching only the first origin
+    try:
+        allowed_domain = os.environ["ALLOWED_ORIGIN_DOMAINS"].split(",")[0]
+    except Exception as e:
+        LOGGER.info(f"falling 'ALLOWED_ORIGIN_DOMAINS' back to * due to: {e}")
+        return "*"
+    return allowed_domain if allowed_domain else "*"
+
+
 def add_cors_to_dict(input_dict: dict) -> dict:
-    return {**input_dict, "headers": {"Access-Control-Allow-Origin": "*"}}
+    return {
+        **input_dict,
+        "headers": {"Access-Control-Allow-Origin": get_allowed_domain()},
+    }
 
 
 @decorator
