@@ -200,7 +200,7 @@ def _write_reports(
 @click.option(
     "-tfp",
     "--transactions-file-path",
-    default="data/merged_transactions.json",
+    default="data/merged_transactions_latest.json",
     help="File path of transactions fetched previously.",
 )
 @click.option(
