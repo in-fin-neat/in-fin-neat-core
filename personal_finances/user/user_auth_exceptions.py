@@ -44,6 +44,10 @@ class InconsistentExceptionDictionary(Exception):
     pass
 
 
+class InvalidIban(Exception):
+    pass
+
+
 """
     This dicts contains the map between the exceptions generated in
     the user login api and the http response. No exception should be
@@ -63,6 +67,10 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         "statusCode": 400,
         "body": "Invalid authentication input",
     },
+    (InvalidIban,): {
+        "statusCode": 400,
+        "body": "Invalid IBAN format",
+    },
     (
         InvalidUserPassword,
         InvalidUserName,
@@ -71,8 +79,8 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         "body": "Username or password does not match the minimal security requirements",
     },
     (
-        InvalidLambdaEventInput,
         InvalidDynamoResponse,
+        InvalidLambdaEventInput
     ): {
         "statusCode": 500,
         "body": "Internal Server Error",
