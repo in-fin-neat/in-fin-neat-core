@@ -1,6 +1,6 @@
 import pytest
-from unittest.mock import patch, MagicMock
-from typing import Any, Dict, Optional
+from unittest.mock import Mock, patch, MagicMock
+from typing import Any, Dict, Generator, Optional
 
 from personal_finances.user.user_service import (
     user_service_handler,
@@ -9,6 +9,14 @@ from personal_finances.user.user_auth_exceptions import (
     InvalidIban,
     UserNotFound,
 )
+import os
+
+
+@pytest.fixture
+def env_var_patch() -> Generator[Mock, None, None]:
+    environment_variables = {"ALLOWED_ORIGIN_DOMAINS": "https://some-test-domain"}
+    with patch.dict(os.environ, environment_variables) as mock:
+        yield mock
 
 
 @pytest.fixture
@@ -249,7 +257,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -261,7 +269,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -273,7 +281,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -285,7 +293,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -297,7 +305,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -309,7 +317,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -321,7 +329,7 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
         (
@@ -333,15 +341,15 @@ def test_user_service_handler_update_iban(
             {
                 "statusCode": 404,
                 "body": "Not Found",
-                "headers": {"Access-Control-Allow-Origin": "*"},
+                "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
     ],
 )
 def test_user_service_handler_not_found(
+    env_var_patch: Mock,
     event: Dict[str, Any],
     expected_response: Dict[str, Any],
 ) -> None:
-
     response = user_service_handler(event, "")
     assert response == expected_response
