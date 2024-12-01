@@ -200,13 +200,19 @@ def test_merge_transaction(
 ) -> None:
     listdir_mock.return_value = transactions_file_names
     open_mock.return_value.read.side_effect = transactions_list
+    mock_dummy_datetime = "2024-01-01T10:00:00.00000"
+    datetime_mock.now.return_value.isoformat.return_value = mock_dummy_datetime
 
     runner = CliRunner()
     result = runner.invoke(merge_transactions, [])
 
     assert result.exit_code == 0
     assert (
-        write_json_mock.call_args.args[0]
+        write_json_mock.call_args_list[0].args[0]
+        == f"data/merged_transactions-{mock_dummy_datetime}.json"
+    )
+    assert (
+        write_json_mock.call_args_list[1].args[0]
         == "data/merged_transactions_latest.json"
     )
 
@@ -251,6 +257,8 @@ def test_empty_data_folder_should_create_empty_output(
     datetime_mock: Mock,
 ) -> None:
     listdir_mock.return_value = []
+    mock_dummy_datetime = "2024-01-01T10:00:00.00000"
+    datetime_mock.now.return_value.isoformat.return_value = mock_dummy_datetime
 
     runner = CliRunner()
     result = runner.invoke(merge_transactions, [])
@@ -258,7 +266,12 @@ def test_empty_data_folder_should_create_empty_output(
     open_mock.return_value.read.assert_not_called()
     assert result.exit_code == 0
     assert write_json_mock.call_args.args[1] == []
+
     assert (
-        write_json_mock.call_args.args[0]
+        write_json_mock.call_args_list[0].args[0]
+        == f"data/merged_transactions-{mock_dummy_datetime}.json"
+    )
+    assert (
+        write_json_mock.call_args_list[1].args[0]
         == "data/merged_transactions_latest.json"
     )

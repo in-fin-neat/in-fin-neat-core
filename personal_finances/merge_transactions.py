@@ -44,7 +44,8 @@ def dedupe_transactions(
 def merge_transactions() -> None:
     """
     Merges files with pattern 'data/transactions*.json' into
-    'data/merged_transactions_latest.json'.
+    'data/merged_transactions_latest.json' and
+    'data/merged_transactions_<current date and time>.json'.
 
     Since 'pending' transactions have different schema,
     this command ignores them.
@@ -73,8 +74,7 @@ def merge_transactions() -> None:
         f"data/merged_transactions-{datetime.now().isoformat()}.json",
         deduped_transactions,
     )
-    # Issue 37:
-    # Generate last merged_transactions_latest.json due filename change
+
     write_json(
         "data/merged_transactions_latest.json",
         deduped_transactions,
