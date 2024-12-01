@@ -63,7 +63,6 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         AuthorizationHeaderNotPresent,
         AuthorizationHeaderEmptyContent,
         InvalidAuthorizationHeader,
-        InvalidLambdaEventInput,
     ): {
         "statusCode": 400,
         "body": "Invalid authentication input",
@@ -79,7 +78,10 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         "statusCode": 400,
         "body": "Username or password does not match the minimal security requirements",
     },
-    (InvalidDynamoResponse,): {
+    (
+        InvalidDynamoResponse,
+        InvalidLambdaEventInput
+    ): {
         "statusCode": 500,
         "body": "Internal Server Error",
     },

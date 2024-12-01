@@ -47,8 +47,8 @@ def mock_update_user_iban() -> Any:
                 "httpMethod": "POST",
             },
             {
-                "statusCode": 400,
-                "body": "Invalid authentication input",
+                "statusCode": 500,
+                "body": "Internal Server Error",
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),

@@ -80,7 +80,7 @@ _TEST_EMPTY_EXCEPTION_LIST_RESPONSE: Dict = {
         ),
         (
             InvalidLambdaEventInput,
-            {"statusCode": 400, "body": "Invalid authentication input"},
+            {"statusCode": 500, "body": "Internal Server Error"},
         ),
         (
             InvalidDynamoResponse,
