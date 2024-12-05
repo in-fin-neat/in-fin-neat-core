@@ -208,8 +208,12 @@ def test_merge_transaction(
 
     assert result.exit_code == 0
     assert (
-        write_json_mock.call_args.args[0]
+        write_json_mock.call_args_list[0].args[0]
         == f"data/merged_transactions-{mock_dummy_datetime}.json"
+    )
+    assert (
+        write_json_mock.call_args_list[1].args[0]
+        == "data/merged_transactions_latest.json"
     )
 
     assert_is_list_equal(
@@ -262,7 +266,12 @@ def test_empty_data_folder_should_create_empty_output(
     open_mock.return_value.read.assert_not_called()
     assert result.exit_code == 0
     assert write_json_mock.call_args.args[1] == []
+
     assert (
-        write_json_mock.call_args.args[0]
+        write_json_mock.call_args_list[0].args[0]
         == f"data/merged_transactions-{mock_dummy_datetime}.json"
+    )
+    assert (
+        write_json_mock.call_args_list[1].args[0]
+        == "data/merged_transactions_latest.json"
     )

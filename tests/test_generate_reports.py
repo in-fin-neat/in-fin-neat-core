@@ -72,11 +72,11 @@ def test_malformed_cli_params_rejected(
 @pytest.mark.parametrize(
     "command_params,user_file_path,transactions_file_path",
     [
-        ([], "config/user_config.yaml", "data/merged_transactions.json"),
+        ([], "config/user_config.yaml", "data/merged_transactions_latest.json"),
         (
             ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01T00:00:01Z"],
             "config/user_config.yaml",
-            "data/merged_transactions.json",
+            "data/merged_transactions_latest.json",
         ),
         (
             [
@@ -86,7 +86,7 @@ def test_malformed_cli_params_rejected(
                 "2023-01-01T00:00:01Z",
             ],
             "config/user_config.yaml",
-            "data/merged_transactions.json",
+            "data/merged_transactions_latest.json",
         ),
         (
             ["-tfp", "/path/to/my/transactions.json"],
@@ -101,12 +101,12 @@ def test_malformed_cli_params_rejected(
         (
             ["-ucfp", "/path/to/my/user_config.yaml"],
             "/path/to/my/user_config.yaml",
-            "data/merged_transactions.json",
+            "data/merged_transactions_latest.json",
         ),
         (
             ["--user-config-file-path", "/path/to/my/user_config.yaml"],
             "/path/to/my/user_config.yaml",
-            "data/merged_transactions.json",
+            "data/merged_transactions_latest.json",
         ),
     ],
 )
