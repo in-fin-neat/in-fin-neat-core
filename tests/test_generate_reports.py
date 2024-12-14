@@ -108,6 +108,51 @@ def test_malformed_cli_params_rejected(
             "/path/to/my/user_config.yaml",
             "data/merged_transactions_latest.json",
         ),
+        (
+            ["-st", "2010-01-01", "-et", "2023-01-01T00:00:01Z"],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
+        (
+            ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01"],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
+        (
+            ["-st", "2010-01-01", "-et", "2023-01-01"],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
+        (
+            [
+                "--start-time",
+                "2010-01-01",
+                "--end-time",
+                "2023-01-01T00:00:01Z",
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
+        (
+            [
+                "--start-time",
+                "2010-01-01T00:00:00Z",
+                "--end-time",
+                "2023-01-01",
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
+        (
+            [
+                "--start-time",
+                "2010-01-01",
+                "--end-time",
+                "2023-01-01",
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
     ],
 )
 def test_correct_cli_params(

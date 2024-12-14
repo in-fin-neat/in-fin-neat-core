@@ -219,6 +219,12 @@ def generate_reports(
     try:
         start_datetime = dateutil.parser.isoparse(start_time)
         end_datetime = dateutil.parser.isoparse(end_time)
+
+        if start_datetime.tzinfo is None:
+            start_datetime = dateutil.parser.isoparse(start_time+" 00:00+00:00")
+        if end_datetime.tzinfo is None:
+            end_datetime = dateutil.parser.isoparse(end_time+" 00:00+00:00")
+
     except ValueError as e:
         raise InvalidDatetime(e)
 
