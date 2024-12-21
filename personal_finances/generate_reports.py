@@ -1,4 +1,5 @@
 import json
+import pytz
 from datetime import datetime
 from personal_finances.bank_interface.nordigen_adapter import as_simple_transaction
 from personal_finances.transaction.grouping import (
@@ -221,9 +222,11 @@ def generate_reports(
         end_datetime = dateutil.parser.isoparse(end_time)
 
         if start_datetime.tzinfo is None:
-            start_datetime = dateutil.parser.isoparse(start_time+" 00:00+00:00")
+            timezone = pytz.timezone("UTC")
+            start_datetime = timezone.localize(start_datetime)
         if end_datetime.tzinfo is None:
-            end_datetime = dateutil.parser.isoparse(end_time+" 00:00+00:00")
+            timezone = pytz.timezone("UTC")
+            end_datetime = timezone.localize(end_datetime)
 
     except ValueError as e:
         raise InvalidDatetime(e)
