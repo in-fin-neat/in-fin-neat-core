@@ -17,6 +17,7 @@ boto3 = "*"
 decorator = "*"
 schwifty = "*"
 pydantic ="*"
+pytz ="*"
 
 [dev-packages]
 pytest = "*"
