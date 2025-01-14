@@ -122,18 +122,23 @@ class BankAuthorizationHandler:
             user_id, requisition_validator
         ):
             LOGGER.debug("requisition store has valid requisitions")
-            return list(map(
-                lambda requisition_id: AuthorizationUrl.model_validate(
-                    {
-                        # These empty strings will be populated when requisition store
-                        # is transformed into URL store, it's needed for bank validation
-                        "authorization_url": "",
-                        "validation_reference": "",
-                        "payload": requisition_id,
-                    }
-                ),
-                self._requisition_store.get_last_requisitions(user_id).RequisitionIds,
-            ))
+            return list(
+                map(
+                    lambda requisition_id: AuthorizationUrl.model_validate(
+                        {
+                            # These empty strings will be populated when
+                            # requisition store is transformed into URL store,
+                            # it's needed for bank validation
+                            "authorization_url": "",
+                            "validation_reference": "",
+                            "payload": requisition_id,
+                        }
+                    ),
+                    self._requisition_store.get_last_requisitions(
+                        user_id
+                    ).RequisitionIds,
+                )
+            )
         else:
             LOGGER.debug("no valid requisitions stored, getting new requisitions")
             authorization_urls = list(
