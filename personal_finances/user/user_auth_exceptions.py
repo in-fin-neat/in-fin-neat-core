@@ -57,7 +57,7 @@ class InvalidIban(Exception):
 _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
     (UserNotFound, PasswordNotMatch): {
         "statusCode": 401,
-        "body": "User or password incorrect",
+        "body": '{"message": "User or password incorrect"}',
     },
     (
         AuthorizationHeaderNotPresent,
@@ -65,31 +65,29 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         InvalidAuthorizationHeader,
     ): {
         "statusCode": 400,
-        "body": "Invalid authentication input",
+        "body": '{"message": "Invalid authentication input"}',
     },
     (InvalidIban,): {
         "statusCode": 400,
-        "body": "Invalid IBAN format",
+        "body": '{"message": "Invalid IBAN format"}',
     },
     (
         InvalidUserPassword,
         InvalidUserName,
     ): {
         "statusCode": 400,
-        "body": "Username or password does not match the minimal security requirements",
+        "body": '{"message": "Username or password does not '
+        + 'match the minimal security requirements"}',
     },
-    (
-        InvalidDynamoResponse,
-        InvalidLambdaEventInput
-    ): {
+    (InvalidDynamoResponse, InvalidLambdaEventInput): {
         "statusCode": 500,
-        "body": "Internal Server Error",
+        "body": '{"message": "Internal Server Error"}',
     },
 }
 
 _UNKNOWN_EXCEPTION_RESPONSE: Dict = {
     "statusCode": 500,
-    "body": "Internal Server Error",
+    "body": '{"message": "Internal Server Error"}',
 }
 
 

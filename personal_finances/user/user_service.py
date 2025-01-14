@@ -57,7 +57,7 @@ def add_cors_decorator(handler: Callable, *args: Any, **kwargs: Any) -> dict:
 def user_service_handler(event: dict, context: str) -> dict:
     resource = event["resource"]
     http_method = event["httpMethod"]
-
+    response = {}
     logging.info(f"info_event:{event}")
     logging.info(f"info_context:{context}")
 
@@ -65,12 +65,15 @@ def user_service_handler(event: dict, context: str) -> dict:
         if resource == "/users/{userId}/login" and http_method == "POST":
             auth_header = _get_auth_header(event)
             token_json = user_login(auth_header)
-            return {"statusCode": 200, "body": f"{token_json}"}
+            response["token"] = token_json
+            return {"statusCode": 200, "body": f"{json.dumps(response)}"}
 
         elif resource == "/users/{userId}/bank-accounts" and http_method == "GET":
             user_id = event["pathParameters"].get("userId")
             iban_list = get_user_ibans(user_id)
-            return {"statusCode": 200, "body": f"ibanList:{json.dumps(iban_list)}"}
+            response_iban = {}
+            response_iban["ibanList"] = iban_list
+            return {"statusCode": 200, "body": f"{json.dumps(response_iban)}"}
 
         elif (
             resource == "/users/{userId}/bank-accounts/{iban}" and http_method == "PUT"
@@ -78,10 +81,12 @@ def user_service_handler(event: dict, context: str) -> dict:
             iban = event["pathParameters"].get("iban")
             user_id = event["pathParameters"].get("userId")
             update_user_iban(user_id, iban)
-            return {"statusCode": 200, "body": "IBAN added successfully"}
+            response["message"] = "IBAN added successfully"
+            return {"statusCode": 200, "body": f"{json.dumps(response)}"}
 
         # Default response for unknown paths/methods
-        return {"statusCode": 404, "body": "Not Found"}
+        response["message"] = "Not Found"
+        return {"statusCode": 404, "body": f"{json.dumps(response)}"}
 
     except Exception as e:
         LOGGER.exception(
