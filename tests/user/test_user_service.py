@@ -48,7 +48,7 @@ def mock_update_user_iban() -> Any:
             },
             {
                 "statusCode": 500,
-                "body": "Internal Server Error",
+                "body": '{"message": "Internal Server Error"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -57,7 +57,7 @@ def mock_update_user_iban() -> Any:
             {"resource": "/users/{userId}/login", "httpMethod": "POST", "headers": {}},
             {
                 "statusCode": 400,
-                "body": "Invalid authentication input",
+                "body": '{"message": "Invalid authentication input"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -70,7 +70,7 @@ def mock_update_user_iban() -> Any:
             },
             {
                 "statusCode": 400,
-                "body": "Invalid authentication input",
+                "body": '{"message": "Invalid authentication input"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -98,7 +98,7 @@ def test_get_auth_header_exceptions(
                 "httpMethod": "POST",
                 "headers": {"Authorization": "Bearer testtoken"},
             },
-            '{"token": "abc123"}',
+            "abc123",
             {
                 "statusCode": 200,
                 "body": '{"token": "abc123"}',
@@ -115,7 +115,7 @@ def test_get_auth_header_exceptions(
             UserNotFound(),
             {
                 "statusCode": 401,
-                "body": "User or password incorrect",
+                "body": '{"message": "User or password incorrect"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -155,7 +155,7 @@ def test_user_service_handler_login(
             ["DE1234567890", "GB0987654321"],
             {
                 "statusCode": 200,
-                "body": 'ibanList:["DE1234567890", "GB0987654321"]',
+                "body": '{"ibanList": ["DE1234567890", "GB0987654321"]}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -169,7 +169,7 @@ def test_user_service_handler_login(
             UserNotFound(),
             {
                 "statusCode": 401,
-                "body": "User or password incorrect",
+                "body": '{"message": "User or password incorrect"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -206,7 +206,7 @@ def test_user_service_handler_get_ibans(
             None,
             {
                 "statusCode": 200,
-                "body": "IBAN added successfully",
+                "body": '{"message": "IBAN added successfully"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -221,7 +221,7 @@ def test_user_service_handler_get_ibans(
             InvalidIban(),
             {
                 "statusCode": 400,
-                "body": "Invalid IBAN format",
+                "body": '{"message": "Invalid IBAN format"}',
                 "headers": {"Access-Control-Allow-Origin": "*"},
             },
         ),
@@ -256,7 +256,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -268,7 +268,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -280,7 +280,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -292,7 +292,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -304,7 +304,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -316,7 +316,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -328,7 +328,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),
@@ -340,7 +340,7 @@ def test_user_service_handler_update_iban(
             },
             {
                 "statusCode": 404,
-                "body": "Not Found",
+                "body": '{"message": "Not Found"}',
                 "headers": {"Access-Control-Allow-Origin": "https://some-test-domain"},
             },
         ),

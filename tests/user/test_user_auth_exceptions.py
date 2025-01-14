@@ -17,7 +17,7 @@ from personal_finances.user.user_auth_exceptions import (
 _TEST_DUPLICATED_EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
     (UserNotFound, PasswordNotMatch): {
         "statusCode": 401,
-        "body": "User or password incorrect",
+        "body": '{"message": "User or password incorrect"}',
     },
     (
         AuthorizationHeaderNotPresent,
@@ -25,13 +25,13 @@ _TEST_DUPLICATED_EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         InvalidAuthorizationHeader,
     ): {
         "statusCode": 400,
-        "body": "Invalid authentication input",
+        "body": '{"message": "Invalid authentication input"}',
     },
 }
 
 _TEST_EMPTY_EXCEPTION_LIST_RESPONSE: Dict = {
     "statusCode": 500,
-    "body": "Internal Server Error",
+    "body": '{"message": "Internal Server Error"}',
 }
 
 
@@ -40,31 +40,31 @@ _TEST_EMPTY_EXCEPTION_LIST_RESPONSE: Dict = {
     [
         (
             UserNotFound,
-            {"statusCode": 401, "body": "User or password incorrect"},
+            {"statusCode": 401, "body": '{"message": "User or password incorrect"}'},
         ),
         (
             PasswordNotMatch,
-            {"statusCode": 401, "body": "User or password incorrect"},
+            {"statusCode": 401, "body": '{"message": "User or password incorrect"}'},
         ),
         (
             AuthorizationHeaderNotPresent,
-            {"statusCode": 400, "body": "Invalid authentication input"},
+            {"statusCode": 400, "body": '{"message": "Invalid authentication input"}'},
         ),
         (
             AuthorizationHeaderEmptyContent,
-            {"statusCode": 400, "body": "Invalid authentication input"},
+            {"statusCode": 400, "body": '{"message": "Invalid authentication input"}'},
         ),
         (
             InvalidAuthorizationHeader,
-            {"statusCode": 400, "body": "Invalid authentication input"},
+            {"statusCode": 400, "body": '{"message": "Invalid authentication input"}'},
         ),
         (
             InvalidUserPassword,
             {
                 "statusCode": 400,
                 "body": (
-                    "Username or password does not "
-                    + "match the minimal security requirements"
+                    '{"message": "Username or password does not '
+                    + 'match the minimal security requirements"}'
                 ),
             },
         ),
@@ -73,26 +73,26 @@ _TEST_EMPTY_EXCEPTION_LIST_RESPONSE: Dict = {
             {
                 "statusCode": 400,
                 "body": (
-                    "Username or password does not "
-                    + "match the minimal security requirements"
+                    '{"message": "Username or password does not '
+                    + 'match the minimal security requirements"}'
                 ),
             },
         ),
         (
             InvalidLambdaEventInput,
-            {"statusCode": 500, "body": "Internal Server Error"},
+            {"statusCode": 500, "body": '{"message": "Internal Server Error"}'},
         ),
         (
             InvalidDynamoResponse,
-            {"statusCode": 500, "body": "Internal Server Error"},
+            {"statusCode": 500, "body": '{"message": "Internal Server Error"}'},
         ),
         (
             KeyError,
-            {"statusCode": 500, "body": "Internal Server Error"},
+            {"statusCode": 500, "body": '{"message": "Internal Server Error"}'},
         ),
         (
             Exception,
-            {"statusCode": 500, "body": "Internal Server Error"},
+            {"statusCode": 500, "body": '{"message": "Internal Server Error"}'},
         ),
     ],
 )
