@@ -9,6 +9,7 @@ from personal_finances.generate_reports import (
     InvalidDatetime,
 )
 from typing import Generator, Any, List
+from datetime import datetime, timezone
 
 transactions_file = '{"test" : "teste"}'
 
@@ -109,6 +110,37 @@ def test_malformed_cli_params_rejected(
             "data/merged_transactions_latest.json",
         ),
         (
+            [
+                "--start-time",
+                "2010-01-01",
+                "--end-time",
+                "2023-01-01"
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+        ),
+    ],
+)
+def test_correct_cli_params(
+    command_params: List[str],
+    user_file_path: str,
+    transactions_file_path: str,
+    cache_user_configuration_mock: Mock,
+    open_mock: Mock,
+    json_mock: Mock,
+) -> None:
+    with patch("personal_finances.generate_reports._write_reports"):
+        runner = CliRunner()
+        result = runner.invoke(generate_reports, command_params)
+        assert result.exit_code == 0
+        cache_user_configuration_mock.assert_called_once_with(user_file_path)
+        open_mock.assert_called_once_with(transactions_file_path, "r")
+
+
+@pytest.mark.parametrize(
+    "command_params,user_file_path,transactions_file_path",
+    [
+        (
             ["-st", "2010-01-01", "-et", "2023-01-01T00:00:01Z"],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
@@ -155,7 +187,7 @@ def test_malformed_cli_params_rejected(
         ),
     ],
 )
-def test_correct_cli_params(
+def test_correct_cli_date_input_params(
     command_params: List[str],
     user_file_path: str,
     transactions_file_path: str,
@@ -163,12 +195,19 @@ def test_correct_cli_params(
     open_mock: Mock,
     json_mock: Mock,
 ) -> None:
-    with patch("personal_finances.generate_reports._write_reports"):
+    with patch(
+        "personal_finances.generate_reports._write_reports"
+    ) as write_reports_mock:
         runner = CliRunner()
         result = runner.invoke(generate_reports, command_params)
         assert result.exit_code == 0
         cache_user_configuration_mock.assert_called_once_with(user_file_path)
         open_mock.assert_called_once_with(transactions_file_path, "r")
+        write_reports_mock.assert_called_once_with(
+            list(),
+            datetime.fromisoformat(command_params[1]).replace(tzinfo=timezone.utc),
+            datetime.fromisoformat(command_params[3]).replace(tzinfo=timezone.utc)
+        )
 
 
 def assert_file_content_json(file_path: str, result: str) -> None:
