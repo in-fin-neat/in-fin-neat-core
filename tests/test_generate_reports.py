@@ -1,4 +1,5 @@
 import json
+import dateutil.parser
 from unittest.mock import Mock, patch, mock_open
 import pytest
 from pytest import fixture
@@ -9,7 +10,6 @@ from personal_finances.generate_reports import (
     InvalidDatetime,
 )
 from typing import Generator, Any, List
-from datetime import datetime, timezone
 
 transactions_file = '{"test" : "teste"}'
 
@@ -71,13 +71,21 @@ def test_malformed_cli_params_rejected(
 
 
 @pytest.mark.parametrize(
-    "command_params,user_file_path,transactions_file_path",
+    "command_params,user_file_path,transactions_file_path,expected_st,expected_et",
     [
-        ([], "config/user_config.yaml", "data/merged_transactions_latest.json"),
+        (
+            [],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+            "1970-01-01T00:00:00Z",
+            "2100-01-01T00:00:00Z"
+        ),
         (
             ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01T00:00:01Z"],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:01Z"
         ),
         (
             [
@@ -88,36 +96,98 @@ def test_malformed_cli_params_rejected(
             ],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:01Z"
         ),
         (
             ["-tfp", "/path/to/my/transactions.json"],
             "config/user_config.yaml",
             "/path/to/my/transactions.json",
+            "1970-01-01T00:00:00Z",
+            "2100-01-01T00:00:00Z"
         ),
         (
             ["--transactions-file-path", "/path/to/my/transactions.json"],
             "config/user_config.yaml",
             "/path/to/my/transactions.json",
+            "1970-01-01T00:00:00Z",
+            "2100-01-01T00:00:00Z"
         ),
         (
             ["-ucfp", "/path/to/my/user_config.yaml"],
             "/path/to/my/user_config.yaml",
             "data/merged_transactions_latest.json",
+            "1970-01-01T00:00:00Z",
+            "2100-01-01T00:00:00Z"
         ),
         (
             ["--user-config-file-path", "/path/to/my/user_config.yaml"],
             "/path/to/my/user_config.yaml",
             "data/merged_transactions_latest.json",
+            "1970-01-01T00:00:00Z",
+            "2100-01-01T00:00:00Z"
+        ),
+        (
+            ["-st", "2010-01-01", "-et", "2023-01-01T00:00:01Z"],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:01Z"
+        ),
+        (
+            ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01"],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:00Z"
+        ),
+        (
+            [
+                "-st",
+                "2010-01-01",
+                "-et",
+                "2023-01-01"
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:00Z"
         ),
         (
             [
                 "--start-time",
                 "2010-01-01",
                 "--end-time",
-                "2023-01-01"
+                "2023-01-01T00:00:01Z",
             ],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:01Z"
+        ),
+        (
+            [
+                "--start-time",
+                "2010-01-01T00:00:00Z",
+                "--end-time",
+                "2023-01-01",
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:00Z"
+        ),
+        (
+            [
+                "--start-time",
+                "2010-01-01",
+                "--end-time",
+                "2023-01-01",
+            ],
+            "config/user_config.yaml",
+            "data/merged_transactions_latest.json",
+            "2010-01-01T00:00:00Z",
+            "2023-01-01T00:00:00Z"
         ),
     ],
 )
@@ -125,72 +195,8 @@ def test_correct_cli_params(
     command_params: List[str],
     user_file_path: str,
     transactions_file_path: str,
-    cache_user_configuration_mock: Mock,
-    open_mock: Mock,
-    json_mock: Mock,
-) -> None:
-    with patch("personal_finances.generate_reports._write_reports"):
-        runner = CliRunner()
-        result = runner.invoke(generate_reports, command_params)
-        assert result.exit_code == 0
-        cache_user_configuration_mock.assert_called_once_with(user_file_path)
-        open_mock.assert_called_once_with(transactions_file_path, "r")
-
-
-@pytest.mark.parametrize(
-    "command_params,user_file_path,transactions_file_path",
-    [
-        (
-            ["-st", "2010-01-01", "-et", "2023-01-01T00:00:01Z"],
-            "config/user_config.yaml",
-            "data/merged_transactions_latest.json",
-        ),
-        (
-            ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01"],
-            "config/user_config.yaml",
-            "data/merged_transactions_latest.json",
-        ),
-        (
-            ["-st", "2010-01-01", "-et", "2023-01-01"],
-            "config/user_config.yaml",
-            "data/merged_transactions_latest.json",
-        ),
-        (
-            [
-                "--start-time",
-                "2010-01-01",
-                "--end-time",
-                "2023-01-01T00:00:01Z",
-            ],
-            "config/user_config.yaml",
-            "data/merged_transactions_latest.json",
-        ),
-        (
-            [
-                "--start-time",
-                "2010-01-01T00:00:00Z",
-                "--end-time",
-                "2023-01-01",
-            ],
-            "config/user_config.yaml",
-            "data/merged_transactions_latest.json",
-        ),
-        (
-            [
-                "--start-time",
-                "2010-01-01",
-                "--end-time",
-                "2023-01-01",
-            ],
-            "config/user_config.yaml",
-            "data/merged_transactions_latest.json",
-        ),
-    ],
-)
-def test_correct_cli_date_input_params(
-    command_params: List[str],
-    user_file_path: str,
-    transactions_file_path: str,
+    expected_st: str,
+    expected_et: str,
     cache_user_configuration_mock: Mock,
     open_mock: Mock,
     json_mock: Mock,
@@ -205,8 +211,8 @@ def test_correct_cli_date_input_params(
         open_mock.assert_called_once_with(transactions_file_path, "r")
         write_reports_mock.assert_called_once_with(
             list(),
-            datetime.fromisoformat(command_params[1]).replace(tzinfo=timezone.utc),
-            datetime.fromisoformat(command_params[3]).replace(tzinfo=timezone.utc)
+            dateutil.parser.isoparse(expected_st),
+            dateutil.parser.isoparse(expected_et)
         )
 
 
