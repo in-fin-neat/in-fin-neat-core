@@ -1,6 +1,6 @@
 import base64
 import logging
-import bcrypt
+from personal_finances.bank_interface.bcrypt import Encription
 from typing import Tuple
 from personal_finances.user.jwt_utils import generate_token
 from personal_finances.user.user_auth_exceptions import (
@@ -27,11 +27,11 @@ def _decode_basic_auth(auth_header: str) -> Tuple[str, str]:
         raise InvalidAuthorizationHeader()
 
 
-def _password_match(recv_password: str, stored_password: str) -> bool:
+"""def _password_match(recv_password: str, stored_password: str) -> bool:
     if bcrypt.checkpw(recv_password.encode("utf-8"), stored_password.encode("utf-8")):
         return True
     else:
-        return False
+        return False"""
 
 
 def _check_user_id_constraints(user: str) -> None:
@@ -55,7 +55,7 @@ def user_login(auth_str_value: str) -> str:
     stored_password = get_user_password(userId)
     token = ""
 
-    if _password_match(recv_password, stored_password):
+    if Encription().password_match(recv_password, stored_password):
         token = generate_token(userId)
     else:
         LOGGER.info(f"Password does not match for user: {userId}")
@@ -67,4 +67,4 @@ def user_login(auth_str_value: str) -> str:
 
 def create_user_hash_password(password: str) -> bytes:
     _check_user_password_constraints(password)
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    return Encription().create_user_hash_password(password)

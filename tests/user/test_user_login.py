@@ -90,7 +90,7 @@ def test_user_password_match(
     assert return_token == generate_token_mock.return_value
 
 
-@patch("personal_finances.user.user_login.bcrypt.gensalt")
+@patch("personal_finances.bank_interface.bcrypt.bcrypt.gensalt")
 def test_password_creation(gensalt: Mock) -> None:
     gensalt.return_value = TEST_USER_PASSWORD_SALT.encode()
     response = create_user_hash_password(TEST_USER_PASSWORD)
