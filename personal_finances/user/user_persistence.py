@@ -2,7 +2,7 @@ from functools import cache
 import logging
 import boto3
 import os
-from typing import Any, List
+from typing import Any
 import boto3.dynamodb
 import boto3.dynamodb.table
 from pydantic import BaseModel, ValidationError
@@ -23,7 +23,7 @@ USER_PASSWORD_MIN_LEN = 6
 class User(BaseModel):
     userId: str
     password: str
-    ibanList: List[str]
+    ibanSet: set[str]
 
 
 @cache
@@ -50,7 +50,7 @@ def get_user_password(userId: str) -> str:
     return user.password
 
 
-def get_user_ibans(userId: str) -> List[str]:
+def get_user_ibans(userId: str) -> set[str]:
     table = _get_user_table()
 
     try:
@@ -61,7 +61,7 @@ def get_user_ibans(userId: str) -> List[str]:
             raise UserNotFound(f"User not found: {userId}")
 
         user = User(**response["Item"])
-        iban_list = user.ibanList
+        iban_list = user.ibanSet
 
         LOGGER.info(f"User IBAN list:{iban_list}")
         return iban_list
@@ -90,17 +90,12 @@ def update_user_iban(userId: str, newIban: str) -> None:
         LOGGER.error(f"Data validation error: {e}")
         raise InvalidDynamoResponse("Invalid data format from DynamoDB")
 
-    iban_list = user.ibanList
-
-    if newIban in iban_list:
-        LOGGER.info("IBAN already exists for the user.")
-        return
-
-    iban_list.append(newIban)
+    iban_list = user.ibanSet
+    iban_list.add(newIban)
 
     response = _get_user_table().update_item(
         Key={"userId": userId},
-        UpdateExpression="SET ibanList = :updated_list",
+        UpdateExpression="SET ibanSet = :updated_list",
         ExpressionAttributeValues={":updated_list": iban_list},
         ReturnValues="UPDATED_NEW",
     )
