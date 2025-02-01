@@ -13,7 +13,7 @@ from personal_finances.user.user_auth_exceptions import (
     InvalidDynamoResponse,
 )
 from schwifty import IBAN
-
+from botocore.exceptions import ClientError
 
 LOGGER = logging.getLogger(__name__)
 USER_ID_MIN_LEN = 6
@@ -79,24 +79,18 @@ def update_user_iban(userId: str, newIban: str) -> None:
     except SchwiftyException:
         raise InvalidIban("The provided IBAN is invalid")
 
-    response = _get_user_table().get_item(Key={"userId": userId})
-    if "Item" not in response:
-        raise UserNotFound(f"User not found: {userId}")
-
     try:
+        response = _get_user_table().update_item(
+            Key={"userId": "userId"},
+            UpdateExpression="ADD ibanSet :new_iban",
+            ExpressionAttributeValues={":new_iban": set([newIban])},
+            ConditionExpression="attribute_exists(userId)",
+            ReturnValues="UPDATED_NEW"
+        )
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            raise UserNotFound(f"User not found: {userId}")
+        else:
+            raise Exception(f"Update user iban error: {response}")
 
-        user = User(**response["Item"])
-    except ValidationError as e:
-        LOGGER.error(f"Data validation error: {e}")
-        raise InvalidDynamoResponse("Invalid data format from DynamoDB")
-
-    iban_list = user.ibanSet
-    iban_list.add(newIban)
-
-    response = _get_user_table().update_item(
-        Key={"userId": userId},
-        UpdateExpression="SET ibanSet = :updated_list",
-        ExpressionAttributeValues={":updated_list": iban_list},
-        ReturnValues="UPDATED_NEW",
-    )
-    LOGGER.info(f"IBAN added successfully:{response}")
+    LOGGER.info("IBAN added successfully:{response}")
