@@ -13,6 +13,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
+    ConditionalCheckFailedException
 )
 
 
@@ -166,20 +167,13 @@ def test_get_user_ibans(
 
 
 @pytest.mark.parametrize(
-    "userId, newIban, get_item_response, expected_exception, iban_validation_exception,"
+    "userId, newIban, expected_exception, iban_validation_exception,"
     "user_validation_exception",
     [
         # IBAN already exists
         (
             "testuser",
             "DE89370400440532013000",
-            {
-                "Item": {
-                    "userId": "testuser",
-                    "password": "password",
-                    "ibanSet": {"DE89370400440532013000", "GB82WEST12345698765432"},
-                }
-            },
             None,
             None,
             None,
@@ -188,22 +182,14 @@ def test_get_user_ibans(
         (
             "unknownuser",
             "DE89370400440532013000",
-            {},
-            UserNotFound,
+            ConditionalCheckFailedException,
             None,
-            UserNotFound,
+            ConditionalCheckFailedException,
         ),
         # invalid IBAN
         (
             "testuser",
             "INVALID_IBAN",
-            {
-                "Item": {
-                    "userId": "testuser",
-                    "password": "password",
-                    "ibanSet": {"DE89370400440532013000", "GB82WEST12345698765432"},
-                }
-            },
             InvalidIban,
             SchwiftyException,
             None,
@@ -213,24 +199,20 @@ def test_get_user_ibans(
 def test_update_user_iban_edge_cases(
     userId: str,
     newIban: str,
-    get_item_response: str,
     expected_exception: type[Exception],
     iban_validation_exception: type[SchwiftyException],
-    user_validation_exception: Exception,
+    user_validation_exception: type[Exception],
     mock_dynamodb_table: Mock,
     mock_iban: Mock
 ) -> None:
 
-    mock_dynamodb_table.get_item.return_value = get_item_response
-
     if iban_validation_exception is not None:
         mock_iban.side_effect = iban_validation_exception
     elif user_validation_exception is not None:
-        mock_dynamodb_table.update_item.side_effect = UserNotFound(
-            f"User not found: {userId}"
-            )
+        mock_dynamodb_table.update_item.side_effect = user_validation_exception
     else:
         mock_iban.return_value = None
+        mock_dynamodb_table.update_item.return_value = None
 
     if expected_exception:
         with pytest.raises(expected_exception):
@@ -242,21 +224,13 @@ def test_update_user_iban_edge_cases(
 
 def test_sucessfull_iban_adding(mock_dynamodb_table: Mock) -> None:
 
-    get_item_response = {
-        "Item": {
-            "userId": "testuser",
-            "password": "password",
-            "ibanSet": {"GB82WEST12345698765432"},
-        }
-    }
-    mock_dynamodb_table.get_item.return_value = get_item_response
     userId = "testuser"
     newIban = "DE89370400440532013000"
 
     update_user_iban(userId, newIban)
 
     mock_dynamodb_table.update_item.assert_called_with(
-        Key={"userId": "userId"},
+        Key={"userId": userId},
         UpdateExpression="ADD ibanSet :new_iban",
         ExpressionAttributeValues={":new_iban": set([newIban])},
         ConditionExpression="attribute_exists(userId)",

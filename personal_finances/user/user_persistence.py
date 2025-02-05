@@ -11,6 +11,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
+    ConditionalCheckFailedException
 )
 from schwifty import IBAN
 from botocore.exceptions import ClientError
@@ -80,8 +81,8 @@ def update_user_iban(userId: str, newIban: str) -> None:
         raise InvalidIban("The provided IBAN is invalid")
 
     try:
-        response = _get_user_table().update_item(
-            Key={"userId": "userId"},
+        _get_user_table().update_item(
+            Key={"userId": userId},
             UpdateExpression="ADD ibanSet :new_iban",
             ExpressionAttributeValues={":new_iban": set([newIban])},
             ConditionExpression="attribute_exists(userId)",
@@ -89,8 +90,9 @@ def update_user_iban(userId: str, newIban: str) -> None:
         )
     except ClientError as e:
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
-            raise UserNotFound(f"User not found: {userId}")
+            LOGGER.info(f"response error: {e.response}")
+            raise ConditionalCheckFailedException(f"userId not found: {userId}")
         else:
-            raise Exception(f"Update user iban error: {response}")
+            raise Exception(f"Update user iban error: {e.response}")
 
-    LOGGER.info("IBAN added successfully:{response}")
+    LOGGER.info("IBAN added successfully")

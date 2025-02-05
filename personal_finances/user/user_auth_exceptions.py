@@ -48,6 +48,10 @@ class InvalidIban(Exception):
     pass
 
 
+class ConditionalCheckFailedException(Exception):
+    pass
+
+
 """
     This dicts contains the map between the exceptions generated in
     the user login api and the http response. No exception should be
@@ -85,6 +89,10 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         "statusCode": 500,
         "body": "Internal Server Error",
     },
+    (ConditionalCheckFailedException,): {
+        "statusCode": 400,
+        "body": "Invalid User",
+        },
 }
 
 _UNKNOWN_EXCEPTION_RESPONSE: Dict = {
