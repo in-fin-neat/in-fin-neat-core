@@ -44,7 +44,7 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 ## Developing
 1. `gh repo clone diegotsutsumi/personal_finances`
 1. `pipenv install --dev`
-1. `pipenv run bash -c 'mypy .; mypy --install-types --non-interactive'`
+1. `pipenv run install_types`
 1. `pipenv run build`
 1. `pipenv run tests`
 1. `pipenv run format`

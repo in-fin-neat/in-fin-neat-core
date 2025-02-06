@@ -17,7 +17,7 @@ jobs:
       - name: Setup pipenv dependencies
         run: pipenv install -d
       - name: Setup mypy type dependencies
-        run: pipenv run bash -c 'mypy . ; mypy --install-types --non-interactive'
+        run: pipenv run install_types
       - name: Run build
         run: pipenv run build
       - name: Run tests
