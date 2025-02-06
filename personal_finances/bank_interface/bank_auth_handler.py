@@ -63,9 +63,11 @@ class BankAuthorizationHandler:
             )
 
             self._wait_references_to_be_validated(
-                map(
-                    lambda auth_url_obj: auth_url_obj.validation_reference,
-                    self.auth_urls,
+                list(
+                    map(
+                        lambda auth_url_obj: auth_url_obj.validation_reference,
+                        self.auth_urls,
+                    )
                 ),
                 validation_provider,
             )
@@ -73,7 +75,7 @@ class BankAuthorizationHandler:
         LOGGER.info("client initialized")
 
     def _wait_references_to_be_validated(
-        self, reference_ids: Iterable[str], validation_provider: BankValidationProvider
+        self, reference_ids: List[str], validation_provider: BankValidationProvider
     ) -> None:
         all_references_are_validated = False
 
