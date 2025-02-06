@@ -104,7 +104,7 @@ class GocardlessClient(BankClient):
             self._nordigen_client.initialize_session,
             institution_id=institution_id,
             redirect_uri=validation_provider.get_validation_url(validation_reference),
-            reference_id=institution_id,
+            reference_id=validation_reference,
         )
         return AuthorizationUrl(
             authorization_url=requisition.link,
