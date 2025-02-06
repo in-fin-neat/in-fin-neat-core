@@ -78,14 +78,14 @@ def test_malformed_cli_params_rejected(
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "1970-01-01T00:00:00Z",
-            "2100-01-01T00:00:00Z"
+            "2100-01-01T00:00:00Z",
         ),
         (
             ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01T00:00:01Z"],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:01Z"
+            "2023-01-01T00:00:01Z",
         ),
         (
             [
@@ -97,61 +97,56 @@ def test_malformed_cli_params_rejected(
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:01Z"
+            "2023-01-01T00:00:01Z",
         ),
         (
             ["-tfp", "/path/to/my/transactions.json"],
             "config/user_config.yaml",
             "/path/to/my/transactions.json",
             "1970-01-01T00:00:00Z",
-            "2100-01-01T00:00:00Z"
+            "2100-01-01T00:00:00Z",
         ),
         (
             ["--transactions-file-path", "/path/to/my/transactions.json"],
             "config/user_config.yaml",
             "/path/to/my/transactions.json",
             "1970-01-01T00:00:00Z",
-            "2100-01-01T00:00:00Z"
+            "2100-01-01T00:00:00Z",
         ),
         (
             ["-ucfp", "/path/to/my/user_config.yaml"],
             "/path/to/my/user_config.yaml",
             "data/merged_transactions_latest.json",
             "1970-01-01T00:00:00Z",
-            "2100-01-01T00:00:00Z"
+            "2100-01-01T00:00:00Z",
         ),
         (
             ["--user-config-file-path", "/path/to/my/user_config.yaml"],
             "/path/to/my/user_config.yaml",
             "data/merged_transactions_latest.json",
             "1970-01-01T00:00:00Z",
-            "2100-01-01T00:00:00Z"
+            "2100-01-01T00:00:00Z",
         ),
         (
             ["-st", "2010-01-01", "-et", "2023-01-01T00:00:01Z"],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:01Z"
+            "2023-01-01T00:00:01Z",
         ),
         (
             ["-st", "2010-01-01T00:00:00Z", "-et", "2023-01-01"],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:00Z"
+            "2023-01-01T00:00:00Z",
         ),
         (
-            [
-                "-st",
-                "2010-01-01",
-                "-et",
-                "2023-01-01"
-            ],
+            ["-st", "2010-01-01", "-et", "2023-01-01"],
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:00Z"
+            "2023-01-01T00:00:00Z",
         ),
         (
             [
@@ -163,7 +158,7 @@ def test_malformed_cli_params_rejected(
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:01Z"
+            "2023-01-01T00:00:01Z",
         ),
         (
             [
@@ -175,7 +170,7 @@ def test_malformed_cli_params_rejected(
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:00Z"
+            "2023-01-01T00:00:00Z",
         ),
         (
             [
@@ -187,7 +182,7 @@ def test_malformed_cli_params_rejected(
             "config/user_config.yaml",
             "data/merged_transactions_latest.json",
             "2010-01-01T00:00:00Z",
-            "2023-01-01T00:00:00Z"
+            "2023-01-01T00:00:00Z",
         ),
     ],
 )
@@ -212,7 +207,7 @@ def test_correct_cli_params(
         write_reports_mock.assert_called_once_with(
             list(),
             dateutil.parser.isoparse(expected_st),
-            dateutil.parser.isoparse(expected_et)
+            dateutil.parser.isoparse(expected_et),
         )
 
 

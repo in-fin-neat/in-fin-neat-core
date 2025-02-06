@@ -92,7 +92,7 @@ _UNKNOWN_EXCEPTION_RESPONSE: Dict = {
 
 
 def _get_exception_type_index(
-    exception_to_http_response: Dict[Tuple, Dict]
+    exception_to_http_response: Dict[Tuple, Dict],
 ) -> Dict[Type[Exception], Dict]:
     exception_type_index: Dict[Type[Exception], Dict] = {}
     for exception_types, http_response in exception_to_http_response.items():
