@@ -13,7 +13,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
-    ConditionalCheckFailedException
+    UserIdNotInDatabase
 )
 
 
@@ -182,9 +182,9 @@ def test_get_user_ibans(
         (
             "unknownuser",
             "DE89370400440532013000",
-            ConditionalCheckFailedException,
+            UserIdNotInDatabase,
             None,
-            ConditionalCheckFailedException,
+            UserIdNotInDatabase,
         ),
         # invalid IBAN
         (

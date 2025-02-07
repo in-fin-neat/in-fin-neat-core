@@ -48,7 +48,7 @@ class InvalidIban(Exception):
     pass
 
 
-class ConditionalCheckFailedException(Exception):
+class UserIdNotInDatabase(Exception):
     pass
 
 
@@ -89,7 +89,7 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
         "statusCode": 500,
         "body": "Internal Server Error",
     },
-    (ConditionalCheckFailedException,): {
+    (UserIdNotInDatabase,): {
         "statusCode": 400,
         "body": "Invalid User",
         },

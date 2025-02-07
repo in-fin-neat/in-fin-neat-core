@@ -11,7 +11,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
-    ConditionalCheckFailedException
+    UserIdNotInDatabase
 )
 from schwifty import IBAN
 from botocore.exceptions import ClientError
@@ -91,7 +91,7 @@ def update_user_iban(userId: str, newIban: str) -> None:
     except ClientError as e:
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
             LOGGER.info(f"response error: {e.response}")
-            raise ConditionalCheckFailedException(f"userId not found: {userId}")
+            raise UserIdNotInDatabase(f"userId not found: {userId}")
         else:
             raise Exception(f"Update user iban error: {e.response}")
 
