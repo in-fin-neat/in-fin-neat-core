@@ -41,6 +41,14 @@ An alternative option is to set it in a `.env` file, [pipenv loads .env into env
 1. `echo REQUISITION_DISK_PATH_PREFIX=/path/to/token/folder >>.env`
 1. `pipenv run <command> <arguments>`
 
+## Requirements
+
+For running and develop, the following software requirements are necessary:
+- python3 (https://wiki.python.org/moin/BeginnersGuide/Download)
+- pip (https://pip.pypa.io/en/stable/installation/)
+- pipenv (https://pipenv.pypa.io/en/latest/installation.html)
+- pyenv (if you are running in linux. https://github.com/pyenv/pyenv?tab=readme-ov-file#installation)
+
 ## Developing
 1. `gh repo clone diegotsutsumi/personal_finances`
 1. `pipenv install --dev`
