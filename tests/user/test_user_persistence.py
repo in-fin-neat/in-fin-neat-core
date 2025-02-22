@@ -107,7 +107,7 @@ def test_get_user_password(
 
 
 @pytest.mark.parametrize(
-    "userId, get_update_response, expected_result, expected_exception",
+    "userId, get_item_response, expected_result, expected_exception",
     [
         # User with IBANs
         (
@@ -142,19 +142,33 @@ def test_get_user_password(
             None,
             UserNotFound,
         ),
+        # Invalid DynamoDB response (missing 'password')
+        (
+            "testuser",
+            {"Item": {"userId": "testuser", "ibanSet": {"DE89370400440532013000"}}},
+            None,
+            InvalidDynamoResponse,
+        ),
+        # Invalid DynamoDB response (missing 'ibanList')
+        (
+            "testuser",
+            {"Item": {"userId": "testuser", "password": "password"}},
+            None,
+            InvalidDynamoResponse,
+        ),
     ],
 )
 def test_get_user_ibans(
     userId: str,
-    get_update_response: str,
+    get_item_response: str,
     expected_result: set[str],
     expected_exception: type[Exception],
     mock_dynamodb_table: Mock,
 ) -> None:
-    if isinstance(get_update_response, Exception):
-        mock_dynamodb_table.get_item.side_effect = get_update_response
+    if isinstance(get_item_response, Exception):
+        mock_dynamodb_table.get_item.side_effect = get_item_response
     else:
-        mock_dynamodb_table.get_item.return_value = get_update_response
+        mock_dynamodb_table.get_item.return_value = get_item_response
 
     if expected_exception:
         with pytest.raises(expected_exception):
