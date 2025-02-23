@@ -50,7 +50,8 @@ class LocalhostValidationProvider(BankValidationProvider):
         validations = requests.get(
             "http://127.0.0.1:8000/validations/", verify=False
         ).json()
+        LOGGER.debug(f"validating reference_id: {reference_id} is in {validations}")
         return reference_id in validations
 
     def get_validation_url(self, reference_id: str) -> str:
-        return f"https://127.0.0.1/validations/{reference_id}"
+        return f"http://127.0.0.1:8000/validations/{reference_id}"

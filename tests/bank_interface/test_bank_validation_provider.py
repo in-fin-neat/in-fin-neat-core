@@ -70,5 +70,5 @@ def test_localhost_validation_provides_correct_url() -> None:
     with LocalhostValidationProvider() as test_provider:
         assert (
             test_provider.get_validation_url("mock-reference")
-            == "https://127.0.0.1/validations/mock-reference"
+            == "http://127.0.0.1:8000/validations/mock-reference"
         )
