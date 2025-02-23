@@ -15,7 +15,7 @@ jobs:
       - name: Install pipenv
         run: pip install pipenv
       - name: Setup pipenv dependencies
-        run: pipenv install -d
+        run: pipenv install --dev
       - name: Setup mypy type dependencies
         run: pipenv run install_types
       - name: Run build
