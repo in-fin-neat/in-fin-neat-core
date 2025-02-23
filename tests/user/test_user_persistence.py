@@ -1,4 +1,4 @@
-from typing import Generator, List
+from typing import Generator
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from schwifty.exceptions import SchwiftyException
@@ -13,6 +13,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
+    UserIdNotInDatabase
 )
 
 
@@ -48,7 +49,7 @@ def mock_iban() -> Generator[Mock, None, None]:
                 "Item": {
                     "userId": "testuser",
                     "password": "securepassword",
-                    "ibanList": [],
+                    "ibanSet": set(),
                 }
             },
             "securepassword",
@@ -64,7 +65,7 @@ def mock_iban() -> Generator[Mock, None, None]:
         # Invalid DynamoDB response (missing 'password')
         (
             "testuser",
-            {"Item": {"userId": "testuser", "ibanList": []}},
+            {"Item": {"userId": "testuser", "ibanSet": set()}},
             None,
             InvalidDynamoResponse,
         ),
@@ -72,7 +73,7 @@ def mock_iban() -> Generator[Mock, None, None]:
         (
             "testuser",
             {
-                "Item": {"userId": "testuser", "password": 123, "ibanList": []}
+                "Item": {"userId": "testuser", "password": 123, "ibanSet": set()}
             },  # password should be str
             None,
             InvalidDynamoResponse,
@@ -115,10 +116,10 @@ def test_get_user_password(
                 "Item": {
                     "userId": "testuser",
                     "password": "password",
-                    "ibanList": ["DE89370400440532013000", "GB82WEST12345698765432"],
+                    "ibanSet": {"DE89370400440532013000", "GB82WEST12345698765432"},
                 }
             },
-            ["DE89370400440532013000", "GB82WEST12345698765432"],
+            {"DE89370400440532013000", "GB82WEST12345698765432"},
             None,
         ),
         # User with no IBANs
@@ -128,10 +129,10 @@ def test_get_user_password(
                 "Item": {
                     "userId": "user_with_no_ibans",
                     "password": "password",
-                    "ibanList": [],
+                    "ibanSet": set(),
                 }
             },
-            [],
+            set(),
             None,
         ),
         # User not found
@@ -144,7 +145,7 @@ def test_get_user_password(
         # Invalid DynamoDB response (missing 'password')
         (
             "testuser",
-            {"Item": {"userId": "testuser", "ibanList": ["DE89370400440532013000"]}},
+            {"Item": {"userId": "testuser", "ibanSet": {"DE89370400440532013000"}}},
             None,
             InvalidDynamoResponse,
         ),
@@ -160,7 +161,7 @@ def test_get_user_password(
 def test_get_user_ibans(
     userId: str,
     get_item_response: str,
-    expected_result: List[str],
+    expected_result: set[str],
     expected_exception: type[Exception],
     mock_dynamodb_table: Mock,
 ) -> None:
@@ -180,19 +181,14 @@ def test_get_user_ibans(
 
 
 @pytest.mark.parametrize(
-    "userId, newIban, get_item_response, expected_exception, iban_validation_exception",
+    "userId, newIban, expected_exception, iban_validation_exception,"
+    "user_validation_exception",
     [
         # IBAN already exists
         (
             "testuser",
             "DE89370400440532013000",
-            {
-                "Item": {
-                    "userId": "testuser",
-                    "password": "password",
-                    "ibanList": ["DE89370400440532013000", "GB82WEST12345698765432"],
-                }
-            },
+            None,
             None,
             None,
         ),
@@ -200,87 +196,57 @@ def test_get_user_ibans(
         (
             "unknownuser",
             "DE89370400440532013000",
-            {},
-            UserNotFound,
+            UserIdNotInDatabase,
             None,
-        ),
-        # Invalid DynamoDB response (missing 'password')
-        (
-            "testuser",
-            "DE89370400440532013000",
-            {"Item": {"userId": "testuser", "ibanList": ["GB82WEST12345698765432"]}},
-            InvalidDynamoResponse,
-            None,
-        ),
-        # Invalid DynamoDB response (missing 'ibanList')
-        (
-            "testuser",
-            "DE89370400440532013000",
-            {"Item": {"userId": "testuser", "password": "password"}},
-            InvalidDynamoResponse,
-            None,
+            UserIdNotInDatabase,
         ),
         # invalid IBAN
         (
             "testuser",
             "INVALID_IBAN",
-            {
-                "Item": {
-                    "userId": "testuser",
-                    "password": "password",
-                    "ibanList": ["DE89370400440532013000", "GB82WEST12345698765432"],
-                }
-            },
             InvalidIban,
             SchwiftyException,
+            None,
         ),
     ],
 )
 def test_update_user_iban_edge_cases(
     userId: str,
     newIban: str,
-    get_item_response: str,
     expected_exception: type[Exception],
     iban_validation_exception: type[SchwiftyException],
+    user_validation_exception: type[Exception],
     mock_dynamodb_table: Mock,
-    mock_iban: Mock,
+    mock_iban: Mock
 ) -> None:
-
-    mock_dynamodb_table.get_item.return_value = get_item_response
 
     if iban_validation_exception is not None:
         mock_iban.side_effect = iban_validation_exception
+    elif user_validation_exception is not None:
+        mock_dynamodb_table.update_item.side_effect = user_validation_exception
     else:
-        mock_iban.return_value = iban_validation_exception
+        mock_iban.return_value = None
+        mock_dynamodb_table.update_item.return_value = None
 
     if expected_exception:
         with pytest.raises(expected_exception):
             update_user_iban(userId, newIban)
     else:
         update_user_iban(userId, newIban)
-
-    mock_dynamodb_table.update_item.assert_not_called()
+        mock_dynamodb_table.update_item.assert_called()
 
 
 def test_sucessfull_iban_adding(mock_dynamodb_table: Mock) -> None:
 
-    get_item_response = {
-        "Item": {
-            "userId": "testuser",
-            "password": "password",
-            "ibanList": ["GB82WEST12345698765432"],
-        }
-    }
-    mock_dynamodb_table.get_item.return_value = get_item_response
     userId = "testuser"
     newIban = "DE89370400440532013000"
 
     update_user_iban(userId, newIban)
 
-    expected_ibans = list(get_item_response["Item"].get("ibanList", [])) + [newIban]
     mock_dynamodb_table.update_item.assert_called_with(
         Key={"userId": userId},
-        UpdateExpression="SET ibanList = :updated_list",
-        ExpressionAttributeValues={":updated_list": expected_ibans},
-        ReturnValues="UPDATED_NEW",
+        UpdateExpression="ADD ibanSet :new_iban",
+        ExpressionAttributeValues={":new_iban": set([newIban])},
+        ConditionExpression="attribute_exists(userId)",
+        ReturnValues="UPDATED_NEW"
     )
