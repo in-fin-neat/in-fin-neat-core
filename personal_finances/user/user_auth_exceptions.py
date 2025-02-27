@@ -90,7 +90,7 @@ _EXCEPTION_TO_HTTP_RESPONSE: Dict[Tuple, Dict] = {
     (UserIdNotInDatabase,): {
         "statusCode": 400,
         "body": "Invalid User",
-        },
+    },
 }
 
 _UNKNOWN_EXCEPTION_RESPONSE: Dict = {

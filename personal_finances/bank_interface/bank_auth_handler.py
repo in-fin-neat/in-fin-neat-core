@@ -56,21 +56,26 @@ class BankAuthorizationHandler:
             self.auth_urls = self._resolve_authorization_urls(
                 TEMPORARY_FIXED_USER_ID, bank_details, validation_provider
             )
+            LOGGER.debug(f"authorization URLs: {self.auth_urls}")
 
-            # Front end opens URL for user authorization
-            open_urls(
-                map(lambda auth_url_obj: auth_url_obj.authorization_url, self.auth_urls)
-            )
-
-            self._wait_references_to_be_validated(
-                list(
+            if any(map(lambda url: url.authorization_url != "", self.auth_urls)):
+                # Front end opens URL for user authorization
+                open_urls(
                     map(
-                        lambda auth_url_obj: auth_url_obj.validation_reference,
+                        lambda auth_url_obj: auth_url_obj.authorization_url,
                         self.auth_urls,
                     )
-                ),
-                validation_provider,
-            )
+                )
+
+                self._wait_references_to_be_validated(
+                    list(
+                        map(
+                            lambda auth_url_obj: auth_url_obj.validation_reference,
+                            self.auth_urls,
+                        )
+                    ),
+                    validation_provider,
+                )
 
         LOGGER.info("client initialized")
 
@@ -88,11 +93,12 @@ class BankAuthorizationHandler:
             LOGGER.debug(f"reference validation {all_references_are_validated}")
             sleep(1)
 
-    def _resolve_auth_token(self, user_id: str) -> None:
+    def _resolve_auth_token(self, user_id: str) -> bool:
         if self._token_store.is_access_token_valid(user_id):
             LOGGER.info("valid access token found")
             stored_token = self._token_store.get_last_token(user_id)
             self._bank_client.set_token(stored_token)
+            return True
 
         elif self._token_store.is_refresh_token_valid(user_id):
             LOGGER.info("valid refresh token found")
@@ -103,12 +109,14 @@ class BankAuthorizationHandler:
             )
             self._bank_client.set_token(updated_token)
             self._token_store.save_token(user_id, updated_token)
+            return True
 
         else:
             LOGGER.info("no valid token found - generating new token")
             new_token_object = log_wrapper(self._bank_client.generate_new_token)
             self._bank_client.set_token(new_token_object)
             self._token_store.save_token(user_id, new_token_object)
+            return False
 
     def _resolve_authorization_urls(
         self,

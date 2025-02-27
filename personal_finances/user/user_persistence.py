@@ -11,7 +11,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
-    UserIdNotInDatabase
+    UserIdNotInDatabase,
 )
 from schwifty import IBAN
 from botocore.exceptions import ClientError
@@ -86,7 +86,7 @@ def update_user_iban(userId: str, newIban: str) -> None:
             UpdateExpression="ADD ibanSet :new_iban",
             ExpressionAttributeValues={":new_iban": set([newIban])},
             ConditionExpression="attribute_exists(userId)",
-            ReturnValues="UPDATED_NEW"
+            ReturnValues="UPDATED_NEW",
         )
     except ClientError as e:
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
