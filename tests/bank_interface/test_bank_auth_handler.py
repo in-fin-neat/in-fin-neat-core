@@ -113,8 +113,12 @@ def disk_requisition_store_mock() -> Generator[Mock, None, None]:
 
 
 def test_bank_auth_handler_initializes_valid_access_token(
-    nordigen_client_mock: Mock, disk_token_store_mock: Mock
+    nordigen_client_mock: Mock,
+    disk_token_store_mock: Mock,
+    localhost_provider_mock: Mock,
+    webbrowser_mock: Mock,
 ) -> None:
+    localhost_mock = localhost_provider_mock.return_value.__enter__.return_value
     disk_token_store_mock.return_value.is_access_token_valid.return_value = True
     BankAuthorizationHandler(
         NordigenAuth(secret_id="mock_secret_id", secret_key="mock_secret_key"),
@@ -129,12 +133,18 @@ def test_bank_auth_handler_initializes_valid_access_token(
     nordigen_client_mock.assert_called_with(
         secret_id="mock_secret_id", secret_key="mock_secret_key"
     )
+    localhost_mock.is_reference_validated.assert_not_called()
+    webbrowser_mock.open.assert_not_called()
     assert nordigen_client_mock.return_value.token == "fake-last-access-token"
 
 
 def test_bank_auth_handler_initializes_valid_refresh_token(
-    nordigen_client_mock: Mock, disk_token_store_mock: Mock
+    nordigen_client_mock: Mock,
+    disk_token_store_mock: Mock,
+    localhost_provider_mock: Mock,
+    webbrowser_mock: Mock,
 ) -> None:
+    localhost_mock = localhost_provider_mock.return_value.__enter__.return_value
     disk_token_store_mock.return_value.is_access_token_valid.return_value = False
     disk_token_store_mock.return_value.is_refresh_token_valid.return_value = True
     nordigen_client_mock.return_value.exchange_token.return_value = {
@@ -168,6 +178,8 @@ def test_bank_auth_handler_initializes_valid_refresh_token(
     nordigen_client_mock.return_value.exchange_token.assert_called_once_with(
         "fake-last-refresh-token"
     )
+    localhost_mock.is_reference_validated.assert_not_called()
+    webbrowser_mock.open.assert_not_called()
 
 
 def test_bank_auth_handler_initializes_invalid_token(
@@ -280,6 +292,7 @@ def test_bank_auth_handler_existing_requisition_store(
     localhost_provider_mock: Mock,
     webbrowser_mock: Mock,
 ) -> None:
+    localhost_mock = localhost_provider_mock.return_value.__enter__.return_value
     disk_req_store_mock = disk_requisition_store_mock.return_value
     disk_req_store_mock.are_stored_requisitions_valid.return_value = True
 
@@ -304,5 +317,5 @@ def test_bank_auth_handler_existing_requisition_store(
 
     disk_req_store_mock.save_requisitions.assert_not_called()
     nordigen_client.institution.get_institution_id_by_name.assert_not_called()
-    localhost_provider_mock.is_reference_validated.assert_not_called()
+    localhost_mock.is_reference_validated.assert_not_called()
     webbrowser_mock.open.assert_not_called()

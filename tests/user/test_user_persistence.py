@@ -13,7 +13,7 @@ from personal_finances.user.user_auth_exceptions import (
     UserNotFound,
     InvalidIban,
     InvalidDynamoResponse,
-    UserIdNotInDatabase
+    UserIdNotInDatabase,
 )
 
 
@@ -217,7 +217,7 @@ def test_update_user_iban_edge_cases(
     iban_validation_exception: type[SchwiftyException],
     user_validation_exception: type[Exception],
     mock_dynamodb_table: Mock,
-    mock_iban: Mock
+    mock_iban: Mock,
 ) -> None:
 
     if iban_validation_exception is not None:
@@ -248,5 +248,5 @@ def test_sucessfull_iban_adding(mock_dynamodb_table: Mock) -> None:
         UpdateExpression="ADD ibanSet :new_iban",
         ExpressionAttributeValues={":new_iban": set([newIban])},
         ConditionExpression="attribute_exists(userId)",
-        ReturnValues="UPDATED_NEW"
+        ReturnValues="UPDATED_NEW",
     )
