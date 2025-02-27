@@ -235,12 +235,12 @@ def test_bank_auth_handler_empty_requisition_store(
             call(
                 institution_id="inst1",
                 redirect_uri="url1",
-                reference_id="inst1",
+                reference_id="first-uuid",
             ),
             call(
                 institution_id="inst2",
                 redirect_uri="url2",
-                reference_id="inst2",
+                reference_id="second-uuid",
             ),
         ]
     )
