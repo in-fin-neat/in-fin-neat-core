@@ -14,8 +14,8 @@ from personal_finances.user.user_auth_exceptions import (
 
 TEST_USER_ID = "testuser"
 TEST_USER_PASSWORD = "|SkfzqE9h={!,o9BvQc{"
-TEST_USER_PASSWORD_SALT = "$2b$12$tBzFe5aHXtLmOPWSQWcy2e"
-TEST_USER_PASSWORD_HASH = "$2b$12$tBzFe5aHXtLmOPWSQWcy2ekjqxf4R5p9C99oWDxv/EJz7bYHE2Ez2"
+TEST_USER_PASSWORD_HASH = "$argon2id$v=19$m=65536,t=3,p=4$Z6dp5ZCLb637IaSncEJg2A$" \
+    "LZj7vnKtnnC24+82v82KWCjYK6GIn9jC2vatgTLSru0"
 TEST_JWT_TOKEN = "jwt_token"
 
 
@@ -88,13 +88,6 @@ def test_user_password_match(
     get_user_password_mock.assert_called_once_with("dummy_user")
 
     assert return_token == generate_token_mock.return_value
-
-
-@patch("personal_finances.bank_interface.bcrypt.bcrypt.gensalt")
-def test_password_creation(gensalt: Mock) -> None:
-    gensalt.return_value = TEST_USER_PASSWORD_SALT.encode()
-    response = create_user_hash_password(TEST_USER_PASSWORD)
-    assert response == TEST_USER_PASSWORD_HASH.encode()
 
 
 def test_invalid_input_password_creation() -> None:
